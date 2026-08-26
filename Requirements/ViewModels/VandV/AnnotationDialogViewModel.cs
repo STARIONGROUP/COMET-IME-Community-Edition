@@ -102,8 +102,10 @@ namespace CDP4Requirements.ViewModels
         {
             this.IsReply = true;
             this.HasIdentification = false;
-            this.DialogTitle = $"Reply to {annotation.UserFriendlyShortName}";
-            this.AnnotatedThingCaption = $"{annotation.UserFriendlyShortName}: {AnnotationKind.Describe(annotation)}";
+            var identifier = AnnotationKind.QueryShortName(annotation);
+
+            this.DialogTitle = $"Reply to {identifier}";
+            this.AnnotatedThingCaption = $"{identifier}: {AnnotationKind.Describe(annotation)}";
 
             var canOk = this.WhenAnyValue(x => x.Content).Select(body => !string.IsNullOrWhiteSpace(body));
 

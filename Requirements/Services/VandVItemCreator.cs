@@ -237,8 +237,6 @@ namespace CDP4Requirements.Services
                 {
                     if (existing != null)
                     {
-                        // the deleted value must also leave the registered clone's containment list, or the
-                        // Requirement update DTO still references it and the whole write is inconsistent
                         clone.ParameterValue.Remove(existing);
                         transaction.Delete(existing.Clone(false), clone);
                     }
@@ -290,6 +288,35 @@ namespace CDP4Requirements.Services
         }
 
         /// <summary>
+        /// Builds, in one pass over the iteration's relationships, the covered requirement per V&amp;V item
+        /// <see cref="CDP4Common.CommonData.Thing.Iid"/>. Consumers walking many items (the exporter above all) use
+        /// this instead of a relationship scan per item.
+        /// </summary>
+        /// <param name="iteration">The <see cref="Iteration"/>.</param>
+        /// <returns>The covered requirement per item; unlinked items are absent.</returns>
+        public static IReadOnlyDictionary<Guid, Requirement> QueryCoveringMap(Iteration iteration)
+        {
+            var map = new Dictionary<Guid, Requirement>();
+
+            if (iteration == null)
+            {
+                return map;
+            }
+
+            foreach (var relationship in iteration.Relationship.OfType<BinaryRelationship>())
+            {
+                if (relationship.Source != null
+                    && relationship.Target is Requirement covered
+                    && relationship.Category.Any(category => category.ShortName == VandVCategory.Verifies || category.ShortName == VandVCategory.Validates))
+                {
+                    map[relationship.Source.Iid] = covered;
+                }
+            }
+
+            return map;
+        }
+
+        /// <summary>
         /// Counts the V&amp;V items already covering a requirement, so a new item can be numbered.
         /// </summary>
         /// <param name="iteration">The iteration.</param>
@@ -325,7 +352,7 @@ namespace CDP4Requirements.Services
         /// <param name="owner">The owning <see cref="DomainOfExpertise"/>.</param>
         /// <param name="transaction">The <see cref="ThingTransaction"/>.</param>
         /// <returns>The V&amp;V <see cref="RequirementsSpecification"/> clone to add the item to.</returns>
-        private static RequirementsSpecification ResolveOrCreateVandVSpecification(Iteration iteration, Iteration iterationClone, DomainOfExpertise owner, IThingTransaction transaction)
+        internal static RequirementsSpecification ResolveOrCreateVandVSpecification(Iteration iteration, Iteration iterationClone, DomainOfExpertise owner, IThingTransaction transaction)
         {
             var existing = iteration.RequirementsSpecification.FirstOrDefault(x => x.ShortName == VandVSpecificationShortName);
 
@@ -357,7 +384,7 @@ namespace CDP4Requirements.Services
         /// <param name="parameterTypeShortName">The parameter type short-name.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="transaction">The <see cref="ThingTransaction"/>.</param>
-        private static void AddAttribute(Requirement vandVItem, ReferenceDataLibrary mrdl, string parameterTypeShortName, string value, IThingTransaction transaction)
+        internal static void AddAttribute(Requirement vandVItem, ReferenceDataLibrary mrdl, string parameterTypeShortName, string value, IThingTransaction transaction)
         {
             if (string.IsNullOrWhiteSpace(value))
             {

@@ -1,0 +1,115 @@
+﻿<dx:DXWindow x:Class="CDP4Requirements.Views.VandVApplyActivityDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             Width="680"
+             Height="620"
+             dx:ThemeManager.ThemeName="Seven"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             mc:Ignorable="d"
+             Title="{Binding Title}">
+
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Margin="0,0,0,8"
+                   TextWrapping="Wrap">
+            <Run Text="The execution record of " /><Run FontWeight="Bold" Text="{Binding ActivityCaption, Mode=OneWay}" /><Run Text=" is written onto every ticked item. Items with a violated analysis check, an open review request, or that are already closed start out unticked: they need a human look, not a bulk gesture." />
+        </TextBlock>
+
+        <ListBox Grid.Row="1"
+                 BorderThickness="1"
+                 ItemsSource="{Binding Items}"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding Display}"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <lc:LayoutControl Grid.Row="2" Orientation="Vertical" ScrollBars="None">
+            <lc:LayoutItem Label="Status: ">
+                <dxe:ComboBoxEdit IsTextEditable="False"
+                                  ItemsSource="{Binding PossibleStatuses}"
+                                  EditValue="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </lc:LayoutItem>
+            <lc:LayoutItem Label="Actual Date: ">
+                <dxe:DateEdit EditValue="{Binding ActualDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </lc:LayoutItem>
+            <lc:LayoutItem Label="Result: ">
+                <dxe:TextEdit Height="40"
+                              AcceptsReturn="True"
+                              TextWrapping="Wrap"
+                              VerticalContentAlignment="Top"
+                              EditValue="{Binding Result, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </lc:LayoutItem>
+            <lc:LayoutItem Label="Evidence Ref.: ">
+                <dxe:TextEdit EditValue="{Binding EvidenceReference, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </lc:LayoutItem>
+        </lc:LayoutControl>
+
+        <GroupBox Grid.Row="3"
+                  Margin="0,6,0,0"
+                  Header="Close-out">
+            <lc:LayoutControl Orientation="Vertical" ScrollBars="None">
+                <lc:LayoutItem Label="Close Out: ">
+                    <dxe:CheckEdit Content="also close the ticked items out as accepted"
+                                   IsChecked="{Binding AlsoCloseOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </lc:LayoutItem>
+                <lc:LayoutItem Label="Compliance: ">
+                    <dxe:ComboBoxEdit IsTextEditable="False"
+                                      IsEnabled="{Binding AlsoCloseOut}"
+                                      ItemsSource="{Binding PossibleCompliances}"
+                                      EditValue="{Binding Compliance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </lc:LayoutItem>
+                <lc:LayoutItem Label="Reason: ">
+                    <dxe:TextEdit IsEnabled="{Binding AlsoCloseOut}"
+                                  EditValue="{Binding CloseOutReason, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </lc:LayoutItem>
+                <lc:LayoutItem Label="Closed By: ">
+                    <Label Content="{Binding ClosedBy, Mode=OneWay}" />
+                </lc:LayoutItem>
+            </lc:LayoutControl>
+        </GroupBox>
+
+        <StackPanel Grid.Row="4"
+                    Margin="0,8,0,0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+            <Button Width="90"
+                    Height="26"
+                    Margin="4,0"
+                    Command="{Binding OkCommand}"
+                    Content="Apply"
+                    IsDefault="True" />
+            <Button Width="90"
+                    Height="26"
+                    Margin="4,0"
+                    Command="{Binding CancelCommand}"
+                    Content="Cancel"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</dx:DXWindow>

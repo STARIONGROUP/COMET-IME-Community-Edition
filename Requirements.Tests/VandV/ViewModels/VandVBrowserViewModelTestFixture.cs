@@ -249,7 +249,7 @@ namespace CDP4Requirements.Tests.ViewModels
             var otherRow = browser.RequirementRows.Single(x => x.ShortName == "REQ-2");
             Assert.That(otherRow.Coverage, Is.EqualTo("1 item(s): 1 failed"));
 
-            Assert.That(browser.SpecificationRows.Single().Coverage, Is.EqualTo("0/2 verified, 1 failed"));
+            Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("0/2 verified, 1 failed"));
         }
 
         [Test]
@@ -264,7 +264,7 @@ namespace CDP4Requirements.Tests.ViewModels
             var browser = this.CreateBrowser();
 
             Assert.That(browser.RequirementRows.Single().IsVerified, Is.True, "a waived item is dispositioned, not outstanding");
-            Assert.That(browser.SpecificationRows.Single().Coverage, Is.EqualTo("1/1 verified"));
+            Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("1/1 verified"));
         }
 
         [Test]
@@ -279,7 +279,7 @@ namespace CDP4Requirements.Tests.ViewModels
             var requirementRow = browser.RequirementRows.Single();
 
             Assert.That(requirementRow.Coverage, Is.EqualTo("1 item(s): 1 open"), "Executed is not yet a verdict");
-            Assert.That(browser.SpecificationRows.Single().Coverage, Is.EqualTo("0/1 verified"));
+            Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("0/1 verified"));
 
             var statusValue = item.ParameterValue.Single(x => x.ParameterType.ShortName == "vnv_status");
             statusValue.Value = new ValueArray<string>(new[] { "Passed" });
@@ -287,7 +287,7 @@ namespace CDP4Requirements.Tests.ViewModels
             this.messageBus.SendObjectChangeEvent(statusValue, EventKind.Updated);
 
             Assert.That(requirementRow.Coverage, Is.EqualTo("1 item(s): 1 passed"), "the roll-up must follow the status write");
-            Assert.That(browser.SpecificationRows.Single().Coverage, Is.EqualTo("1/1 verified"), "and so must the container roll-up");
+            Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("1/1 verified"), "and so must the container roll-up");
         }
 
         [Test]
@@ -325,7 +325,6 @@ namespace CDP4Requirements.Tests.ViewModels
             Assert.That(browser.RequirementRows.Single(x => x.ShortName == "REQ-1").ContainedRows, Has.Count.EqualTo(2), "every stage shows by default");
             Assert.That(browser.RequirementRows.Select(x => x.ShortName), Does.Contain("REQ-2"));
 
-            // a stage change rebuilds the rows, so the row objects captured before it are stale by design
             browser.SelectedStage = "CDR";
 
             var filtered = browser.RequirementRows.Single();
@@ -371,7 +370,6 @@ namespace CDP4Requirements.Tests.ViewModels
             Assert.That(stepRow.StepExpected, Is.EqualTo("Green LED"));
             Assert.That(itemRow.Procedure, Is.EqualTo("0 of 1 step(s) recorded"), "nothing has been run yet");
 
-            // a step is not a V&V item and must never be counted as one
             Assert.That(browser.RequirementRows.Single().RollUp.Total, Is.EqualTo(1), "the roll-up counts the item, not its steps");
         }
 
@@ -410,7 +408,6 @@ namespace CDP4Requirements.Tests.ViewModels
             specificationRow.IsExpanded = true;
             requirementRow.IsExpanded = true;
 
-            // an edit to an item refreshes the coverage rows, which used to fold the whole tree shut
             this.SetStatus(item, "Passed");
             this.messageBus.SendObjectChangeEvent(item, EventKind.Updated);
 
@@ -421,8 +418,6 @@ namespace CDP4Requirements.Tests.ViewModels
         [Test]
         public void VerifyThatBothEnumValueSpellingsRollUpTheSame()
         {
-            // the stock parameter-value editor stores enum shortNames ("Not_Applicable"), this plugin stores
-            // names ("Not Applicable"), both must classify identically
             Assert.That(VandVCoverageQuery.AreSameEnumValue("Not Applicable", "Not_Applicable"), Is.True);
             Assert.That(VandVCoverageQuery.AreSameEnumValue("Failed", "failed"), Is.True, "casing must not matter either");
             Assert.That(VandVCoverageQuery.AreSameEnumValue("Passed", "In Progress"), Is.False);

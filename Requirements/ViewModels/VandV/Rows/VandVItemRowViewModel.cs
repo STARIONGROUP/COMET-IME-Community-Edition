@@ -384,8 +384,6 @@ namespace CDP4Requirements.ViewModels.Rows
                 return;
             }
 
-            // "recorded" means a human has set the step's Result to something other than Not Run. Nothing is
-            // executed by the tool; this counts how much of the as-run record has been filled in.
             var recorded = steps.Count(step =>
             {
                 var result = VandVCoverageQuery.Attribute(step, VandVParameter.StepResult);
@@ -437,20 +435,25 @@ namespace CDP4Requirements.ViewModels.Rows
         /// </summary>
         private void SetProperties()
         {
+            var iteration = this.Thing.GetContainerOfType<Iteration>();
+
+            var performingActivity = VandVActivityQuery.QueryActivity(iteration, this.Thing);
+
             this.Name = this.Thing.Name;
             this.ShortName = this.Thing.ShortName;
             this.Definition = this.Thing.Definition.FirstOrDefault()?.Content;
-            this.Method = this.Attribute(VandVParameter.Method);
-            this.Stage = this.Attribute(VandVParameter.Stage);
-            this.Level = this.Attribute(VandVParameter.Level);
-            this.Status = this.Attribute(VandVParameter.Status);
+
+            this.Method = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Method);
+            this.Stage = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Stage);
+            this.Level = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Level);
+            this.Status = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Status);
             this.Criticality = this.Attribute(VandVParameter.Criticality);
-            this.PlannedDate = this.Attribute(VandVParameter.PlannedDate);
-            this.ActualDate = this.Attribute(VandVParameter.ActualDate);
-            this.ActivityNumber = this.Attribute(VandVParameter.ActivityNumber);
+            this.PlannedDate = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.PlannedDate);
+            this.ActualDate = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.ActualDate);
+            this.ActivityNumber = performingActivity?.ShortName ?? this.Attribute(VandVParameter.ActivityNumber);
             this.Acceptance = this.Attribute(VandVParameter.AcceptanceCriteria);
-            this.Result = this.Attribute(VandVParameter.Result);
-            this.EvidenceReference = this.Attribute(VandVParameter.EvidenceReference);
+            this.Result = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Result);
+            this.EvidenceReference = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.EvidenceReference);
             this.Owner = this.Thing.Owner?.ShortName;
             this.Compliance = VandVCloseOut.QueryCompliance(this.Thing);
 
@@ -466,16 +469,13 @@ namespace CDP4Requirements.ViewModels.Rows
         }
 
         /// <summary>
-        /// Returns the first value of the <see cref="SimpleParameterValue"/> whose <see cref="ParameterType"/> has the
-        /// supplied short-name, or null when the V&amp;V item does not carry that attribute.
+        /// Returns the value the V&amp;V item itself carries for an attribute, or null when it carries none.
         /// </summary>
         /// <param name="shortName">The parameter type short-name.</param>
         /// <returns>The attribute value, or null.</returns>
         private string Attribute(string shortName)
         {
-            return this.Thing.ParameterValue
-                .FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == shortName)?
-                .Value.FirstOrDefault();
+            return VandVCoverageQuery.Attribute(this.Thing, shortName);
         }
     }
 }

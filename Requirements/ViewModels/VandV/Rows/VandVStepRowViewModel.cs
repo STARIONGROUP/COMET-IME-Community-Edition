@@ -25,6 +25,8 @@
 
 namespace CDP4Requirements.ViewModels.Rows
 {
+    using System.Text.RegularExpressions;
+
     using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
 
@@ -142,11 +144,31 @@ namespace CDP4Requirements.ViewModels.Rows
         private void SetProperties()
         {
             this.ShortName = this.Thing.ShortName;
-            this.Name = this.Thing.Name;
-            this.StepAction = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepAction);
-            this.StepExpected = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepExpectedResult);
-            this.StepActual = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepActualResult);
+            this.Name = Flatten(this.Thing.Name);
+            this.StepAction = Flatten(VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepAction));
+            this.StepExpected = Flatten(VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepExpectedResult));
+            this.StepActual = Flatten(VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepActualResult));
             this.StepResult = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepResult);
+        }
+
+        /// <summary>
+        /// Reduces a stored value to a single line for the tree.
+        /// </summary>
+        /// <param name="value">The stored value.</param>
+        /// <returns>The value with its line breaks replaced by spaces.</returns>
+        /// <remarks>
+        /// Step text is written in multi-line editors, and a tree cell holding a line break renders as a row several
+        /// lines high, which showed up as an unexplained gap between two steps. The stored text keeps its line breaks;
+        /// only this projection is flattened.
+        /// </remarks>
+        private static string Flatten(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+
+            return Regex.Replace(value, @"\s+", " ").Trim();
         }
     }
 }

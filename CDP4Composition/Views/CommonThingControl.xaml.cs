@@ -65,6 +65,11 @@ namespace CDP4Composition.Views
         private static readonly DependencyProperty IsFavoriteToggleVisibleProperty = DependencyProperty.Register("IsFavoriteToggleVisible", typeof(bool), typeof(CommonThingControl));
 
         /// <summary>
+        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="IsExportVisible"/> setter method.
+        /// </summary>
+        private static readonly DependencyProperty IsExportVisibleProperty = DependencyProperty.Register("IsExportVisible", typeof(bool), typeof(CommonThingControl));
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CommonThingControl"/> class.
         /// </summary>
         public CommonThingControl()
@@ -103,6 +108,17 @@ namespace CDP4Composition.Views
         {
             get => this.GetValue(IsFavoriteToggleVisibleProperty) is bool && (bool) this.GetValue(IsFavoriteToggleVisibleProperty);
             set => this.SetValue(IsFavoriteToggleVisibleProperty, value);
+        }
+
+        /// <summary>
+        /// The boolean that enables or disables the visibility of the export button. It defaults to false, so a
+        /// browser that does not export keeps the toolbar it has always had; a browser that does opts in and gets the
+        /// export button in its standard place rather than a toolbar of its own.
+        /// </summary>
+        public bool IsExportVisible
+        {
+            get => this.GetValue(IsExportVisibleProperty) is bool && (bool) this.GetValue(IsExportVisibleProperty);
+            set => this.SetValue(IsExportVisibleProperty, value);
         }
         
         /// <summary>

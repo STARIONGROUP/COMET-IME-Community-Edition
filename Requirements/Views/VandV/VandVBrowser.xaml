@@ -45,6 +45,11 @@
                 <ContentPresenter Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
             </HierarchicalDataTemplate>
 
+            <!--  Shared activities expand to the V&V items they perform in the Activities view.  -->
+            <HierarchicalDataTemplate DataType="{x:Type rows:VandVActivityRowViewModel}" ItemsSource="{Binding ContainedRows}">
+                <ContentPresenter Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </HierarchicalDataTemplate>
+
             <!--  Procedure steps are leaves.  -->
             <HierarchicalDataTemplate DataType="{x:Type rows:VandVStepRowViewModel}">
                 <ContentPresenter Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
@@ -84,15 +89,15 @@
             <dxb:BarButtonItem Command="{Binding OpenMatrixCommand}"
                                Content="Coverage Matrix"
                                Glyph="{dx:DXImage Image=Pivot_16x16.png}"
-                               Hint="Open the RVM coverage matrix" />
+                               Hint="Open the VCRM coverage matrix" />
             <dxb:BarButtonItem Command="{Binding RunAnalysisCheckCommand}"
                                Content="Run Analysis Check"
                                Glyph="{dx:DXImage Image=Recurrence_16x16.png}"
                                Hint="Evaluate every V&amp;V item's covered parameter against its requirement's parametric constraints" />
             <dxb:BarButtonItem Command="{Binding ExportWorkbookCommand}"
-                               Content="Export VCD / RVM"
+                               Content="Export VCD / VCRM"
                                Glyph="{dx:DXImage Image=ExportToXLSX_16x16.png}"
-                               Hint="Export the VCD, RVM, execution records and NCRs to Excel" />
+                               Hint="Export the VCD, VCRM, execution records and NCRs to Excel" />
         </dxb:ToolBarControl>
 
         <dxg:TreeListControl Grid.Row="1"
@@ -135,6 +140,16 @@
                     <dxg:TreeListView.ContextMenu>
                         <ContextMenu Name="RowContextMenu" />
                     </dxg:TreeListView.ContextMenu>
+
+                    <dxg:TreeListView.RowStyle>
+                        <Style TargetType="{x:Type dxg:RowControl}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
+                                    <Setter Property="Background" Value="Yellow" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </dxg:TreeListView.RowStyle>
 
                 </dragDrop:TreeListViewDragDrop>
             </dxg:TreeListControl.View>

@@ -65,16 +65,38 @@
                                           ItemsSource="{Binding PossibleOwners}"
                                           EditValue="{Binding Owner, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                     </lc:LayoutItem>
-                    <lc:LayoutItem Label="Method: ">
+                    <lc:LayoutItem Label="Performed By: "
+                                   ToolTip="The shared activity that performs this item, e.g. producing the mass budget. Pick it first: the method, stage gate, procedure and execution record then come from the activity, and every field this item leaves empty inherits from it.">
+                        <dxe:ComboBoxEdit DisplayMember="Display"
+                                          IsTextEditable="False"
+                                          NullValueButtonPlacement="EditBox"
+                                          ItemsSource="{Binding PossibleActivities}"
+                                          SelectedItem="{Binding SelectedActivityChoice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </lc:LayoutItem>
+                    <lc:LayoutItem Label="Method: " ToolTip="Only needed when no shared activity performs this item, or to override the activity's method for this requirement.">
                         <dxe:ComboBoxEdit IsTextEditable="False"
+                                          NullValueButtonPlacement="EditBox"
                                           ItemsSource="{Binding PossibleMethods}"
                                           EditValue="{Binding Method, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                     </lc:LayoutItem>
-                    <lc:LayoutItem Label="Stage Gate: ">
+                    <TextBlock Margin="4,0,4,4"
+                               FontStyle="Italic"
+                               Foreground="#FF5A6B7D"
+                               TextWrapping="Wrap"
+                               Text="{Binding MethodInheritanceNote, Mode=OneWay}"
+                               Visibility="{Binding IsPerformedByActivity, Converter={dx:BooleanToVisibilityConverter}}" />
+                    <lc:LayoutItem Label="Stage Gate: " ToolTip="Only needed when no shared activity performs this item, or to override the activity's stage gate for this requirement.">
                         <dxe:ComboBoxEdit IsTextEditable="False"
+                                          NullValueButtonPlacement="EditBox"
                                           ItemsSource="{Binding PossibleStages}"
                                           EditValue="{Binding Stage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                     </lc:LayoutItem>
+                    <TextBlock Margin="4,0,4,4"
+                               FontStyle="Italic"
+                               Foreground="#FF5A6B7D"
+                               TextWrapping="Wrap"
+                               Text="{Binding StageInheritanceNote, Mode=OneWay}"
+                               Visibility="{Binding IsPerformedByActivity, Converter={dx:BooleanToVisibilityConverter}}" />
                     <lc:LayoutItem Label="Acceptance Criteria: "
                                    ToolTip="What must be observed for this activity to pass. 'From constraint' copies one of the requirement's parametric constraints in, so the human-readable and machine-evaluable criteria agree.">
                         <Grid>
@@ -124,14 +146,28 @@
                 <lc:LayoutGroup Header="Planning" Orientation="Vertical" VerticalAlignment="Top">
                     <lc:LayoutItem Label="Method: ">
                         <dxe:ComboBoxEdit IsTextEditable="False"
+                                          NullValueButtonPlacement="EditBox"
                                           ItemsSource="{Binding PossibleMethods}"
                                           EditValue="{Binding Method, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                     </lc:LayoutItem>
+                    <TextBlock Margin="4,0,4,4"
+                               FontStyle="Italic"
+                               Foreground="#FF5A6B7D"
+                               TextWrapping="Wrap"
+                               Text="{Binding MethodInheritanceNote, Mode=OneWay}"
+                               Visibility="{Binding IsPerformedByActivity, Converter={dx:BooleanToVisibilityConverter}}" />
                     <lc:LayoutItem Label="Stage Gate: ">
                         <dxe:ComboBoxEdit IsTextEditable="False"
+                                          NullValueButtonPlacement="EditBox"
                                           ItemsSource="{Binding PossibleStages}"
                                           EditValue="{Binding Stage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                     </lc:LayoutItem>
+                    <TextBlock Margin="4,0,4,4"
+                               FontStyle="Italic"
+                               Foreground="#FF5A6B7D"
+                               TextWrapping="Wrap"
+                               Text="{Binding StageInheritanceNote, Mode=OneWay}"
+                               Visibility="{Binding IsPerformedByActivity, Converter={dx:BooleanToVisibilityConverter}}" />
                     <lc:LayoutItem Label="Acceptance Criteria: "
                                    ToolTip="What must be observed for this activity to pass. 'From constraint' copies one of the requirement's parametric constraints in, so the human-readable and machine-evaluable criteria agree.">
                         <Grid>
@@ -177,11 +213,11 @@
                                           ItemsSource="{Binding PossibleCriticalities}"
                                           EditValue="{Binding Criticality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </lc:LayoutItem>
-                    <lc:LayoutItem Label="Plan Reference: " ToolTip="The section of the verification plan that describes this activity. ECSS-E-ST-10-02 Annex B requires the VCD to link each method to the plan.">
-                        <dxe:TextEdit EditValue="{Binding PlanReference, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </lc:LayoutItem>
-                    <lc:LayoutItem Label="Activity No.: ">
-                        <dxe:TextEdit EditValue="{Binding ActivityNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <lc:LayoutItem Label="Plan Reference: " ToolTip="The section of the verification plan (the input document that says what will be verified how) that describes this item. Not the report: the report is the output document the activity's results are recorded in, and is picked on the activity. Values already used in the model are offered.">
+                        <dxe:ComboBoxEdit AutoComplete="True"
+                                          IsTextEditable="True"
+                                          ItemsSource="{Binding SuggestedPlanReferences}"
+                                          EditValue="{Binding PlanReference, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </lc:LayoutItem>
                     <lc:LayoutItem Label="Planned Date: ">
                         <dxe:DateEdit EditValue="{Binding PlannedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -203,17 +239,26 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0"
+                                   Margin="0,0,0,4"
+                                   FontWeight="Bold"
+                                   Foreground="#FF9A6B00"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding IsPerformedByActivity, Converter={dx:BooleanToVisibilityConverter}}"
+                                   Text="A shared activity performs this item: its procedure is written once, on the activity. Leave this tab empty unless this requirement needs its own, additional steps." />
+
+                        <TextBlock Grid.Row="1"
                                    Margin="0,0,0,8"
                                    FontStyle="Italic"
                                    Foreground="#FF5A6B7D"
                                    TextWrapping="Wrap"
                                    Text="Action and Expected are written while planning. Actual and Result are filled in while running the procedure, which is the as-run record the test report needs. Steps renumber automatically. Double-click a cell to edit; the text cells accept several lines." />
 
-                        <Grid Grid.Row="1" Margin="0,0,0,8">
+                        <Grid Grid.Row="2" Margin="0,0,0,8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -243,7 +288,7 @@
                                           EditValue="{Binding Conditions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
 
-                        <Grid Grid.Row="2">
+                        <Grid Grid.Row="3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -297,6 +342,12 @@
 
                 <!--  EXECUTION  -->
                 <lc:LayoutGroup Header="Execution" Orientation="Vertical" VerticalAlignment="Top">
+                    <TextBlock Margin="4,2,4,8"
+                               FontWeight="Bold"
+                               Foreground="#FF9A6B00"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding IsPerformedByActivity, Converter={dx:BooleanToVisibilityConverter}}"
+                               Text="A shared activity performs this item: its execution is recorded once, on the activity, and every field left empty here inherits from it. Fill these fields only to record something specific to this requirement." />
                     <lc:LayoutItem Label="Status: ">
                         <dxe:ComboBoxEdit IsTextEditable="False"
                                           ItemsSource="{Binding PossibleStatuses}"
@@ -312,15 +363,18 @@
                                       VerticalContentAlignment="Top"
                                       EditValue="{Binding Result, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </lc:LayoutItem>
-                    <lc:LayoutItem Label="Evidence Ref.: ">
-                        <dxe:TextEdit EditValue="{Binding EvidenceReference, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <lc:LayoutItem Label="Evidence Ref.: " ToolTip="The report or record backing the result. References already used in the model, and the reports defined in it, are offered.">
+                        <dxe:ComboBoxEdit AutoComplete="True"
+                                          IsTextEditable="True"
+                                          ItemsSource="{Binding SuggestedEvidenceReferences}"
+                                          EditValue="{Binding EvidenceReference, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </lc:LayoutItem>
 
                     <TextBlock Margin="4,8,4,0"
                                FontStyle="Italic"
                                Foreground="#FF5A6B7D"
                                TextWrapping="Wrap"
-                               Text="These fields may be left empty while the activity is only planned, and filled in later." />
+                               Text="These fields may be left empty while the activity is only planned, and filled in later. An item performed by a shared activity inherits the activity's execution record for every field it leaves empty." />
                 </lc:LayoutGroup>
 
                 <!--  COMPLIANCE, the ECSS close-out record: does the design meet the requirement, and has that been accepted  -->
@@ -329,7 +383,7 @@
                                FontStyle="Italic"
                                Foreground="#FF5A6B7D"
                                TextWrapping="Wrap"
-                               Text="Compliance answers whether the design meets the requirement, which is not the same as whether the activity ran. A test can pass while the requirement is only partly met, and that is the case a waiver or deviation covers. Close-out records the customer accepting it." />
+                               Text="Compliance answers whether the design meets the requirement, which is not the same as whether the activity ran. A test can pass while the requirement is only partly met, and that is the case a waiver or deviation covers. Close-out records the customer accepting this item. Requirement Closure is a separate question again: it says whether the requirement itself is finished, or whether more V&amp;V is owed at a later stage gate. Compliance and closure are recorded per item, so they can differ from one stage gate to the next." />
                     <lc:LayoutItem Label="Compliance: ">
                         <dxe:ComboBoxEdit IsTextEditable="False"
                                           ItemsSource="{Binding PossibleCompliances}"
@@ -339,6 +393,12 @@
                         <TextBlock VerticalAlignment="Center"
                                    TextWrapping="Wrap"
                                    Text="{Binding AnalysisCheck, Mode=OneWay}" />
+                    </lc:LayoutItem>
+
+                    <lc:LayoutItem Label="Requirement Closure: " ToolTip="Does finishing this item finish the requirement, or is further V&amp;V owed at a later stage gate? Leaving this at Not Assessed marks the requirement as undefined in the stage gate review, which is where planning gaps are meant to show up.">
+                        <dxe:ComboBoxEdit IsTextEditable="False"
+                                          ItemsSource="{Binding PossibleClosures}"
+                                          EditValue="{Binding Closure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </lc:LayoutItem>
 
                     <lc:LayoutItem Label="Closed: ">

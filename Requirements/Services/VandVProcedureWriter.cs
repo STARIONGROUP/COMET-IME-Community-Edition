@@ -90,6 +90,44 @@ namespace CDP4Requirements.Services
         }
 
         /// <summary>
+        /// Builds, in one pass over the iteration's relationships, the procedure steps per owning
+        /// <see cref="Thing.Iid"/> (item or activity), each list in step-number order. Consumers walking many owners
+        /// (the exporter, the browsers) use this instead of a relationship scan per owner.
+        /// </summary>
+        /// <param name="iteration">The <see cref="Iteration"/>.</param>
+        /// <returns>The ordered steps per owner; owners without steps are absent.</returns>
+        public static IReadOnlyDictionary<Guid, IReadOnlyList<Requirement>> QueryStepsMap(Iteration iteration)
+        {
+            var map = new Dictionary<Guid, List<Requirement>>();
+
+            if (iteration == null)
+            {
+                return new Dictionary<Guid, IReadOnlyList<Requirement>>();
+            }
+
+            foreach (var relationship in iteration.Relationship.OfType<BinaryRelationship>())
+            {
+                if (relationship.Source != null
+                    && relationship.Target is Requirement step
+                    && !step.IsDeprecated
+                    && relationship.Category.Any(category => category.ShortName == HasStepCategoryShortName))
+                {
+                    if (!map.TryGetValue(relationship.Source.Iid, out var steps))
+                    {
+                        steps = new List<Requirement>();
+                        map.Add(relationship.Source.Iid, steps);
+                    }
+
+                    steps.Add(step);
+                }
+            }
+
+            return map.ToDictionary(
+                pair => pair.Key,
+                pair => (IReadOnlyList<Requirement>)pair.Value.OrderBy(QueryStepNumber).ThenBy(step => step.ShortName).ToList());
+        }
+
+        /// <summary>
         /// Reads the step number of a step, falling back to <see cref="int.MaxValue"/> so an unnumbered step sorts
         /// last rather than jumping to the front.
         /// </summary>
@@ -159,17 +197,12 @@ namespace CDP4Requirements.Services
 
             foreach (var removed in existing.Where(step => !keptIids.Contains(step.Iid)))
             {
-                // the link is an ordinary relationship and is deleted outright
                 foreach (var link in QueryStepLinks(iteration, vandVItem, removed))
                 {
                     iterationClone.Relationship.Remove(link);
                     transaction.Delete(link.Clone(false), iterationClone);
                 }
 
-                // the step itself is a Requirement, and a Requirement is deprecatable: the SDK refuses to hard
-                // delete one ("Delete of Deprecatable thing is not implemented"), so a dropped step is deprecated,
-                // which is also what the stock browsers do to a requirement. QuerySteps filters deprecated steps
-                // out, so it disappears from the procedure either way.
                 var removedClone = removed.Clone(false);
                 removedClone.IsDeprecated = true;
                 transaction.CreateOrUpdate(removedClone);
@@ -309,7 +342,6 @@ namespace CDP4Requirements.Services
             {
                 if (existing != null)
                 {
-                    // the deleted value must also leave the registered clone's containment list
                     clone.ParameterValue.Remove(existing);
                     transaction.Delete(existing.Clone(false), clone);
                 }

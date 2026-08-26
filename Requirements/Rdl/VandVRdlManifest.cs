@@ -288,6 +288,33 @@ namespace CDP4Requirements.Rdl
     }
 
     /// <summary>
+    /// The values of the <c>vnv_closure</c> enumeration: how much of the requirement's verification this one item
+    /// accounts for.
+    /// </summary>
+    /// <remarks>
+    /// ECSS-E-ST-10-02 allows a requirement to be verified by a combination of methods, levels and stages, so closing
+    /// an item out is not the same as closing the requirement out. Without this distinction the register cannot answer
+    /// the question a stage gate review actually asks: is this requirement done, or is more work owed at a later gate?
+    /// </remarks>
+    public static class VandVClosure
+    {
+        /// <summary>Nobody has stated whether more V&amp;V is owed after this item. This is the planning gap.</summary>
+        public const string NotAssessed = "Not Assessed";
+
+        /// <summary>Completing this item completes the verification of the requirement; nothing further is owed.</summary>
+        public const string ClosesOut = "Closes Out Requirement";
+
+        /// <summary>This item contributes evidence, but the requirement needs further V&amp;V at a later stage.</summary>
+        public const string FurtherRequired = "Further V&V Required";
+
+        /// <summary>
+        /// Gets every closure value, in the order it is seeded and offered. <see cref="NotAssessed"/> leads: a new
+        /// item must never claim to close a requirement out that nobody has judged.
+        /// </summary>
+        public static string[] All { get; } = { NotAssessed, ClosesOut, FurtherRequired };
+    }
+
+    /// <summary>
     /// The values of the <c>vnv_step_result</c> enumeration, the verdict of a single procedure step.
     /// </summary>
     public static class VandVStepResult
@@ -375,6 +402,9 @@ namespace CDP4Requirements.Rdl
         /// <summary>The close-out flag.</summary>
         public const string Closed = "vnv_closed";
 
+        /// <summary>Whether closing this item closes the requirement out, or further V&amp;V is owed at a later stage.</summary>
+        public const string Closure = "vnv_closure";
+
         /// <summary>The reason the item was closed out.</summary>
         public const string CloseOutReason = "vnv_closeout_reason";
 
@@ -423,11 +453,21 @@ namespace CDP4Requirements.Rdl
         /// <summary>The sub-category identifying a validation item.</summary>
         public const string ValidationItem = "ValidationItem";
 
-        /// <summary>The category identifying a test campaign group.</summary>
-        public const string TestCampaign = "TestCampaign";
+        /// <summary>
+        /// The category identifying a shared V&amp;V activity: one task (produce the mass budget, run the power-speed
+        /// curve test) that performs the verification of many V&amp;V items, so its description, procedure and
+        /// execution record are written once instead of being retyped per item.
+        /// </summary>
+        public const string VnVActivity = "VnVActivity";
 
-        /// <summary>The category identifying a stage gate group.</summary>
-        public const string StageGateGroup = "StageGateGroup";
+        /// <summary>
+        /// The category identifying a report (deliverable) specification: a self-contained
+        /// <see cref="CDP4Common.EngineeringModelData.RequirementsSpecification"/> holding the activities recorded in
+        /// one real-world document (a FAT report, the mass budget). A specification rather than a group, so the report
+        /// is a standalone thing that can be browsed and exported as one document, with its groups free to serve as
+        /// chapters.
+        /// </summary>
+        public const string VnVReport = "VnVReport";
 
         /// <summary>The category identifying a non-conformance report.</summary>
         public const string Ncr = "NCR";
@@ -456,6 +496,9 @@ namespace CDP4Requirements.Rdl
         /// <summary>The category of the relationship by which a V&amp;V item owns a procedure step.</summary>
         public const string HasStep = "hasStep";
 
+        /// <summary>The category of the relationship by which a V&amp;V item is performed by a shared V&amp;V activity.</summary>
+        public const string PerformedBy = "performedBy";
+
         /// <summary>
         /// Gets the categories marking a covering traceability relationship, the ones that make a requirement count as
         /// covered.
@@ -466,14 +509,14 @@ namespace CDP4Requirements.Rdl
         /// Gets every category applied to a relationship the V&amp;V capability authors, so a browser can tell a V&amp;V
         /// link apart from an ordinary requirement trace link.
         /// </summary>
-        public static IReadOnlyList<string> RelationshipLinks { get; } = new[] { Verifies, Validates, CoversOption, CoversState, CoversParameter, VerifiedOn, HasStep };
+        public static IReadOnlyList<string> RelationshipLinks { get; } = new[] { Verifies, Validates, CoversOption, CoversState, CoversParameter, VerifiedOn, HasStep, PerformedBy };
 
         /// <summary>
         /// Gets the categories that must exist before a V&amp;V item can be written. Creating or editing an item is one
         /// user action but several writes (the item, its coverage, its procedure), so all of them are checked up front:
         /// a partially seeded library used to commit the item and then fail on the coverage, leaving an orphan behind.
         /// </summary>
-        public static IReadOnlyList<string> RequiredForItemWrite { get; } = new[] { VnVItem, Verifies, Validates, CoversParameter, CoversOption, CoversState, VerifiedOn, VnVStep, HasStep };
+        public static IReadOnlyList<string> RequiredForItemWrite { get; } = new[] { VnVItem, Verifies, Validates, CoversParameter, CoversOption, CoversState, VerifiedOn, VnVStep, HasStep, VnVActivity, PerformedBy, VnVReport };
     }
 
     /// <summary>
@@ -490,7 +533,6 @@ namespace CDP4Requirements.Rdl
         /// </summary>
         public static IReadOnlyList<VandVParameterTypeDefinition> ParameterTypes { get; } = new[]
         {
-            // Planning
             new VandVParameterTypeDefinition(VandVParameter.Method, "V&V Method", VandVParameterKind.Enumeration, "Inspection", "Analysis", "Similarity", "Demonstration", "Test", "Review of Design"),
             new VandVParameterTypeDefinition(VandVParameter.Stage, "V&V Stage Gate", VandVParameterKind.Enumeration, "SRR", "PDR", "CDR", "TRR", "FAT", "HAT", "SAT", "ORR", "In-Service"),
             new VandVParameterTypeDefinition(VandVParameter.Level, "V&V Integration Level", VandVParameterKind.Enumeration, "Equipment", "Subsystem", "System", "System-of-Systems", "Operational"),
@@ -505,26 +547,19 @@ namespace CDP4Requirements.Rdl
             new VandVParameterTypeDefinition(VandVParameter.Criticality, "V&V Criticality", VandVParameterKind.Enumeration, "Deployment", "Operation", "Mission-critical"),
             new VandVParameterTypeDefinition(VandVParameter.CoverageNote, "V&V Coverage Note", VandVParameterKind.Text),
 
-            // Execution
             new VandVParameterTypeDefinition(VandVParameter.Status, "V&V Status", VandVParameterKind.Enumeration, VandVStatus.All),
             new VandVParameterTypeDefinition(VandVParameter.ActualDate, "V&V Actual Date", VandVParameterKind.Date),
             new VandVParameterTypeDefinition(VandVParameter.Result, "V&V Result", VandVParameterKind.Text),
             new VandVParameterTypeDefinition(VandVParameter.EvidenceReference, "V&V Evidence Reference", VandVParameterKind.Text),
 
-            // Close-out. ECSS-E-ST-10-02 Annex B requires the compliance status and the close-out status to be
-            // recorded separately from the execution status: a test can pass while the requirement is only partly
-            // met, which is exactly the case a waiver covers.
-            // "Not Assessed" leads deliberately: the dialog defaults to the first value, and a new item must never
-            // claim a compliance nobody has judged
             new VandVParameterTypeDefinition(VandVParameter.Compliance, "V&V Compliance Status", VandVParameterKind.Enumeration, VandVCompliance.All),
             new VandVParameterTypeDefinition(VandVParameter.Closed, "V&V Closed", VandVParameterKind.Boolean),
+            new VandVParameterTypeDefinition(VandVParameter.Closure, "V&V Requirement Closure", VandVParameterKind.Enumeration, VandVClosure.All),
             new VandVParameterTypeDefinition(VandVParameter.CloseOutReason, "V&V Close-out Reason", VandVParameterKind.Text),
             new VandVParameterTypeDefinition(VandVParameter.ClosedBy, "V&V Closed By", VandVParameterKind.Text),
             new VandVParameterTypeDefinition(VandVParameter.ClosedOn, "V&V Closed On", VandVParameterKind.Date),
             new VandVParameterTypeDefinition(VandVParameter.PlanReference, "V&V Plan Reference", VandVParameterKind.Text),
 
-            // Procedure. ECSS-E-ST-10-03 expects a test procedure of ordered steps, each with what to do, what is
-            // expected, and what was actually observed when it was run (the as-run procedure in the test report).
             new VandVParameterTypeDefinition(VandVParameter.ProcedureReference, "V&V Procedure Reference", VandVParameterKind.Text),
             new VandVParameterTypeDefinition(VandVParameter.StepNumber, "V&V Step Number", VandVParameterKind.Text),
             new VandVParameterTypeDefinition(VandVParameter.StepAction, "V&V Step Action", VandVParameterKind.Text),
@@ -541,19 +576,19 @@ namespace CDP4Requirements.Rdl
             new VandVCategoryDefinition(VandVCategory.VnVItem, "VnV Item", new[] { ClassKind.Requirement }),
             new VandVCategoryDefinition(VandVCategory.VerificationItem, "Verification Item", new[] { ClassKind.Requirement }, VandVCategory.VnVItem),
             new VandVCategoryDefinition(VandVCategory.ValidationItem, "Validation Item", new[] { ClassKind.Requirement }, VandVCategory.VnVItem),
-            new VandVCategoryDefinition(VandVCategory.TestCampaign, "Test Campaign", new[] { ClassKind.RequirementsGroup }),
-            new VandVCategoryDefinition(VandVCategory.StageGateGroup, "Stage Gate Group", new[] { ClassKind.RequirementsGroup }),
             new VandVCategoryDefinition(VandVCategory.Ncr, "NCR", new[] { ClassKind.ReviewItemDiscrepancy }),
             new VandVCategoryDefinition(VandVCategory.VnVStep, "VnV Procedure Step", new[] { ClassKind.Requirement }),
+            new VandVCategoryDefinition(VandVCategory.VnVActivity, "VnV Activity", new[] { ClassKind.Requirement }),
+            new VandVCategoryDefinition(VandVCategory.VnVReport, "VnV Report", new[] { ClassKind.RequirementsSpecification }),
 
-            // Categories applied to the traceability BinaryRelationships (governing rules are deferred, see VandVRdlService).
             new VandVCategoryDefinition(VandVCategory.Verifies, "verifies", new[] { ClassKind.BinaryRelationship }),
             new VandVCategoryDefinition(VandVCategory.Validates, "validates", new[] { ClassKind.BinaryRelationship }),
             new VandVCategoryDefinition(VandVCategory.CoversOption, "covers option", new[] { ClassKind.BinaryRelationship }),
             new VandVCategoryDefinition(VandVCategory.CoversState, "covers state", new[] { ClassKind.BinaryRelationship }),
             new VandVCategoryDefinition(VandVCategory.CoversParameter, "covers parameter", new[] { ClassKind.BinaryRelationship }),
             new VandVCategoryDefinition(VandVCategory.VerifiedOn, "verified on", new[] { ClassKind.BinaryRelationship }),
-            new VandVCategoryDefinition(VandVCategory.HasStep, "has step", new[] { ClassKind.BinaryRelationship })
+            new VandVCategoryDefinition(VandVCategory.HasStep, "has step", new[] { ClassKind.BinaryRelationship }),
+            new VandVCategoryDefinition(VandVCategory.PerformedBy, "performed by", new[] { ClassKind.BinaryRelationship })
         };
 
         /// <summary>

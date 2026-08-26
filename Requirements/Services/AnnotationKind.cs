@@ -109,5 +109,22 @@ namespace CDP4Requirements.Services
             return All.FirstOrDefault(kind => kind.ClassKind == annotation.ClassKind)?.Name
                    ?? annotation.ClassKind.ToString();
         }
+
+        /// <summary>
+        /// Returns the identifier to show for an annotation.
+        /// </summary>
+        /// <param name="annotation">The annotation.</param>
+        /// <returns>The short-name of a review request, or the kind for a plain note, which carries none.</returns>
+        /// <remarks>
+        /// Deliberately not <c>UserFriendlyShortName</c>: the SDK leaves it unimplemented on the annotation types, so
+        /// it rendered as the literal sentence "User-friendly short-name not implemented." wherever it was shown.
+        /// Only a <see cref="ModellingAnnotationItem"/> carries a real short-name; a plain note has none at all.
+        /// </remarks>
+        public static string QueryShortName(EngineeringModelDataAnnotation annotation)
+        {
+            var shortName = (annotation as ModellingAnnotationItem)?.ShortName;
+
+            return string.IsNullOrWhiteSpace(shortName) ? Describe(annotation) : shortName;
+        }
     }
 }

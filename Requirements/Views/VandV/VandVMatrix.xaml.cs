@@ -31,7 +31,7 @@ namespace CDP4Requirements.Views
     using CDP4Composition;
 
     /// <summary>
-    /// Interaction logic for the V&amp;V coverage matrix (RVM) panel.
+    /// Interaction logic for the V&amp;V coverage matrix (VCRM) panel.
     /// </summary>
     [Export(typeof(IPanelView))]
     public partial class VandVMatrix : UserControl, IPanelView

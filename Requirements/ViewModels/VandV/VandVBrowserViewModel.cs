@@ -45,6 +45,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -61,7 +62,6 @@ namespace CDP4Requirements.ViewModels
 
     using ReactiveUI;
 
-    // DevExpress.Xpf.Core has its own IDropTarget; the drag-drop framework here is CDP4Composition's
     using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
 
     /// <summary>
@@ -88,7 +88,7 @@ namespace CDP4Requirements.ViewModels
         private readonly VandVItemCreator itemCreator = new VandVItemCreator();
 
         /// <summary>
-        /// Writes the VCD / RVM workbook.
+        /// Writes the VCD / VCRM workbook.
         /// </summary>
         private readonly VandVWorkbookExporter exporter = new VandVWorkbookExporter();
 
@@ -106,6 +106,12 @@ namespace CDP4Requirements.ViewModels
         /// Writes RIDs, requests for deviation and requests for waiver.
         /// </summary>
         private readonly AnnotationCreator annotationCreator = new AnnotationCreator();
+
+        /// <summary>
+        /// Writes the shared V&amp;V activities, their report groups, the <c>performedBy</c> links and the bulk item
+        /// operations.
+        /// </summary>
+        private readonly VandVActivityWriter activityWriter = new VandVActivityWriter();
 
         /// <summary>
         /// Every requirement row in the tree, flattened, so coverage can be refreshed without walking the hierarchy.
@@ -144,10 +150,21 @@ namespace CDP4Requirements.ViewModels
         private IReadOnlyCollection<ClassKind> creatableAnnotationKinds = new HashSet<ClassKind>();
 
         /// <summary>
-        /// The <see cref="Iid"/>s of the parameters covered by a V&amp;V item, rebuilt only when a relationship changes.
-        /// Recomputing it per value-set event meant a full relationship scan on every parameter edit in the model.
+        /// The V&amp;V items covering each parameter, rebuilt only when a relationship changes. Recomputing it per
+        /// value-set event meant a full relationship scan on every parameter edit in the model, and knowing <i>which</i>
+        /// items cover the parameter is what lets a value change re-check those rows instead of the whole register.
         /// </summary>
-        private HashSet<Guid> coveredParameterIids;
+        private IReadOnlyDictionary<Guid, IReadOnlyList<Guid>> itemsByCoveredParameter;
+
+        /// <summary>
+        /// Whether a full tree rebuild arrived while the assembler was mid-batch and still owes to be run.
+        /// </summary>
+        private bool isRebuildPending;
+
+        /// <summary>
+        /// Whether a coverage refresh arrived while the assembler was mid-batch and still owes to be run.
+        /// </summary>
+        private bool isCoverageRefreshPending;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VandVBrowserViewModel"/> class.
@@ -170,21 +187,25 @@ namespace CDP4Requirements.ViewModels
                 this.ExecuteCreateVandVItem,
                 this.WhenAnyValue(x => x.SelectedThing, x => x.CanCreateVandVItem, (row, canCreate) => canCreate && row is RequirementCoverageRowViewModel));
 
+            this.CreateActivityFromItemCommand = ReactiveCommandCreator.CreateAsyncTask(
+                this.ExecuteCreateActivityFromItem,
+                this.WhenAnyValue(x => x.SelectedThing, x => x.CanCreateVandVItem, (row, canCreate) => canCreate && row is VandVItemRowViewModel));
+
             this.ExportWorkbookCommand = ReactiveCommandCreator.Create(this.ExecuteExportWorkbook);
             this.RunAnalysisCheckCommand = ReactiveCommandCreator.Create(this.ExecuteRunAnalysisCheck);
             this.OpenMatrixCommand = ReactiveCommandCreator.Create(this.ExecuteOpenMatrix);
 
-            // gated per kind, not once for all five: a participant may be allowed to raise a change request and not a
-            // request for waiver, and each command must reflect its own class kind
             this.CreateAnnotationCommands = AnnotationKind.All.ToDictionary(
                 kind => kind,
                 kind => ReactiveCommandCreator.CreateAsyncTask(
                     () => this.ExecuteCreateAnnotation(kind),
                     this.WhenAnyValue(x => x.SelectedThing, x => x.CreatableAnnotationKinds, (row, kinds) => row != null && kinds.Contains(kind.ClassKind))));
 
-            this.PossibleStages = BuildStageChoices(this.Thing);
+            var coverage = VandVCoverageQuery.Build(this.Thing);
 
-            this.PopulateRows();
+            this.PossibleStages = BuildStageChoices(coverage);
+
+            this.PopulateRows(coverage);
             this.AddSubscriptions();
 
             this.Disposables.Add(
@@ -193,7 +214,6 @@ namespace CDP4Requirements.ViewModels
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.Rebuild()));
 
-            // the Procedure view nests the steps under each item, so switching view rebuilds the rows
             this.Disposables.Add(
                 this.WhenAnyValue(x => x.SelectedView)
                     .Skip(1)
@@ -245,7 +265,12 @@ namespace CDP4Requirements.ViewModels
         public ReactiveCommand<Unit, Unit> CreateVandVItemCommand { get; }
 
         /// <summary>
-        /// Gets the command that exports the VCD / RVM workbook.
+        /// Gets the command that turns the selected V&amp;V item's own plan and procedure into a shared activity.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CreateActivityFromItemCommand { get; }
+
+        /// <summary>
+        /// Gets the command that exports the VCD / VCRM workbook.
         /// </summary>
         public ReactiveCommand<Unit, Unit> ExportWorkbookCommand { get; }
 
@@ -295,7 +320,6 @@ namespace CDP4Requirements.ViewModels
         {
             base.ComputePermission();
 
-            // called once from the base constructor, before this view-model's own state exists
             if (this.Thing == null)
             {
                 return;
@@ -316,15 +340,15 @@ namespace CDP4Requirements.ViewModels
         {
             base.PopulateContextMenu();
 
-            // the base constructor populates the menu once before this class's own fields are assigned, so none of
-            // the commands exist yet on that first pass; the next selection change rebuilds the menu properly
             if (this.CreateAnnotationCommands == null)
             {
                 return;
             }
 
+            var index = 0;
+
             this.ContextMenu.Insert(
-                0,
+                index++,
                 new ContextMenuItemViewModel(
                     "Create V&V Item for this Requirement",
                     "",
@@ -332,17 +356,29 @@ namespace CDP4Requirements.ViewModels
                     MenuItemKind.Create,
                     ClassKind.Requirement));
 
+            if (this.SelectedThing is VandVItemRowViewModel)
+            {
+                this.ContextMenu.Insert(
+                    index++,
+                    new ContextMenuItemViewModel(
+                        "Create a V&V Activity from this Item...",
+                        "",
+                        this.CreateActivityFromItemCommand,
+                        MenuItemKind.Create,
+                        ClassKind.Requirement));
+            }
+
             this.ContextMenu.Insert(
-                1,
+                index++,
                 new ContextMenuItemViewModel(
-                    "Open Coverage Matrix (RVM)",
+                    "Open Coverage Matrix (VCRM)",
                     "",
                     this.OpenMatrixCommand,
                     MenuItemKind.Navigate,
                     ClassKind.NotThing));
 
             this.ContextMenu.Insert(
-                2,
+                index++,
                 new ContextMenuItemViewModel(
                     "Run Analysis Check",
                     "",
@@ -351,16 +387,14 @@ namespace CDP4Requirements.ViewModels
                     ClassKind.NotThing));
 
             this.ContextMenu.Insert(
-                3,
+                index,
                 new ContextMenuItemViewModel(
-                    "Export VCD / RVM workbook...",
+                    "Export VCD / VCRM workbook...",
                     "",
                     this.ExportWorkbookCommand,
                     MenuItemKind.Export,
                     ClassKind.NotThing));
 
-            // deliberately NOT the base class's stock commands: those navigate to ThingDialogs the IME never
-            // registered for any of these ClassKinds, so they throw "not registered" and silently do nothing
             foreach (var kind in AnnotationKind.All)
             {
                 this.ContextMenu.Add(
@@ -380,18 +414,7 @@ namespace CDP4Requirements.ViewModels
         /// <returns>true when the V&amp;V item may be written.</returns>
         private bool EnsureReferenceData(string caption)
         {
-            if (VandVItemCreator.CanCreate(this.Thing))
-            {
-                return true;
-            }
-
-            DXMessageBox.Show(
-                "The V&V reference data is not complete in this model yet. Run 'Set up V&V' on the Requirements ribbon tab first.",
-                caption,
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-
-            return false;
+            return VandVPanelHelper.EnsureReferenceData(this.Thing, caption);
         }
 
         /// <summary>
@@ -452,9 +475,9 @@ namespace CDP4Requirements.ViewModels
         {
             try
             {
-                // coverage belongs to the V&V ITEM, not to the requirement it covers
                 await this.SaveCoverageAsync(dialogViewModel, vandVItem);
                 await this.procedureWriter.WriteAsync(this.Session, this.Thing, vandVItem, dialogViewModel.ProcedureSteps.ToList());
+                await this.activityWriter.SetPerformedByAsync(this.Session, this.Thing, vandVItem, dialogViewModel.SelectedActivity);
             }
             catch (Exception ex)
             {
@@ -463,6 +486,87 @@ namespace CDP4Requirements.ViewModels
                     caption,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
+            }
+        }
+
+        /// <summary>
+        /// Turns the selected V&amp;V item's own plan and procedure into a shared activity, and points the item at it.
+        /// </summary>
+        /// <returns>A <see cref="Task"/>.</returns>
+        /// <remarks>
+        /// This is the bridge between the two ways of working. Whoever writes a requirement is expected to cover it,
+        /// but rarely knows which real-world task will do the verifying, so they write an item with a procedure of
+        /// their own. Later, someone planning the campaign turns that item into the activity everybody else can share:
+        /// the method, stage gate, description and the whole step list are carried over, the item is linked to the new
+        /// activity, and its own copy of the procedure is dropped so the steps live in exactly one place. Other items
+        /// then join it through "Link existing V&amp;V Items" in the Activities panel.
+        /// </remarks>
+        private async Task ExecuteCreateActivityFromItem()
+        {
+            if (!(this.SelectedThing is VandVItemRowViewModel row) || !this.EnsureReferenceData("Create V&V Activity"))
+            {
+                return;
+            }
+
+            var item = row.Thing;
+            var steps = VandVProcedureWriter.QuerySteps(this.Thing, item).Select(step => new VandVProcedureStep(step)).ToList();
+
+            var dialogViewModel = new VandVActivityDialogViewModel(this.Thing, this.Session)
+            {
+                Name = item.Name,
+                Method = VandVCoverageQuery.Attribute(item, VandVParameter.Method),
+                Stage = VandVCoverageQuery.Attribute(item, VandVParameter.Stage),
+                Level = VandVCoverageQuery.Attribute(item, VandVParameter.Level),
+                Description = VandVCoverageQuery.Attribute(item, VandVParameter.Description),
+                Facility = VandVCoverageQuery.Attribute(item, VandVParameter.Facility),
+                ProcedureReference = VandVCoverageQuery.Attribute(item, VandVParameter.ProcedureReference),
+                Preconditions = VandVCoverageQuery.Attribute(item, VandVParameter.Preconditions),
+                Conditions = VandVCoverageQuery.Attribute(item, VandVParameter.Conditions)
+            };
+
+            dialogViewModel.ProcedureSteps.AddRange(steps.Select(step => new VandVProcedureStep
+            {
+                Action = step.Action,
+                ExpectedResult = step.ExpectedResult,
+                ActualResult = step.ActualResult,
+                Result = step.Result
+            }));
+
+            var result = this.DialogNavigationService.NavigateModal(dialogViewModel);
+
+            if (result == null || result.Result != true)
+            {
+                return;
+            }
+
+            try
+            {
+                var activity = await this.activityWriter.CreateAsync(
+                    this.Session,
+                    this.Thing,
+                    dialogViewModel.ShortName,
+                    dialogViewModel.Name,
+                    dialogViewModel.Owner,
+                    dialogViewModel.BuildAttributes(),
+                    dialogViewModel.Report);
+
+                await this.procedureWriter.WriteAsync(this.Session, this.Thing, activity, dialogViewModel.ProcedureSteps.ToList());
+                await this.activityWriter.SetPerformedByAsync(this.Session, this.Thing, item, activity);
+
+                if (steps.Any())
+                {
+                    await this.procedureWriter.WriteAsync(this.Session, this.Thing, item, new List<VandVProcedureStep>());
+                }
+
+                DXMessageBox.Show(
+                    $"Activity '{activity.ShortName}' now carries this procedure, and '{item.ShortName}' is performed by it.\n\nUse 'Link existing V&V Items' in the Activities panel to point more items at it.",
+                    "Create V&V Activity",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                DXMessageBox.Show("The activity could not be created:\n\n" + ex.Message, "Create V&V Activity", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -479,8 +583,6 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            // a step is edited in its item's procedure grid, not in the stock Requirement dialog, which would let
-            // the user move it out of the procedure entirely
             if (this.QueryOwningItem(this.SelectedThing) is Requirement owningItem)
             {
                 this.EditVandVItem(owningItem, tabIndex: VandVItemDialogViewModel.ProcedureTabIndex);
@@ -522,8 +624,6 @@ namespace CDP4Requirements.ViewModels
         /// </remarks>
         private async void EditVandVItem(Requirement vandVItem, ParameterOrOverrideBase preselectedParameter = null, int? tabIndex = null)
         {
-            // an edit writes the item, its coverage and its procedure just like a create does, so it needs the same
-            // reference data; without this check a rename on a partially seeded library half-applied and then failed
             if (!this.EnsureReferenceData("Edit V&V Item"))
             {
                 return;
@@ -636,7 +736,6 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            // guarded lookup: OpenIterations transiently misses/nulls the tuple while the session re-assembles
             if (!this.Session.OpenIterations.TryGetValue(this.Thing, out var participantAndDomain) || participantAndDomain == null)
             {
                 return;
@@ -732,8 +831,6 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            // the whole body is guarded: an exception escaping an async void event handler kills the application,
-            // and the coverage query before the confirmation can throw just as well as the write can
             try
             {
                 if (VandVCoverageWriter.QueryCoverageRelationships(this.Thing, row.Thing).Any())
@@ -750,7 +847,6 @@ namespace CDP4Requirements.ViewModels
                     }
                 }
 
-                // a ParameterOverride lives in an ElementUsage, so the element must be resolved through the usage
                 var element = parameter.Container as ElementDefinition
                               ?? (parameter.Container as ElementUsage)?.ElementDefinition;
 
@@ -770,7 +866,7 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Asks for a destination and writes the VCD / RVM workbook.
+        /// Asks for a destination and writes the VCD / VCRM workbook.
         /// </summary>
         private void ExecuteExportWorkbook()
         {
@@ -805,8 +901,6 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void ExecuteOpenMatrix()
         {
-            // closing the panel disposes its view-model (PanelNavigationService.CleanUpPanelsAndSendCloseEvent),
-            // so a cached instance must be dropped on close, see AddSubscriptions, or reopening shows a dead panel
             if (this.matrixViewModel == null)
             {
                 this.matrixViewModel = new VandVMatrixViewModel(
@@ -822,14 +916,22 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Builds the specification → group → requirement → V&amp;V item hierarchy.
+        /// Builds the specification → group → requirement → V&amp;V item hierarchy. Report specifications are skipped:
+        /// they hold the shared activities, which are browsed in the V&amp;V Activities panel.
         /// </summary>
-        private void PopulateRows()
+        /// <param name="prebuiltModel">
+        /// A coverage model the caller has already built, or null to build one. <see cref="VandVCoverageQuery.Build"/>
+        /// walks the whole iteration, so the constructor, which needs one anyway to list the stage gates, hands its
+        /// model in rather than paying for a second identical walk.
+        /// </param>
+        private void PopulateRows(VandVCoverageModel prebuiltModel = null)
         {
-            this.RefreshStageVisibility();
+            var model = prebuiltModel ?? VandVCoverageQuery.Build(this.Thing);
+
+            this.RefreshStageVisibility(model);
 
             foreach (var specification in this.Thing.RequirementsSpecification
-                         .Where(x => !x.IsDeprecated && x.ShortName != VandVItemCreator.VandVSpecificationShortName)
+                         .Where(x => !x.IsDeprecated && x.ShortName != VandVItemCreator.VandVSpecificationShortName && !VandVActivityQuery.IsReport(x))
                          .OrderBy(x => x.ShortName))
             {
                 var specificationRow = new VandVSpecificationRowViewModel(specification, this.Session, this);
@@ -846,13 +948,14 @@ namespace CDP4Requirements.ViewModels
                 }
             }
 
-            this.RefreshCoverage();
+            this.RefreshCoverage(model);
         }
 
         /// <summary>
         /// Recomputes which requirements the stage filter lets through.
         /// </summary>
-        private void RefreshStageVisibility()
+        /// <param name="model">The coverage model already built for this rebuild.</param>
+        private void RefreshStageVisibility(VandVCoverageModel model)
         {
             if (this.SelectedStage == AllStages)
             {
@@ -861,8 +964,8 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.stageVisibleRequirements = new HashSet<Guid>(
-                VandVCoverageQuery.Build(this.Thing).Coverages
-                    .Where(coverage => coverage.VandVItems.Any(this.MatchesSelectedStage))
+                model.Coverages
+                    .Where(coverage => coverage.VandVItems.Any(item => this.MatchesSelectedStage(item, model.ActivityByItem)))
                     .Select(coverage => coverage.Requirement.Iid));
         }
 
@@ -915,10 +1018,8 @@ namespace CDP4Requirements.ViewModels
         /// <returns>The requirements.</returns>
         private static IEnumerable<Requirement> QueryRequirements(RequirementsSpecification specification, RequirementsGroup group)
         {
-            // excluded by category, not only by which specification they sit in: a step is never a requirement to
-            // be verified, wherever it ended up
             return specification.Requirement
-                .Where(requirement => !VandVProcedureWriter.IsStep(requirement))
+                .Where(requirement => !VandVProcedureWriter.IsStep(requirement) && !VandVActivityQuery.IsActivity(requirement))
                 .Where(requirement =>
                     !requirement.IsDeprecated
                     && !VandVCoverageQuery.IsVnVItem(requirement)
@@ -932,12 +1033,29 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void RefreshCoverage()
         {
-            var expansion = this.CaptureExpansion();
-            var model = VandVCoverageQuery.Build(this.Thing);
+            if (this.HasUpdateStarted)
+            {
+                this.isCoverageRefreshPending = true;
+
+                return;
+            }
+
+            this.RefreshCoverage(VandVCoverageQuery.Build(this.Thing));
+        }
+
+        /// <summary>
+        /// Rebuilds every requirement row's V&amp;V item children from an already built coverage model.
+        /// </summary>
+        /// <param name="model">The coverage model to project.</param>
+        private void RefreshCoverage(VandVCoverageModel model)
+        {
+            var expansion = VandVPanelHelper.CaptureExpansion(this.SpecificationRows);
             var itemsByRequirement = model.Coverages.ToDictionary(x => x.Requirement.Iid, x => x.VandVItems);
 
-            // the rows about to be disposed may be the current selection; leaving it pointing at a disposed row
-            // sends the selection pipeline through PopulateContextMenu against dead state
+            var stepsByOwner = this.SelectedView.ShowsProcedure
+                ? VandVProcedureWriter.QueryStepsMap(this.Thing)
+                : null;
+
             if (this.SelectedThing is VandVItemRowViewModel || this.SelectedThing is VandVStepRowViewModel)
             {
                 this.SelectedThing = null;
@@ -954,15 +1072,15 @@ namespace CDP4Requirements.ViewModels
 
                 if (itemsByRequirement.TryGetValue(row.Thing.Iid, out var items))
                 {
-                    foreach (var item in items.Where(this.MatchesSelectedStage))
+                    foreach (var item in items.Where(x => this.MatchesSelectedStage(x, model.ActivityByItem)))
                     {
                         var itemRow = new VandVItemRowViewModel(item, this.Session, row);
                         itemRow.ParameterDropped += this.OnParameterDropped;
                         row.ContainedRows.Add(itemRow);
 
-                        if (this.SelectedView.ShowsProcedure)
+                        if (stepsByOwner != null && stepsByOwner.TryGetValue(item.Iid, out var steps))
                         {
-                            foreach (var step in VandVProcedureWriter.QuerySteps(this.Thing, item))
+                            foreach (var step in steps)
                             {
                                 itemRow.ContainedRows.Add(new VandVStepRowViewModel(step, this.Session, itemRow));
                             }
@@ -970,33 +1088,33 @@ namespace CDP4Requirements.ViewModels
                     }
                 }
 
-                row.RefreshCoverage();
+                row.RefreshCoverage(model.ActivityByItem);
             }
 
-            // containers roll up their requirements, so they can only be refreshed once every requirement row is done
             this.RefreshContainerRollUps();
 
-            this.RestoreExpansion(expansion);
+            VandVPanelHelper.RestoreExpansion(this.SpecificationRows, expansion);
         }
 
         /// <summary>
-        /// Asserts whether a parameter is covered by any V&amp;V item, from a set cached until a relationship changes.
+        /// Returns the V&amp;V items covering a parameter, from a map cached until a relationship changes, so a value
+        /// change refreshes only the rows that actually measure that parameter.
         /// </summary>
         /// <param name="parameter">The parameter whose value changed, or null.</param>
-        /// <returns>true when a <c>coversParameter</c> relationship points at it.</returns>
-        private bool IsCoveredParameter(ParameterOrOverrideBase parameter)
+        /// <returns>The covering item identifiers, empty when nothing covers it.</returns>
+        private IReadOnlyList<Guid> QueryCoveringItems(ParameterOrOverrideBase parameter)
         {
             if (parameter == null)
             {
-                return false;
+                return new List<Guid>();
             }
 
-            if (this.coveredParameterIids == null)
+            if (this.itemsByCoveredParameter == null)
             {
-                this.coveredParameterIids = new HashSet<Guid>(VandVCoverageQuery.QueryCoveredParameterIids(this.Thing));
+                this.itemsByCoveredParameter = VandVCoverageQuery.QueryCoveredParameterMap(this.Thing);
             }
 
-            return this.coveredParameterIids.Contains(parameter.Iid);
+            return this.itemsByCoveredParameter.TryGetValue(parameter.Iid, out var items) ? items : new List<Guid>();
         }
 
         /// <summary>
@@ -1004,8 +1122,6 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            // no iteration filter here: a removed requirement's container chain is already broken, so filtering by
-            // GetContainerOfType would silently drop exactly the deletion events this browser must react to
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Requirement))
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -1015,23 +1131,21 @@ namespace CDP4Requirements.ViewModels
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequirementsSpecification))
                     .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequirementsGroup)))
                     .Where(x => x.EventKind != EventKind.Updated)
+                    .Where(x => x.EventKind == EventKind.Removed
+                        ? this.IsShownInThisTree(x.ChangedThing)
+                        : x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.Rebuild()));
 
-            // the analysis check reads live parameter values, so a design change has to re-run it; ValueSet changes
-            // are what move a parameter, and they never touch the V&V item itself.
-            // Only a parameter some item actually covers is worth re-checking: re-running the check over the whole
-            // register on every value edit in the model stuttered the UI on models with a few hundred items
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterValueSet))
                     .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOverrideValueSet)))
                     .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
-                    .Where(x => this.IsCoveredParameter(x.ChangedThing.Container as ParameterOrOverrideBase))
+                    .Select(x => this.QueryCoveringItems(x.ChangedThing.Container as ParameterOrOverrideBase))
+                    .Where(coveringItems => coveringItems.Any())
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.RefreshAnalysisChecks()));
+                    .Subscribe(this.RefreshAnalysisChecks));
 
-            // review requests live on the EngineeringModel, not the iteration, so they arrive as their own events;
-            // without this the item icons would keep showing the state the tree was built with
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ReviewItemDiscrepancy))
                     .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequestForDeviation)))
@@ -1042,15 +1156,11 @@ namespace CDP4Requirements.ViewModels
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.RefreshAnnotationStates()));
 
-            // closing the matrix panel disposes its view-model, so the cached instance must be dropped or the next
-            // "Open Coverage Matrix" would re-dock a dead panel that no longer reacts to model changes
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<NavigationPanelEvent>()
                     .Where(x => x.ViewModel == this.matrixViewModel && x.PanelStatus == PanelStatus.Closed)
                     .Subscribe(_ => this.matrixViewModel = null));
 
-            // only the register's own links: an ordinary requirement trace link elsewhere in the iteration used to
-            // dispose and recreate every V&V row in the tree, resubscribing them all for nothing
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
                     .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
@@ -1058,17 +1168,23 @@ namespace CDP4Requirements.ViewModels
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ =>
                     {
-                        this.coveredParameterIids = null;
+                        this.itemsByCoveredParameter = null;
                         this.RefreshCoverage();
                     }));
 
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(SimpleParameterValue))
-                    .Where(x => x.EventKind == EventKind.Updated)
+                    .Where(x => x.EventKind == EventKind.Updated && x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
                     .Select(x => x.ChangedThing as SimpleParameterValue)
                     .Where(x => x != null)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.OnSimpleParameterValueUpdated));
+                    .Subscribe(x => this.OnSimpleParameterValuesUpdated(new[] { x })));
+
+            this.Disposables.Add(
+                this.CDPMessageBus.Listen<HighlightEvent>()
+                    .Select(x => x.HighlightedThing)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(this.RevealHighlightedItem));
         }
 
         /// <summary>
@@ -1082,9 +1198,6 @@ namespace CDP4Requirements.ViewModels
         {
             if (eventKind == EventKind.Removed)
             {
-                // a removed requirement's container chain is already broken, so membership is decided by whether
-                // this browser's own rows reference it; without that check a deletion in any other open model
-                // refreshed this panel too and reset its selection
                 if (this.requirementRows.Any(x => x.Thing == requirement))
                 {
                     this.Rebuild();
@@ -1104,7 +1217,6 @@ namespace CDP4Requirements.ViewModels
 
             if (VandVCoverageQuery.IsVnVItem(requirement) || VandVProcedureWriter.IsStep(requirement))
             {
-                // saving a ten-step procedure raises an event per step; a full Rebuild each time froze the tree
                 this.RefreshCoverage();
                 return;
             }
@@ -1132,8 +1244,6 @@ namespace CDP4Requirements.ViewModels
         {
             this.RefreshAnalysisChecks();
 
-            // the whole register, not the rows that survived the stage filter: a check that silently skipped
-            // most of the model would report "3 items meet their constraint" on a model with forty
             var results = VandVCoverageQuery.Build(this.Thing).Coverages
                 .SelectMany(coverage => coverage.VandVItems)
                 .Select(item => VandVAnalysisChecker.Check(this.Thing, item))
@@ -1151,8 +1261,8 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Re-runs the automatic analysis check on every V&amp;V item row, so a design change is reflected without a
-        /// reopen.
+        /// Re-runs the automatic analysis check on every V&amp;V item row, used by the explicit Run Analysis Check
+        /// command.
         /// </summary>
         private void RefreshAnalysisChecks()
         {
@@ -1160,6 +1270,36 @@ namespace CDP4Requirements.ViewModels
             {
                 itemRow.RefreshAnalysis();
             }
+        }
+
+        /// <summary>
+        /// Re-runs the automatic analysis check on the rows that cover a changed parameter, and only those. Every
+        /// check walks the relationships, so re-checking the whole register on each design value edit was what made
+        /// the register stutter on large models.
+        /// </summary>
+        /// <param name="coveringItemIids">The V&amp;V items covering the parameter whose value changed.</param>
+        private void RefreshAnalysisChecks(IReadOnlyList<Guid> coveringItemIids)
+        {
+            var affected = new HashSet<Guid>(coveringItemIids);
+
+            foreach (var itemRow in this.requirementRows
+                         .SelectMany(row => row.ContainedRows.OfType<VandVItemRowViewModel>())
+                         .Where(itemRow => affected.Contains(itemRow.Thing.Iid)))
+            {
+                itemRow.RefreshAnalysis();
+            }
+        }
+
+        /// <summary>
+        /// Asserts whether a <see cref="Thing"/> is one this tree actually shows, used to decide whether a removal
+        /// event, whose container chain is already broken, concerns this browser at all.
+        /// </summary>
+        /// <param name="thing">The removed <see cref="Thing"/>.</param>
+        /// <returns>true when a row of this tree stands for it.</returns>
+        private bool IsShownInThisTree(Thing thing)
+        {
+            return this.SpecificationRows.Any(row => row.Thing == thing)
+                   || this.SpecificationRows.Any(row => VandVGroupRowViewModel.QueryGroupRows(row).Any(groupRow => groupRow.Thing == thing));
         }
 
         /// <summary>
@@ -1173,8 +1313,69 @@ namespace CDP4Requirements.ViewModels
                 itemRow.RefreshAnnotationState();
             }
 
-            // the menu is rebuilt on selection change only, so a status written from it would otherwise go stale
             this.PopulateContextMenu();
+        }
+
+        /// <summary>
+        /// Brings the register to the front and opens every row above a highlighted V&amp;V item, so the yellow row is
+        /// actually on screen rather than buried in a collapsed specification behind another document.
+        /// </summary>
+        /// <param name="highlightedThing">The <see cref="Thing"/> that was highlighted.</param>
+        private void RevealHighlightedItem(Thing highlightedThing)
+        {
+            var itemRow = this.requirementRows
+                .SelectMany(row => row.ContainedRows.OfType<VandVItemRowViewModel>())
+                .FirstOrDefault(row => row.Thing == highlightedThing);
+
+            if (itemRow == null)
+            {
+                return;
+            }
+
+            this.IsSelected = true;
+
+            var ancestor = itemRow.ContainerViewModel;
+
+            while (ancestor is IRowViewModelBase<Thing> ancestorRow)
+            {
+                ancestorRow.IsExpanded = true;
+                ancestor = ancestorRow.ContainerViewModel;
+            }
+        }
+
+        /// <summary>
+        /// Runs the work deferred while the assembler was mid-batch, once the batch has ended.
+        /// </summary>
+        /// <param name="sessionEvent">The <see cref="SessionEvent"/>.</param>
+        /// <remarks>
+        /// Every rebuild here is a full model walk. Closing a model, or any write that lands a burst of changes,
+        /// delivers one change event per affected thing, and running that walk per event is quadratic: on a model with
+        /// a few thousand requirements the register froze for the length of the close. Deferring to the end of the
+        /// batch collapses the burst into the single rebuild it always meant.
+        /// </remarks>
+        protected override void OnAssemblerUpdate(SessionEvent sessionEvent)
+        {
+            base.OnAssemblerUpdate(sessionEvent);
+
+            if (this.HasUpdateStarted)
+            {
+                return;
+            }
+
+            var rebuild = this.isRebuildPending;
+            var refresh = this.isCoverageRefreshPending;
+
+            this.isRebuildPending = false;
+            this.isCoverageRefreshPending = false;
+
+            if (rebuild)
+            {
+                this.Rebuild();
+            }
+            else if (refresh)
+            {
+                this.RefreshCoverage();
+            }
         }
 
         /// <summary>
@@ -1182,16 +1383,22 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void Rebuild()
         {
-            var expansion = this.CaptureExpansion();
+            if (this.HasUpdateStarted)
+            {
+                this.isRebuildPending = true;
 
-            // a rebuild disposes every row, so nothing may still be selected when it starts
+                return;
+            }
+
+            var expansion = VandVPanelHelper.CaptureExpansion(this.SpecificationRows);
+
             this.SelectedThing = null;
 
             this.requirementRows.Clear();
             this.SpecificationRows.ClearAndDispose();
             this.PopulateRows();
 
-            this.RestoreExpansion(expansion);
+            VandVPanelHelper.RestoreExpansion(this.SpecificationRows, expansion);
         }
 
         /// <summary>
@@ -1210,117 +1417,82 @@ namespace CDP4Requirements.ViewModels
         /// Asserts whether a V&amp;V item belongs in the current stage-gate filter.
         /// </summary>
         /// <param name="item">The V&amp;V item.</param>
+        /// <param name="activityByItem">The item-to-activity map of the current coverage model.</param>
         /// <returns>true when the item passes the filter.</returns>
-        private bool MatchesSelectedStage(Requirement item)
+        private bool MatchesSelectedStage(Requirement item, IReadOnlyDictionary<Guid, Requirement> activityByItem)
         {
-            return this.SelectedStage == AllStages
-                   || VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(item, VandVParameter.Stage), this.SelectedStage);
+            if (this.SelectedStage == AllStages)
+            {
+                return true;
+            }
+
+            var performingActivity = activityByItem != null && activityByItem.TryGetValue(item.Iid, out var activity) ? activity : null;
+
+            return VandVCoverageQuery.AreSameEnumValue(VandVActivityQuery.EffectiveAttribute(item, performingActivity, VandVParameter.Stage), this.SelectedStage);
         }
 
         /// <summary>
         /// Builds the stage picker from the model's own stage gates, so a project that defines its own can filter on
         /// them without a rebuild.
         /// </summary>
-        /// <param name="iteration">The iteration.</param>
+        /// <param name="model">The coverage model the stage gates are read from.</param>
         /// <returns>The stage choices.</returns>
-        private static IReadOnlyList<string> BuildStageChoices(Iteration iteration)
+        private static IReadOnlyList<string> BuildStageChoices(VandVCoverageModel model)
         {
             var stages = new List<string> { AllStages };
 
-            stages.AddRange(VandVCoverageQuery.Build(iteration).Stages);
+            stages.AddRange(model.Stages);
 
             return stages;
         }
 
         /// <summary>
-        /// Records which rows are expanded, keyed by the thing each row stands for.
+        /// Handles a burst of <see cref="SimpleParameterValue"/> updates by refreshing each owning V&amp;V item row
+        /// once and rolling the containers up once for the whole burst.
         /// </summary>
-        /// <returns>The expansion state.</returns>
+        /// <param name="simpleParameterValues">The updated values collected over the buffering window.</param>
         /// <remarks>
-        /// Emptying a row's children makes the tree collapse it, and rebuilding the rows replaces the objects the
-        /// tree was tracking, so without capturing and restoring this the whole tree folded shut every time an item
-        /// was edited. Keyed by <see cref="Thing.Iid"/> rather than by row, so it survives a full rebuild.
+        /// The owning rows are found through one <see cref="Thing.Iid"/> lookup built per burst: hunting each row by
+        /// walking every requirement row's children was O(rows x items) <i>per changed value</i>, so a bulk apply
+        /// over fifty items scanned the whole tree fifty times.
         /// </remarks>
-        private Dictionary<Guid, bool> CaptureExpansion()
+        private void OnSimpleParameterValuesUpdated(IList<SimpleParameterValue> simpleParameterValues)
         {
-            var expansion = new Dictionary<Guid, bool>();
+            var rowsByItem = new Dictionary<Guid, (RequirementCoverageRowViewModel Requirement, VandVItemRowViewModel Item)>();
 
-            foreach (var row in this.SpecificationRows)
+            foreach (var requirementRow in this.requirementRows)
             {
-                Capture(row, expansion);
+                foreach (var itemRow in requirementRow.ContainedRows.OfType<VandVItemRowViewModel>())
+                {
+                    rowsByItem[itemRow.Thing.Iid] = (requirementRow, itemRow);
+                }
             }
 
-            return expansion;
-        }
+            var touchedRequirementRows = new HashSet<RequirementCoverageRowViewModel>();
 
-        /// <summary>
-        /// Records the expansion of a row and everything below it.
-        /// </summary>
-        /// <param name="row">The row.</param>
-        /// <param name="expansion">The state being built.</param>
-        private static void Capture(IRowViewModelBase<Thing> row, IDictionary<Guid, bool> expansion)
-        {
-            expansion[row.Thing.Iid] = row.IsExpanded;
-
-            foreach (var child in row.ContainedRows.OfType<IRowViewModelBase<Thing>>())
+            foreach (var container in simpleParameterValues.Select(x => x.Container).Where(x => x != null).Distinct())
             {
-                Capture(child, expansion);
-            }
-        }
+                if (!rowsByItem.TryGetValue(container.Iid, out var rows))
+                {
+                    continue;
+                }
 
-        /// <summary>
-        /// Puts the recorded expansion back onto the rows, leaving rows it says nothing about alone.
-        /// </summary>
-        /// <param name="expansion">The recorded state.</param>
-        private void RestoreExpansion(IReadOnlyDictionary<Guid, bool> expansion)
-        {
-            foreach (var row in this.SpecificationRows)
-            {
-                Restore(row, expansion);
-            }
-        }
-
-        /// <summary>
-        /// Puts the recorded expansion back onto a row and everything below it.
-        /// </summary>
-        /// <param name="row">The row.</param>
-        /// <param name="expansion">The recorded state.</param>
-        private static void Restore(IRowViewModelBase<Thing> row, IReadOnlyDictionary<Guid, bool> expansion)
-        {
-            if (expansion.TryGetValue(row.Thing.Iid, out var isExpanded))
-            {
-                row.IsExpanded = isExpanded;
+                rows.Item.RefreshAttributes();
+                touchedRequirementRows.Add(rows.Requirement);
             }
 
-            foreach (var child in row.ContainedRows.OfType<IRowViewModelBase<Thing>>())
-            {
-                Restore(child, expansion);
-            }
-        }
-
-        /// <summary>
-        /// Handles an update of a <see cref="SimpleParameterValue"/> by refreshing the owning V&amp;V item row.
-        /// </summary>
-        /// <param name="simpleParameterValue">The updated <see cref="SimpleParameterValue"/>.</param>
-        private void OnSimpleParameterValueUpdated(SimpleParameterValue simpleParameterValue)
-        {
-            var requirementRow = this.requirementRows
-                .FirstOrDefault(x => x.ContainedRows.OfType<VandVItemRowViewModel>().Any(item => item.Thing == simpleParameterValue.Container));
-
-            var row = requirementRow?.ContainedRows
-                .OfType<VandVItemRowViewModel>()
-                .FirstOrDefault(x => x.Thing == simpleParameterValue.Container);
-
-            if (row == null)
+            if (!touchedRequirementRows.Any())
             {
                 return;
             }
 
-            row.RefreshAttributes();
+            var activityByItem = VandVActivityQuery.QueryActivityMap(this.Thing);
 
-            // vnv_status feeds the roll-up, so the requirement and its containers have to be recomputed as well;
-            // refreshing only the item row left "2 open" on screen after an item had just passed
-            requirementRow.RefreshCoverage();
+            foreach (var requirementRow in touchedRequirementRows)
+            {
+                requirementRow.RefreshCoverage(activityByItem);
+            }
+
             this.RefreshContainerRollUps();
         }
 
@@ -1374,13 +1546,13 @@ namespace CDP4Requirements.ViewModels
                 var status = AnnotationQuery.DescribeStatus(annotation);
                 var hasStatus = !string.IsNullOrEmpty(status);
 
-                // a participant who may not write the annotation should see the action greyed out, not discover the
-                // denial as a server exception after typing a full reply
                 var canWrite = this.PermissionService.CanWrite(annotation);
 
+                var identifier = AnnotationKind.QueryShortName(annotation);
+
                 var header = hasStatus
-                    ? $"{annotation.UserFriendlyShortName}, {AnnotationKind.Describe(annotation)} ({status})"
-                    : $"{annotation.UserFriendlyShortName}, {AnnotationKind.Describe(annotation)}";
+                    ? $"{identifier}, {AnnotationKind.Describe(annotation)} ({status})"
+                    : $"{identifier}, {AnnotationKind.Describe(annotation)}";
 
                 var group = new ContextMenuItemViewModel(header, "", null, MenuItemKind.None, annotation.ClassKind);
 

@@ -167,7 +167,7 @@ namespace CDP4Requirements.Tests.Services
                 using (var workbook = new XLWorkbook(path))
                 {
                     var names = workbook.Worksheets.Select(x => x.Name).ToList();
-                    Assert.That(names, Is.EquivalentTo(new[] { "VCD", "RVM", "Execution Records", "Procedures", "NCRs" }));
+                    Assert.That(names, Is.EquivalentTo(new[] { "VCD", "VCRM", "Activities", "Execution Records", "Procedures", "NCRs" }));
 
                     var vcd = workbook.Worksheet("VCD");
                     Assert.That(vcd.Cell(1, 1).GetString(), Is.EqualTo("Requirement"));

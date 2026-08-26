@@ -51,6 +51,26 @@
         </dxb:BarSplitButtonItem.PopupControl>
     </dxb:BarSplitButtonItem>
 
+    <dxb:BarSplitButtonItem Name="OpenVandVActivityBrowserBarItem"
+                            ActAsDropDown="True"
+                            Content="Open Activities"
+                            RibbonStyle="Large"
+                            IsEnabled="{Binding ActivityBrowser.HasModels, UpdateSourceTrigger=PropertyChanged}"
+                            LargeGlyph="{dx:DXImage Image=Task_32x32.png}"
+                            Hint="Plan the work: the reports (deliverables), the shared activities recorded in them, and the V&amp;V items each activity performs">
+        <dxb:BarSplitButtonItem.PopupControl>
+            <dxr:GalleryDropDownPopupMenu>
+                <dxr:GalleryDropDownPopupMenu.Gallery>
+                    <dxb:Gallery GroupsSource="{av:Binding ActivityBrowser.OpenModels}"
+                                 GroupTemplate="{StaticResource groupTemplate}"
+                                 ItemCheckMode="Multiple"
+                                 IsGroupCaptionVisible="True"
+                                 ColCount="1" />
+                </dxr:GalleryDropDownPopupMenu.Gallery>
+            </dxr:GalleryDropDownPopupMenu>
+        </dxb:BarSplitButtonItem.PopupControl>
+    </dxb:BarSplitButtonItem>
+
     <dxb:BarSplitButtonItem Name="OpenVandVBrowserBarItem"
                             ActAsDropDown="True"
                             Content="Open VCD"
