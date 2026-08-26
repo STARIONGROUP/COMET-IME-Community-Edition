@@ -196,6 +196,21 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyThatDeprecatedPersonIsNotAPossiblePerson()
+        {
+            var deprecatedPerson = new Person(Guid.NewGuid(), this.cache, this.uri) { IsDeprecated = true };
+            this.sitedir.Person.Add(deprecatedPerson);
+
+            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+
+            var dialog = new ParticipantDialogViewModel(participant, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
+
+            Assert.That(dialog.PossiblePerson, Does.Not.Contain(deprecatedPerson));
+            Assert.That(dialog.PossiblePerson, Does.Contain(this.person));
+        }
+
+        [Test]
         public void VerifyOkCanExecute()
         {
             var participant = new Participant(Guid.NewGuid(), this.cache, this.uri);

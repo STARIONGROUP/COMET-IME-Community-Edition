@@ -151,7 +151,7 @@ namespace CDP4SiteDirectory.ViewModels
 
             if (this.dialogKind == ThingDialogKind.Create)
             {
-                foreach (var person in sitedir.Person.OrderBy(x => x.Name).Except(model.Participant.Select(p => p.Person)))
+                foreach (var person in sitedir.Person.Where(x => !x.IsDeprecated).OrderBy(x => x.Name).Except(model.Participant.Select(p => p.Person)))
                 {
                     this.PossiblePerson.Add(person);
                 }
