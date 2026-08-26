@@ -192,7 +192,20 @@ namespace CDP4CommonView
 
             clone.AllowMultiSelect = this.AllowMultiSelect;
 
-            this.UpdateOrderedItemList(clone.ValueDefinition, this.ValueDefinition.Select(x => x.Thing));
+            if (!clone.ValueDefinition.SortedItems.Values.SequenceEqual(this.ValueDefinition.Select(x => x.Thing)))
+            {
+                var itemCount = this.ValueDefinition.Count;
+                for (var i = 0; i < itemCount; i++)
+                {
+                    var item = this.ValueDefinition[i].Thing;
+                    var currentIndex = clone.ValueDefinition.IndexOf(item);
+
+                    if (currentIndex != i)
+                    {
+                        clone.ValueDefinition.Move(currentIndex, i);
+                    }
+                }
+            }
             
         }
 

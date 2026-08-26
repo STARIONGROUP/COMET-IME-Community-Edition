@@ -243,7 +243,20 @@ namespace CDP4CommonView
             clone.Category.AddRange(this.Category);
 
 
-            this.UpdateOrderedItemList(clone.ParametricConstraint, this.ParametricConstraint.Select(x => x.Thing));
+            if (!clone.ParametricConstraint.SortedItems.Values.SequenceEqual(this.ParametricConstraint.Select(x => x.Thing)))
+            {
+                var itemCount = this.ParametricConstraint.Count;
+                for (var i = 0; i < itemCount; i++)
+                {
+                    var item = this.ParametricConstraint[i].Thing;
+                    var currentIndex = clone.ParametricConstraint.IndexOf(item);
+
+                    if (currentIndex != i)
+                    {
+                        clone.ParametricConstraint.Move(currentIndex, i);
+                    }
+                }
+            }
             
         }
 

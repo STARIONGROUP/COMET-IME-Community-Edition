@@ -532,7 +532,20 @@ namespace CDP4CommonView
 
             clone.EngineeringModelSetup = this.SelectedEngineeringModelSetup;
 
-            this.UpdateOrderedItemList(clone.Book, this.Book.Select(x => x.Thing));
+            if (!clone.Book.SortedItems.Values.SequenceEqual(this.Book.Select(x => x.Thing)))
+            {
+                var itemCount = this.Book.Count;
+                for (var i = 0; i < itemCount; i++)
+                {
+                    var item = this.Book[i].Thing;
+                    var currentIndex = clone.Book.IndexOf(item);
+
+                    if (currentIndex != i)
+                    {
+                        clone.Book.Move(currentIndex, i);
+                    }
+                }
+            }
             
         }
 

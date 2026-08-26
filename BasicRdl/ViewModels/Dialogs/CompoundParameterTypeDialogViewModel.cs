@@ -175,8 +175,12 @@ namespace BasicRdl.ViewModels
                 // remove from the ContainerList in the case of an existing thing
             }
 
+            var orderedItems = this.Thing.Component.SortedItems.Values.ToList();
+
             // this is called at the end so that any component order change may be taken into account after it was added/removed
             base.UpdateTransaction();
+
+            this.RestoreSortKeysOfDeletedItems(this.Thing.Component, orderedItems);
         }
 
         /// <summary>

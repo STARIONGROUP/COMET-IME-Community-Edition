@@ -183,6 +183,18 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Update the transaction with the <see cref="PossibleFiniteStateList"/> represented by this dialog
+        /// </summary>
+        protected override void UpdateTransaction()
+        {
+            var orderedItems = this.Thing.PossibleState.SortedItems.Values.ToList();
+
+            base.UpdateTransaction();
+
+            this.RestoreSortKeysOfDeletedItems(this.Thing.PossibleState, orderedItems);
+        }
+
+        /// <summary>
         /// Update the <see cref="OkCanExecute"/> property
         /// </summary>
         protected override void UpdateOkCanExecute()

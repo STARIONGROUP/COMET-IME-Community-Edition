@@ -739,50 +739,39 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Applies the order of the rows of a dialog to the <see cref="OrderedItemList{T}"/> of the <see cref="Thing"/> that is
-        /// being updated
+        /// Restores the position, and therefore the sort key, of the <see cref="Thing"/>s that are marked for deletion in an
+        /// <see cref="OrderedItemList{T}"/> that has been reordered
         /// </summary>
         /// <typeparam name="TItem">
         /// The type of <see cref="Thing"/> that is contained by the <see cref="OrderedItemList{T}"/>
         /// </typeparam>
         /// <param name="orderedItemList">
-        /// The <see cref="OrderedItemList{T}"/> of the clone that is to be reordered
+        /// The <see cref="OrderedItemList{T}"/> of the clone that has been reordered
         /// </param>
-        /// <param name="rows">
-        /// The <see cref="Thing"/>s of the rows, in the order in which they appear in the dialog
+        /// <param name="originalOrder">
+        /// The content of the <paramref name="orderedItemList"/> as it was before it was reordered
         /// </param>
         /// <remarks>
         /// A <see cref="Thing"/> that is marked for deletion is not represented by a row, it does however remain part of the
         /// <see cref="OrderedItemList{T}"/> of the clone: <see cref="ThingTransaction.Delete"/> leaves the removal on the original
-        /// container to the data-source. Such an item keeps the position, and therefore the sort key, that it currently has, since
-        /// the data-source cannot resolve a reordered <see cref="Thing"/> that is deleted in the same transaction. The rows are laid
-        /// out over the remaining positions, in the order in which they appear in the dialog.
+        /// container to the data-source. Applying the order of the rows assigns such an item a new sort key, which the data-source
+        /// cannot resolve for a <see cref="Thing"/> that is deleted in the same transaction. Moving it back to the position that it
+        /// had restores its sort key, the reordered rows keep their new relative order and are laid out over the other positions.
         /// </remarks>
-        protected void UpdateOrderedItemList<TItem>(OrderedItemList<TItem> orderedItemList, IEnumerable<TItem> rows) where TItem : Thing
+        protected void RestoreSortKeysOfDeletedItems<TItem>(OrderedItemList<TItem> orderedItemList, IReadOnlyList<TItem> originalOrder) where TItem : Thing
         {
-            var orderedItems = orderedItemList.SortedItems.Values.ToList();
-            var orderedRows = rows.ToList();
-
-            if (orderedItems.Where(x => x.ChangeKind != ChangeKind.Delete).SequenceEqual(orderedRows))
+            for (var i = 0; i < originalOrder.Count; i++)
             {
-                return;
-            }
+                var item = originalOrder[i];
 
-            var rowIndex = 0;
-
-            for (var i = 0; i < orderedItems.Count; i++)
-            {
-                var item = orderedItems[i];
-
-                if (item.ChangeKind != ChangeKind.Delete && rowIndex < orderedRows.Count)
+                if (item.ChangeKind != ChangeKind.Delete)
                 {
-                    item = orderedRows[rowIndex];
-                    rowIndex++;
+                    continue;
                 }
 
                 var currentIndex = orderedItemList.IndexOf(item);
 
-                if (currentIndex != i)
+                if (currentIndex > -1 && currentIndex != i)
                 {
                     orderedItemList.Move(currentIndex, i);
                 }

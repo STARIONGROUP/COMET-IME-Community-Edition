@@ -312,7 +312,11 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         protected override void UpdateTransaction()
         {
+            var orderedItems = this.Thing.ParametricConstraint.SortedItems.Values.ToList();
+
             base.UpdateTransaction();
+
+            this.RestoreSortKeysOfDeletedItems(this.Thing.ParametricConstraint, orderedItems);
 
             var existingDefinition = this.Thing.Definition.SingleOrDefault(x => x.LanguageCode == this.SelectedLanguageCode.Name);
             if (existingDefinition == null && !string.IsNullOrWhiteSpace(this.RequirementText))

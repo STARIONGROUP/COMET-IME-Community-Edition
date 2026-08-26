@@ -248,7 +248,20 @@ namespace CDP4CommonView
 
             clone.Owner = this.SelectedOwner;
 
-            this.UpdateOrderedItemList(clone.RuleVerification, this.RuleVerification.Select(x => x.Thing));
+            if (!clone.RuleVerification.SortedItems.Values.SequenceEqual(this.RuleVerification.Select(x => x.Thing)))
+            {
+                var itemCount = this.RuleVerification.Count;
+                for (var i = 0; i < itemCount; i++)
+                {
+                    var item = this.RuleVerification[i].Thing;
+                    var currentIndex = clone.RuleVerification.IndexOf(item);
+
+                    if (currentIndex != i)
+                    {
+                        clone.RuleVerification.Move(currentIndex, i);
+                    }
+                }
+            }
             
         }
 

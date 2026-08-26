@@ -315,43 +315,49 @@ namespace CDP4Composition.Tests.Mvvm
         }
 
         [Test]
-        public void VerifyThatUpdateOrderedItemListAppliesTheOrderOfTheRows()
-        {
-            var testdialog = this.CreateTestDialogViewModel(out var orderedItemList, out var persons);
-            var sortKeys = orderedItemList.SortedItems.Keys.ToList();
-
-            testdialog.UpdateOrderedItems(orderedItemList, new[] { persons[2], persons[0], persons[1] });
-
-            Assert.That(orderedItemList.SortedItems.Values, Is.EqualTo(new[] { persons[2], persons[0], persons[1] }));
-            Assert.That(orderedItemList.SortedItems.Keys, Is.EqualTo(sortKeys));
-        }
-
-        [Test]
-        public void VerifyThatUpdateOrderedItemListDoesNotMoveAnItemThatIsMarkedForDeletion()
+        public void VerifyThatRestoreSortKeysOfDeletedItemsRestoresTheOrderAfterADeletion()
         {
             var testdialog = this.CreateTestDialogViewModel(out var orderedItemList, out var persons);
             var expected = orderedItemList.SortedItems.ToList();
 
-            // the row of a Person that is marked for deletion is no longer present, the remaining ones may not be reordered
+            // the row of the Person that is marked for deletion is gone, the generated dialog moves the remaining rows over it
             persons[1].ChangeKind = ChangeKind.Delete;
+            testdialog.ApplyRowOrder(orderedItemList, new[] { persons[0], persons[2] });
 
-            testdialog.UpdateOrderedItems(orderedItemList, new[] { persons[0], persons[2] });
+            testdialog.RestoreSortKeys(orderedItemList, expected.Select(x => x.Value).ToList());
 
             Assert.That(orderedItemList.SortedItems.ToList(), Is.EqualTo(expected));
         }
 
         [Test]
-        public void VerifyThatUpdateOrderedItemListKeepsTheSortKeyOfAnItemThatIsMarkedForDeletion()
+        public void VerifyThatRestoreSortKeysOfDeletedItemsKeepsTheNewOrderOfTheRemainingItems()
         {
             var testdialog = this.CreateTestDialogViewModel(out var orderedItemList, out var persons);
             var sortKeys = orderedItemList.SortedItems.Keys.ToList();
-
-            persons[1].ChangeKind = ChangeKind.Delete;
+            var originalOrder = orderedItemList.SortedItems.Values.ToList();
 
             // the remaining rows are reordered while a Person is marked for deletion
-            testdialog.UpdateOrderedItems(orderedItemList, new[] { persons[2], persons[0] });
+            persons[1].ChangeKind = ChangeKind.Delete;
+            testdialog.ApplyRowOrder(orderedItemList, new[] { persons[2], persons[0] });
+
+            testdialog.RestoreSortKeys(orderedItemList, originalOrder);
 
             Assert.That(orderedItemList.SortedItems.Values, Is.EqualTo(new[] { persons[2], persons[1], persons[0] }));
+            Assert.That(orderedItemList.SortedItems.Keys, Is.EqualTo(sortKeys));
+        }
+
+        [Test]
+        public void VerifyThatRestoreSortKeysOfDeletedItemsLeavesAReorderWithoutDeletionsAlone()
+        {
+            var testdialog = this.CreateTestDialogViewModel(out var orderedItemList, out var persons);
+            var sortKeys = orderedItemList.SortedItems.Keys.ToList();
+            var originalOrder = orderedItemList.SortedItems.Values.ToList();
+
+            testdialog.ApplyRowOrder(orderedItemList, new[] { persons[2], persons[0], persons[1] });
+
+            testdialog.RestoreSortKeys(orderedItemList, originalOrder);
+
+            Assert.That(orderedItemList.SortedItems.Values, Is.EqualTo(new[] { persons[2], persons[0], persons[1] }));
             Assert.That(orderedItemList.SortedItems.Keys, Is.EqualTo(sortKeys));
         }
 
@@ -448,9 +454,25 @@ namespace CDP4Composition.Tests.Mvvm
             this.ExecuteMoveUpCommand(this.OrderedRows, row);
         }
 
-        public void UpdateOrderedItems(OrderedItemList<Person> orderedItemList, IEnumerable<Person> rows)
+        /// <summary>
+        /// Mirrors the loop that the generated dialog view-models run in their UpdateTransaction to apply the order of the rows
+        /// </summary>
+        public void ApplyRowOrder(OrderedItemList<Person> orderedItemList, IReadOnlyList<Person> rows)
         {
-            this.UpdateOrderedItemList(orderedItemList, rows);
+            for (var i = 0; i < rows.Count; i++)
+            {
+                var currentIndex = orderedItemList.IndexOf(rows[i]);
+
+                if (currentIndex != i)
+                {
+                    orderedItemList.Move(currentIndex, i);
+                }
+            }
+        }
+
+        public void RestoreSortKeys(OrderedItemList<Person> orderedItemList, IReadOnlyList<Person> originalOrder)
+        {
+            this.RestoreSortKeysOfDeletedItems(orderedItemList, originalOrder);
         }
     }
 
