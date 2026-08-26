@@ -45,6 +45,8 @@ namespace CDP4Grapher.Tests.ViewModels
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.ViewModels;
+    using CDP4Composition.ViewModels.DialogResult;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -74,6 +76,7 @@ namespace CDP4Grapher.Tests.ViewModels
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
+        private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
         private readonly Uri uri = new Uri("http://test.com");
         private CDPMessageBus messageBus;
@@ -113,6 +116,7 @@ namespace CDP4Grapher.Tests.ViewModels
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
+            this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -227,7 +231,7 @@ namespace CDP4Grapher.Tests.ViewModels
                 this.session.Object,
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
-                null,
+                this.dialogNavigationService.Object,
                 this.pluginSettingsService.Object);
         }
 
@@ -750,7 +754,7 @@ namespace CDP4Grapher.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatAConfigurationCanBeSavedAppliedAndDeleted()
+        public async Task VerifyThatAConfigurationIsSavedThroughTheSharedDialogAndCanBeApplied()
         {
             var viewModel = this.CreateViewModel();
 
@@ -759,12 +763,19 @@ namespace CDP4Grapher.Tests.ViewModels
             viewModel.SelectedDefaultLevelCategories = new List<Category> { this.traceCategory };
             viewModel.SelectedRootClassKinds = new List<ClassKind> { ClassKind.RequirementsSpecification, ClassKind.ElementDefinition };
             viewModel.SelectedRootCategories = new List<Category> { this.specCategory };
-            viewModel.ConfigurationName = "my preset";
+
+            // the shared dialog is what names and writes the preset, so it is driven the way the navigation service
+            // would drive it
+            this.SetupSaveConfigurationDialog("my preset", "the description");
 
             await viewModel.SaveConfigurationCommand.Execute();
 
             this.pluginSettingsService.Verify(x => x.Write(this.settings), Times.Once);
-            Assert.That(this.settings.SavedConfigurations.OfType<TraceabilityConfiguration>().Single().Name, Is.EqualTo("my preset"));
+
+            var saved = this.settings.SavedConfigurations.OfType<TraceabilityConfiguration>().Single();
+            Assert.That(saved.Name, Is.EqualTo("my preset"));
+            Assert.That(saved.Description, Is.EqualTo("the description"));
+
             Assert.That(viewModel.SavedConfigurations.Count, Is.EqualTo(1));
             Assert.That(viewModel.SelectedConfiguration, Is.Not.Null);
 
@@ -781,7 +792,19 @@ namespace CDP4Grapher.Tests.ViewModels
             Assert.That(viewModel.SelectedRootClassKinds, Is.EquivalentTo(new[] { ClassKind.RequirementsSpecification, ClassKind.ElementDefinition }));
             Assert.That(viewModel.SelectedRootCategories, Is.EquivalentTo(new[] { this.specCategory }));
 
-            await viewModel.DeleteConfigurationCommand.Execute();
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatCancellingTheSaveDialogWritesNothing()
+        {
+            var viewModel = this.CreateViewModel();
+
+            this.dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<SavedConfigurationDialogViewModel<GrapherPluginSettings>>()))
+                .Returns(new SavedConfigurationResult(false));
+
+            await viewModel.SaveConfigurationCommand.Execute();
 
             Assert.That(this.settings.SavedConfigurations, Is.Empty);
             Assert.That(viewModel.SavedConfigurations, Is.Empty);
@@ -791,21 +814,183 @@ namespace CDP4Grapher.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatSavingUnderAnExistingNameReplacesThePreset()
+        public async Task VerifyThatDeletingThroughTheManagerClearsTheAppliedPreset()
         {
             var viewModel = this.CreateViewModel();
 
-            viewModel.ConfigurationName = "preset";
-            viewModel.DepthDown = 2;
+            this.SetupSaveConfigurationDialog("my preset", "the description");
             await viewModel.SaveConfigurationCommand.Execute();
 
-            viewModel.DepthDown = 5;
-            await viewModel.SaveConfigurationCommand.Execute();
+            viewModel.SelectedConfiguration = viewModel.SavedConfigurations.Single();
 
-            var saved = this.settings.SavedConfigurations.OfType<TraceabilityConfiguration>().Single();
-            Assert.That(saved.DepthDown, Is.EqualTo(5));
+            // the manager dialog owns the deletion; it writes back whatever is left
+            this.dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<ManageConfigurationsDialogViewModel<GrapherPluginSettings>>()))
+                .Returns((IDialogViewModel dialog) =>
+                {
+                    var manageDialog = (ManageConfigurationsDialogViewModel<GrapherPluginSettings>)dialog;
+                    manageDialog.SelectedConfiguration = manageDialog.SavedConfigurations.Single();
+                    manageDialog.DeleteSelectedCommand.Execute().GetAwaiter().GetResult();
+                    manageDialog.OkCommand.Execute().GetAwaiter().GetResult();
+
+                    return manageDialog.DialogResult;
+                });
+
+            await viewModel.ManageConfigurationsCommand.Execute();
+
+            Assert.That(this.settings.SavedConfigurations, Is.Empty);
+            Assert.That(viewModel.SavedConfigurations, Is.Empty);
+            Assert.That(viewModel.SelectedConfiguration, Is.Null);
 
             viewModel.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatSettingANodeAsRootRestartsTheTraversalFromIt()
+        {
+            // spec1 and spec3 both point at spec2, so from spec1 alone the second parent stays out of sight
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+            this.AddBinaryRelationship(this.spec3, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.DepthUp = 1;
+
+            Assert.That(viewModel.Nodes.Select(x => x.Thing), Is.EquivalentTo(new Thing[] { this.spec1, this.spec2 }));
+
+            viewModel.SelectedNode = viewModel.Nodes.Single(x => x.Thing == this.spec2);
+            await viewModel.SetSelectedNodeAsRootCommand.Execute();
+
+            // the picked node replaces the roots, so the other path leading into it shows up above it
+            Assert.That(viewModel.RootThings, Is.EquivalentTo(new Thing[] { this.spec2 }));
+            Assert.That(viewModel.Nodes.Select(x => x.Thing), Is.EquivalentTo(new Thing[] { this.spec1, this.spec2, this.spec3 }));
+            Assert.That(viewModel.Nodes.Single(x => x.Thing == this.spec2).IsRoot, Is.True);
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatAddingANodeToTheRootsKeepsTheExistingRoots()
+        {
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+            this.AddBinaryRelationship(this.spec3, this.elementDefinition, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            Assert.That(viewModel.Nodes.Select(x => x.Thing), Is.EquivalentTo(new Thing[] { this.spec1, this.spec2 }));
+
+            viewModel.SelectedNode = viewModel.Nodes.Single(x => x.Thing == this.spec2);
+            await viewModel.AddSelectedNodeToRootsCommand.Execute();
+
+            // unlike setting the root, the branch that was already shown stays
+            Assert.That(viewModel.RootThings, Is.EquivalentTo(new Thing[] { this.spec1, this.spec2 }));
+            Assert.That(viewModel.Nodes.Single(x => x.Thing == this.spec2).IsRoot, Is.True);
+            Assert.That(viewModel.Nodes.Select(x => x.Thing), Does.Contain(this.spec1));
+
+            // adding the same node twice does not duplicate it
+            viewModel.SelectedNode = viewModel.Nodes.Single(x => x.Thing == this.spec2);
+            await viewModel.AddSelectedNodeToRootsCommand.Execute();
+
+            Assert.That(viewModel.RootThings.Count, Is.EqualTo(2));
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatTheMaxNodeWarningNamesTheLimits()
+        {
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+            this.AddBinaryRelationship(this.spec2, this.spec3, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.MaxNodes = 2;
+
+            Assert.That(viewModel.IsMaxNodeCountReached, Is.True);
+
+            // the warning states the maximum that was hit and the range it may be raised within
+            Assert.That(viewModel.MaxNodeCountMessage, Does.Contain("2"));
+            Assert.That(viewModel.MaxNodeCountMessage, Does.Contain(RelationshipTraceabilityViewModel.MinimumMaxNodes.ToString()));
+            Assert.That(viewModel.MaxNodeCountMessage, Does.Contain(RelationshipTraceabilityViewModel.MaximumMaxNodes.ToString()));
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatARelationshipOfAnotherIterationDoesNotRecomputeTheGraph()
+        {
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var otherIteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
+            this.model.Iteration.Add(otherIteration);
+
+            var foreignRelationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri);
+            otherIteration.Relationship.Add(foreignRelationship);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            // a relationship that would extend the graph, but the panel is not told about it yet
+            this.AddBinaryRelationship(this.spec2, this.spec3, this.traceCategory);
+
+            this.messageBus.SendObjectChangeEvent(foreignRelationship, EventKind.Added);
+            Assert.That(viewModel.Nodes.Count, Is.EqualTo(2));
+
+            this.messageBus.SendObjectChangeEvent(this.iteration.Relationship.Last(), EventKind.Added);
+            Assert.That(viewModel.Nodes.Count, Is.EqualTo(3));
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatReassigningTheSameDepthDoesNotRecomputeTheGraph()
+        {
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            var recomputes = 0;
+            using (viewModel.Nodes.Changed.Subscribe(_ => recomputes++))
+            {
+                viewModel.DepthDown = viewModel.DepthDown;
+                viewModel.DepthUp = viewModel.DepthUp;
+                viewModel.MaxNodes = viewModel.MaxNodes;
+
+                Assert.That(recomputes, Is.Zero);
+
+                viewModel.MaxNodes = 42;
+
+                Assert.That(recomputes, Is.Not.Zero);
+            }
+
+            viewModel.Dispose();
+        }
+
+        /// <summary>
+        /// Sets the dialog navigation service up to drive the shared save dialog the way a user would: filling in the
+        /// name and description and confirming it
+        /// </summary>
+        /// <param name="name">The name to save the preset under</param>
+        /// <param name="description">The description of the preset</param>
+        private void SetupSaveConfigurationDialog(string name, string description)
+        {
+            this.dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<SavedConfigurationDialogViewModel<GrapherPluginSettings>>()))
+                .Returns((IDialogViewModel dialog) =>
+                {
+                    var saveDialog = (SavedConfigurationDialogViewModel<GrapherPluginSettings>)dialog;
+                    saveDialog.Name = name;
+                    saveDialog.Description = description;
+                    saveDialog.OkCommand.Execute().GetAwaiter().GetResult();
+
+                    return saveDialog.DialogResult;
+                });
         }
     }
 }

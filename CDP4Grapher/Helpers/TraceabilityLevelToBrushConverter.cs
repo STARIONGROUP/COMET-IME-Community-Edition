@@ -52,6 +52,34 @@ namespace CDP4Grapher.Helpers
         private static readonly Brush UpBrush = new SolidColorBrush(Color.FromRgb(200, 230, 201));
 
         /// <summary>
+        /// Gets the <see cref="Brush"/> a node at the given level is filled with
+        /// </summary>
+        /// <param name="level">The level of the node: zero for a root, positive downward, negative upward</param>
+        /// <returns>The <see cref="Brush"/> of the node</returns>
+        public static Brush GetBrush(int level)
+        {
+            if (level == 0)
+            {
+                return RootBrush;
+            }
+
+            return level > 0 ? DownBrush : UpBrush;
+        }
+
+        /// <summary>
+        /// Gets the fill of a node at the given level as an SVG hexadecimal color, so that an exported diagram keeps
+        /// the colors of the on-screen one
+        /// </summary>
+        /// <param name="level">The level of the node: zero for a root, positive downward, negative upward</param>
+        /// <returns>The hexadecimal color, in <c>#RRGGBB</c> notation</returns>
+        public static string GetHexColor(int level)
+        {
+            var color = ((SolidColorBrush)GetBrush(level)).Color;
+
+            return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+        /// <summary>
         /// Converts a node level to a <see cref="Brush"/>
         /// </summary>
         /// <param name="value">The level of the node</param>
@@ -61,17 +89,7 @@ namespace CDP4Grapher.Helpers
         /// <returns>The <see cref="Brush"/> of the node</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(value is int level))
-            {
-                return DownBrush;
-            }
-
-            if (level == 0)
-            {
-                return RootBrush;
-            }
-
-            return level > 0 ? DownBrush : UpBrush;
+            return value is int level ? GetBrush(level) : DownBrush;
         }
 
         /// <summary>

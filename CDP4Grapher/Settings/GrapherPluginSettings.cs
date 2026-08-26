@@ -25,10 +25,6 @@
 
 namespace CDP4Grapher.Settings
 {
-    using System.Collections.Generic;
-
-    using CDP4Common.CommonData;
-
     using CDP4Composition.PluginSettingService;
 
     /// <summary>
@@ -38,21 +34,5 @@ namespace CDP4Grapher.Settings
     /// </summary>
     public class GrapherPluginSettings : PluginSettings
     {
-        /// <summary>
-        /// The set of <see cref="ClassKind"/>s offered by the traceability diagram pickers, the same curated set the
-        /// Relationship Matrix uses instead of every categorizable <see cref="ClassKind"/> of the model
-        /// </summary>
-        public static readonly IReadOnlyList<ClassKind> DefaultClassKinds = new List<ClassKind>
-        {
-            ClassKind.ElementDefinition,
-            ClassKind.ElementUsage,
-            ClassKind.NestedElement,
-            ClassKind.Option,
-            ClassKind.Parameter,
-            ClassKind.ParametricConstraint,
-            ClassKind.RequirementsSpecification,
-            ClassKind.RequirementsGroup,
-            ClassKind.Requirement
-        };
     }
 }

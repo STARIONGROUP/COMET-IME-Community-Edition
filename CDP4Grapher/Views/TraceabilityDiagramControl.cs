@@ -49,18 +49,33 @@ namespace CDP4Grapher.Views
                 yield break;
             }
 
+            // the shortcuts themselves are bound on the view; the menu only advertises them
             yield return new BarButtonItem
             {
-                Content = "Edit",
+                Content = "Edit (Ctrl+E)",
                 ToolTip = "Opens the update dialog of the selected node or relationship",
                 Command = viewModel.EditSelectedThingCommand
             };
 
             yield return new BarButtonItem
             {
-                Content = "Inspect",
+                Content = "Inspect (Ctrl+I)",
                 ToolTip = "Opens the inspect dialog of the selected node or relationship",
                 Command = viewModel.InspectSelectedThingCommand
+            };
+
+            yield return new BarButtonItem
+            {
+                Content = "Set as root",
+                ToolTip = "Restarts the diagram from the selected node, so the paths that lead to it become visible",
+                Command = viewModel.SetSelectedNodeAsRootCommand
+            };
+
+            yield return new BarButtonItem
+            {
+                Content = "Add to roots",
+                ToolTip = "Expands the selected node as an extra root, next to the roots that are already shown",
+                Command = viewModel.AddSelectedNodeToRootsCommand
             };
 
             yield return new BarButtonItem

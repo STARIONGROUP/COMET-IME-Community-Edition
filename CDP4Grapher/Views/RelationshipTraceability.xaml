@@ -59,12 +59,9 @@
                                           DisplayMember="Name"
                                           AllowNullInput="True"
                                           NullText="Select a preset..." />
-                        <dxe:TextEdit Margin="0,3,0,0"
-                                      EditValue="{Binding ConfigurationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      NullText="Preset name" />
                         <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                            <Button Content="Save" MinWidth="60" Command="{Binding SaveConfigurationCommand}" />
-                            <Button Content="Delete" MinWidth="60" Margin="5,0,0,0" Command="{Binding DeleteConfigurationCommand}" />
+                            <Button Content="Save as..." MinWidth="70" Command="{Binding SaveConfigurationCommand}" />
+                            <Button Content="Manage..." MinWidth="70" Margin="5,0,0,0" Command="{Binding ManageConfigurationsCommand}" />
                         </StackPanel>
                     </StackPanel>
                     </dxlc:LayoutItem>
@@ -118,12 +115,17 @@
                                   Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
                     <dxlc:LayoutItem>
                     <StackPanel>
+                        <!-- ValidateOnTextInput=False: typing "5000" commits once instead of rebuilding the graph
+                             for 5, 50, 500 and 5000 on the way there; the spin buttons still commit immediately -->
                         <TextBlock Text="Levels down (source to target):" />
-                        <dxe:SpinEdit Value="{Binding DepthDown, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}" MinValue="0" MaxValue="20" IsFloatValue="False" />
+                        <dxe:SpinEdit Value="{Binding DepthDown, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}" MinValue="0" MaxValue="20" IsFloatValue="False" ValidateOnTextInput="False" />
                         <TextBlock Text="Levels up (target to source):" Margin="0,3,0,0" />
-                        <dxe:SpinEdit Value="{Binding DepthUp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}" MinValue="0" MaxValue="20" IsFloatValue="False" />
+                        <dxe:SpinEdit Value="{Binding DepthUp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}" MinValue="0" MaxValue="20" IsFloatValue="False" ValidateOnTextInput="False" />
                         <TextBlock Text="Maximum nodes:" Margin="0,3,0,0" />
-                        <dxe:SpinEdit Value="{Binding MaxNodes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}" MinValue="10" MaxValue="5000" IsFloatValue="False" />
+                        <dxe:SpinEdit Value="{Binding MaxNodes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}"
+                                      MinValue="{x:Static viewModels:RelationshipTraceabilityViewModel.MinimumMaxNodes}"
+                                      MaxValue="{x:Static viewModels:RelationshipTraceabilityViewModel.MaximumMaxNodes}"
+                                      IsFloatValue="False" ValidateOnTextInput="False" />
                     </StackPanel>
                     </dxlc:LayoutItem>
                 </dxlc:LayoutGroup>
@@ -265,8 +267,7 @@
                     BorderThickness="1"
                     Padding="5"
                     Visibility="{Binding IsMaxNodeCountReached, Converter={dxmvvm:BooleanToVisibilityConverter}}">
-                <TextBlock TextWrapping="Wrap"
-                           Text="The maximum number of nodes was reached; the diagram is incomplete. Raise the maximum, lower the depth or add filters." />
+                <TextBlock TextWrapping="Wrap" Text="{Binding MaxNodeCountMessage}" />
             </Border>
 
             <TextBlock Grid.Row="1" Margin="5,2" Text="{Binding StatusMessage}" />
@@ -283,6 +284,8 @@
                 </i:Interaction.Behaviors>
                 <dxmvvm:Interaction.Behaviors>
                     <behaviors:TraceabilityDiagramBehavior />
+                    <dxmvvm:KeyToCommand KeyGesture="Ctrl+E" Command="{Binding EditSelectedThingCommand}" />
+                    <dxmvvm:KeyToCommand KeyGesture="Ctrl+I" Command="{Binding InspectSelectedThingCommand}" />
                     <dxmvvm:EventToCommand EventName="SelectionChanged"
                                            Command="{Binding DiagramSelectionChangedCommand}"
                                            PassEventArgsToCommand="True" />

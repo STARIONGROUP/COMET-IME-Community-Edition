@@ -48,6 +48,8 @@ namespace CDP4Grapher.ViewModels
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.ViewModels;
+    using CDP4Composition.ViewModels.DialogResult;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -72,6 +74,18 @@ namespace CDP4Grapher.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Relationship Traceability";
+
+        /// <summary>
+        /// The smallest value <see cref="MaxNodes"/> may take. Typed as the spin editor's own value type so that the
+        /// editor bounds and the warning message cannot drift apart.
+        /// </summary>
+        public const decimal MinimumMaxNodes = 10;
+
+        /// <summary>
+        /// The largest value <see cref="MaxNodes"/> may take. Typed as the spin editor's own value type so that the
+        /// editor bounds and the warning message cannot drift apart.
+        /// </summary>
+        public const decimal MaximumMaxNodes = 5000;
 
         /// <summary>
         /// A value indicating whether the view-model finished initializing, used to keep the construction-time
@@ -167,9 +181,9 @@ namespace CDP4Grapher.ViewModels
         private string statusMessage;
 
         /// <summary>
-        /// Backing field for <see cref="ConfigurationName"/>
+        /// Backing field for <see cref="MaxNodeCountMessage"/>
         /// </summary>
-        private string configurationName;
+        private string maxNodeCountMessage;
 
         /// <summary>
         /// Backing field for <see cref="SelectedConfiguration"/>
@@ -302,6 +316,11 @@ namespace CDP4Grapher.ViewModels
             get => this.depthDown;
             set
             {
+                if (value == this.depthDown)
+                {
+                    return;
+                }
+
                 this.RaiseAndSetIfChanged(ref this.depthDown, value);
                 this.ComputeGraph();
             }
@@ -315,6 +334,11 @@ namespace CDP4Grapher.ViewModels
             get => this.depthUp;
             set
             {
+                if (value == this.depthUp)
+                {
+                    return;
+                }
+
                 this.RaiseAndSetIfChanged(ref this.depthUp, value);
                 this.ComputeGraph();
             }
@@ -328,6 +352,11 @@ namespace CDP4Grapher.ViewModels
             get => this.maxNodes;
             set
             {
+                if (value == this.maxNodes)
+                {
+                    return;
+                }
+
                 this.RaiseAndSetIfChanged(ref this.maxNodes, value);
                 this.ComputeGraph();
             }
@@ -466,12 +495,13 @@ namespace CDP4Grapher.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets the name under which the current configuration is saved
+        /// Gets the warning shown when <see cref="IsMaxNodeCountReached"/>, naming the maximum that was hit and the
+        /// range it may be raised within, so the user does not have to guess the numbers
         /// </summary>
-        public string ConfigurationName
+        public string MaxNodeCountMessage
         {
-            get => this.configurationName;
-            set => this.RaiseAndSetIfChanged(ref this.configurationName, value);
+            get => this.maxNodeCountMessage;
+            private set => this.RaiseAndSetIfChanged(ref this.maxNodeCountMessage, value);
         }
 
         /// <summary>
@@ -521,14 +551,14 @@ namespace CDP4Grapher.ViewModels
         public ReactiveCommand<Unit, Unit> RemoveLevelFilterRowCommand { get; private set; }
 
         /// <summary>
-        /// Gets the command that saves the current configuration under <see cref="ConfigurationName"/>
+        /// Gets the command that saves the current configuration as a named preset
         /// </summary>
         public ReactiveCommand<Unit, Unit> SaveConfigurationCommand { get; private set; }
 
         /// <summary>
-        /// Gets the command that deletes <see cref="SelectedConfiguration"/>
+        /// Gets the command that opens the manager of the saved presets
         /// </summary>
-        public ReactiveCommand<Unit, Unit> DeleteConfigurationCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ManageConfigurationsCommand { get; private set; }
 
         /// <summary>
         /// Gets the command invoked when the diagram selection changes; it publishes the selected node's
@@ -541,6 +571,18 @@ namespace CDP4Grapher.ViewModels
         /// reachable through it disappears with it
         /// </summary>
         public ReactiveCommand<Unit, Unit> ExcludeSelectedNodeCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that restarts the traversal from <see cref="SelectedNode"/>, which is how a node deeper
+        /// down the tree is inspected for the other paths that lead to it
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> SetSelectedNodeAsRootCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that adds <see cref="SelectedNode"/> to the roots, keeping the roots that are already
+        /// there, so that a second branch is expanded next to the current one
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> AddSelectedNodeToRootsCommand { get; private set; }
 
         /// <summary>
         /// Gets the command that opens the update dialog of the <see cref="SelectedDiagramThing"/>
@@ -656,6 +698,8 @@ namespace CDP4Grapher.ViewModels
 
             this.IsMaxNodeCountReached = graph.MaxNodeCountReached;
 
+            this.MaxNodeCountMessage = $"The maximum of {this.MaxNodes} nodes was reached, so the diagram is incomplete. Raise the maximum (allowed {MinimumMaxNodes} to {MaximumMaxNodes}), lower the depth or add filters.";
+
             var exclusionSuffix = this.ExcludedThings.Any() ? $", {this.ExcludedThings.Count} excluded" : string.Empty;
             this.StatusMessage = $"{graph.Nodes.Count} nodes, {graph.Edges.Count} relationships{exclusionSuffix}";
         }
@@ -667,9 +711,9 @@ namespace CDP4Grapher.ViewModels
         /// <returns>The matching <see cref="Thing"/>s</returns>
         private IEnumerable<Thing> QueryRootsByClassKindAndCategory()
         {
-            var candidates = this.Session.Assembler.Cache
-                .Where(x => x.Key.Iteration.HasValue && x.Key.Iteration.Value == this.Thing.Iid)
-                .Select(x => x.Value.Value)
+            // walking the containment tree of this iteration only, rather than the session cache which holds the
+            // things of every open iteration and model
+            var candidates = this.Thing.QueryContainedThingsDeep()
                 .Where(x => this.SelectedRootClassKinds.Contains(x.ClassKind));
 
             if (!this.SelectedRootCategories.Any())
@@ -745,7 +789,7 @@ namespace CDP4Grapher.ViewModels
             this.PossibleClassKinds.Clear();
 
             this.PossibleClassKinds.AddRange(
-                GrapherPluginSettings.DefaultClassKinds
+                RelationshipClassKinds.Default
                     .Where(x => TypeInitializer.Initialize(x) is ICategorizableThing)
                     .OrderBy(x => x.ToString()));
 
@@ -815,13 +859,9 @@ namespace CDP4Grapher.ViewModels
                 },
                 this.WhenAnyValue(x => x.SelectedLevelFilterRow).Select(x => x != null));
 
-            this.SaveConfigurationCommand = ReactiveCommandCreator.Create(
-                this.SaveConfiguration,
-                this.WhenAnyValue(x => x.ConfigurationName).Select(x => !string.IsNullOrWhiteSpace(x)));
+            this.SaveConfigurationCommand = ReactiveCommandCreator.Create(this.ExecuteSaveConfiguration);
 
-            this.DeleteConfigurationCommand = ReactiveCommandCreator.Create(
-                this.DeleteConfiguration,
-                this.WhenAnyValue(x => x.SelectedConfiguration).Select(x => x != null));
+            this.ManageConfigurationsCommand = ReactiveCommandCreator.Create(this.ExecuteManageConfigurations);
 
             this.DiagramSelectionChangedCommand = ReactiveCommandCreator.Create<object>(this.OnDiagramSelectionChanged);
 
@@ -831,6 +871,44 @@ namespace CDP4Grapher.ViewModels
                     if (this.ExcludedThings.All(x => x.Iid != this.SelectedNode.Thing.Iid))
                     {
                         this.ExcludedThings.Add(this.SelectedNode.Thing);
+                    }
+
+                    this.ComputeGraph();
+                },
+                this.WhenAnyValue(x => x.SelectedNode).Select(x => x != null));
+
+            this.SetSelectedNodeAsRootCommand = ReactiveCommandCreator.Create(
+                () =>
+                {
+                    var thing = this.SelectedNode.Thing;
+
+                    // the picked node becomes the only root, so the diagram is re-centred on it and the upward cone
+                    // shows every other path that leads to it; suppressed so that this is a single recompute
+                    this.isInitialized = false;
+
+                    try
+                    {
+                        this.RootThings.Clear();
+                        this.RootThings.Add(thing);
+                        this.SelectedRootClassKinds = new List<ClassKind>();
+                    }
+                    finally
+                    {
+                        this.isInitialized = true;
+                    }
+
+                    this.ComputeGraph();
+                },
+                this.WhenAnyValue(x => x.SelectedNode).Select(x => x != null));
+
+            this.AddSelectedNodeToRootsCommand = ReactiveCommandCreator.Create(
+                () =>
+                {
+                    var thing = this.SelectedNode.Thing;
+
+                    if (this.RootThings.All(x => x.Iid != thing.Iid))
+                    {
+                        this.RootThings.Add(thing);
                     }
 
                     this.ComputeGraph();
@@ -903,6 +981,9 @@ namespace CDP4Grapher.ViewModels
             {
                 this.Disposables.Add(
                     this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(relationshipType)
+                        // the subscription is registered by type, so a relationship of another open iteration would
+                        // otherwise rebuild this panel's graph for nothing
+                        .Where(objectChange => objectChange.ChangedThing.GetContainerOfType<Iteration>()?.Iid == this.Thing.Iid)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(_ =>
                         {
@@ -987,16 +1068,53 @@ namespace CDP4Grapher.ViewModels
         }
 
         /// <summary>
-        /// Saves the current configuration under <see cref="ConfigurationName"/>, replacing an existing preset with
-        /// the same name
+        /// Saves the current configuration as a preset, through the shared name and description dialog
         /// </summary>
-        private void SaveConfiguration()
+        private void ExecuteSaveConfiguration()
         {
-            this.ConfigurationName = this.ConfigurationName.Trim();
+            var configuration = this.BuildSavedConfiguration();
 
-            var configuration = new TraceabilityConfiguration
+            var dialogViewModel = new SavedConfigurationDialogViewModel<GrapherPluginSettings>(this.PluginSettingsService, configuration);
+
+            if (!((this.DialogNavigationService.NavigateModal(dialogViewModel) as SavedConfigurationResult)?.Result ?? false))
             {
-                Name = this.ConfigurationName,
+                return;
+            }
+
+            this.LoadSavedConfigurations();
+
+            this.selectedConfiguration = this.SavedConfigurations.FirstOrDefault(x => x.Id == configuration.Id);
+            this.RaisePropertyChanged(nameof(this.SelectedConfiguration));
+        }
+
+        /// <summary>
+        /// Opens the shared manager of the saved presets, which is where a preset is deleted
+        /// </summary>
+        private void ExecuteManageConfigurations()
+        {
+            var dialogViewModel = new ManageConfigurationsDialogViewModel<GrapherPluginSettings>(this.PluginSettingsService);
+
+            if (!((this.DialogNavigationService.NavigateModal(dialogViewModel) as ManageConfigurationsResult)?.Result ?? false))
+            {
+                return;
+            }
+
+            this.LoadSavedConfigurations();
+
+            // the applied preset may have just been deleted
+            this.selectedConfiguration = this.SavedConfigurations.FirstOrDefault(x => x.Id == this.selectedConfiguration?.Id);
+            this.RaisePropertyChanged(nameof(this.SelectedConfiguration));
+        }
+
+        /// <summary>
+        /// Builds a <see cref="TraceabilityConfiguration"/> from the current state of the panel; its name and
+        /// description are filled in by the save dialog
+        /// </summary>
+        /// <returns>The <see cref="TraceabilityConfiguration"/></returns>
+        private TraceabilityConfiguration BuildSavedConfiguration()
+        {
+            return new TraceabilityConfiguration
+            {
                 RootClassKinds = this.SelectedRootClassKinds.ToList(),
                 RootCategories = this.SelectedRootCategories.Select(x => x.Iid).ToList(),
                 DepthDown = this.DepthDown,
@@ -1010,47 +1128,6 @@ namespace CDP4Grapher.ViewModels
                     .Select(x => new TraceabilityLevelOverride { Level = x.Level, Direction = x.Direction, Categories = x.SelectedCategories.Select(c => c.Iid).ToList() })
                     .ToList()
             };
-
-            var settings = this.ReadOrInitializeSettings();
-
-            var existing = settings.SavedConfigurations
-                .OfType<TraceabilityConfiguration>()
-                .FirstOrDefault(x => x.Name == configuration.Name);
-
-            if (existing != null)
-            {
-                configuration.Id = existing.Id;
-                settings.SavedConfigurations.Remove(existing);
-            }
-
-            settings.SavedConfigurations.Add(configuration);
-            this.PluginSettingsService.Write(settings);
-
-            this.LoadSavedConfigurations();
-            this.selectedConfiguration = this.SavedConfigurations.FirstOrDefault(x => x.Id == configuration.Id);
-            this.RaisePropertyChanged(nameof(this.SelectedConfiguration));
-        }
-
-        /// <summary>
-        /// Deletes <see cref="SelectedConfiguration"/> from the plugin settings
-        /// </summary>
-        private void DeleteConfiguration()
-        {
-            var settings = this.ReadOrInitializeSettings();
-
-            var existing = settings.SavedConfigurations
-                .OfType<TraceabilityConfiguration>()
-                .FirstOrDefault(x => x.Id == this.SelectedConfiguration.Id);
-
-            if (existing != null)
-            {
-                settings.SavedConfigurations.Remove(existing);
-                this.PluginSettingsService.Write(settings);
-            }
-
-            this.selectedConfiguration = null;
-            this.RaisePropertyChanged(nameof(this.SelectedConfiguration));
-            this.LoadSavedConfigurations();
         }
 
         /// <summary>
@@ -1068,7 +1145,6 @@ namespace CDP4Grapher.ViewModels
 
             try
             {
-                this.ConfigurationName = configuration.Name;
                 this.SelectedRootClassKinds = configuration.RootClassKinds.ToList();
                 this.SelectedRootCategories = this.ResolveCategories(configuration.RootCategories);
                 this.DepthDown = configuration.DepthDown;

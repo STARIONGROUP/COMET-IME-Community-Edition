@@ -29,10 +29,12 @@ namespace CDP4Grapher.Helpers
 
     using CDP4Common.CommonData;
 
+    using CDP4Composition.Converters;
+
     /// <summary>
     /// Converts the edit value of a checked combo box to a <see cref="List{T}"/> of <see cref="ClassKind"/>
     /// </summary>
-    public class TraceabilityClassKindListConverter : TraceabilityListConverter<ClassKind>
+    public class TraceabilityClassKindListConverter : GenericObjectListConverter<ClassKind>
     {
     }
 }
