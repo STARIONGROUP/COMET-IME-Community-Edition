@@ -32,6 +32,12 @@ namespace CDP4Grapher.Settings
     /// <see cref="PluginSettings.SavedConfigurations"/> collection holds the saved
     /// <see cref="TraceabilityConfiguration"/> presets.
     /// </summary>
+    /// <remarks>
+    /// The class declares no members of its own on purpose, but it cannot be dropped in favour of
+    /// <see cref="PluginSettings"/>: the <see cref="IPluginSettingsService"/> derives the settings file name from the
+    /// assembly that declares the type it is given, so this type is what routes the reads and writes to the
+    /// CDP4Grapher settings file instead of the one of CDP4Composition.
+    /// </remarks>
     public class GrapherPluginSettings : PluginSettings
     {
     }

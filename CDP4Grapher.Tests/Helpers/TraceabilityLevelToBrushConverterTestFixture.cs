@@ -47,27 +47,43 @@ namespace CDP4Grapher.Tests.Helpers
             var down = converter.Convert(2, typeof(Brush), null, CultureInfo.InvariantCulture);
             var up = converter.Convert(-2, typeof(Brush), null, CultureInfo.InvariantCulture);
 
-            Assert.That(root, Is.Not.EqualTo(down));
-            Assert.That(down, Is.Not.EqualTo(up));
+            Assert.Multiple(() =>
+            {
+                Assert.That(root, Is.Not.EqualTo(down));
+                Assert.That(down, Is.Not.EqualTo(up));
+                Assert.That(root, Is.Not.EqualTo(up));
 
-            // a non-integer level still yields a usable brush rather than throwing on the diagram
-            Assert.That(converter.Convert(null, typeof(Brush), null, CultureInfo.InvariantCulture), Is.EqualTo(down));
+                // every level of a cone keeps the colour of that cone
+                Assert.That(converter.Convert(1, typeof(Brush), null, CultureInfo.InvariantCulture), Is.EqualTo(down));
+                Assert.That(converter.Convert(-1, typeof(Brush), null, CultureInfo.InvariantCulture), Is.EqualTo(up));
+
+                // a non-integer level still yields a usable brush rather than throwing on the diagram
+                Assert.That(converter.Convert(null, typeof(Brush), null, CultureInfo.InvariantCulture), Is.EqualTo(down));
+                Assert.That(converter.Convert("not a level", typeof(Brush), null, CultureInfo.InvariantCulture), Is.EqualTo(down));
+            });
         }
 
         [Test]
         public void VerifyThatTheHexColorMatchesTheBrushOfTheSameLevel()
         {
-            // the SVG export reads the hex colors, so they must not drift from the on-screen brushes
-            foreach (var level in new[] { -2, -1, 0, 1, 2 })
+            Assert.Multiple(() =>
             {
-                var color = ((SolidColorBrush)TraceabilityLevelToBrushConverter.GetBrush(level)).Color;
+                // the SVG export reads the hex colors, so they must not drift from the on-screen brushes
+                foreach (var level in new[] { -2, -1, 0, 1, 2 })
+                {
+                    var color = ((SolidColorBrush)TraceabilityLevelToBrushConverter.GetBrush(level)).Color;
 
-                Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(level), Is.EqualTo($"#{color.R:X2}{color.G:X2}{color.B:X2}"));
-            }
+                    Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(level), Is.EqualTo($"#{color.R:X2}{color.G:X2}{color.B:X2}"));
+                }
 
-            Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(0), Is.EqualTo("#FFE082"));
-            Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(1), Is.EqualTo("#BBDEFB"));
-            Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(-1), Is.EqualTo("#C8E6C9"));
+                Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(0), Is.EqualTo("#FFE082"));
+                Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(1), Is.EqualTo("#BBDEFB"));
+                Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(-1), Is.EqualTo("#C8E6C9"));
+
+                // the whole cone shares one colour, so a deeper level exports the same fill
+                Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(2), Is.EqualTo(TraceabilityLevelToBrushConverter.GetHexColor(1)));
+                Assert.That(TraceabilityLevelToBrushConverter.GetHexColor(-2), Is.EqualTo(TraceabilityLevelToBrushConverter.GetHexColor(-1)));
+            });
         }
     }
 }
