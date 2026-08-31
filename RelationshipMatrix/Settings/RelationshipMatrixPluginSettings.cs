@@ -30,6 +30,7 @@ namespace CDP4RelationshipMatrix
 
     using CDP4Common.CommonData;
 
+    using CDP4Composition;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.PluginSettingService;
 
@@ -46,18 +47,7 @@ namespace CDP4RelationshipMatrix
         /// <summary>
         /// A set of default possible <see cref="ClassKind"/>.
         /// </summary>
-        public static IEnumerable<ClassKind> DefaultClassKinds = new List<ClassKind>
-        {
-            ClassKind.ElementDefinition,
-            ClassKind.ElementUsage,
-            ClassKind.NestedElement,
-            ClassKind.Option,
-            ClassKind.Parameter,
-            ClassKind.ParametricConstraint,
-            ClassKind.RequirementsSpecification,
-            ClassKind.RequirementsGroup,
-            ClassKind.Requirement
-        };
+        public static IEnumerable<ClassKind> DefaultClassKinds = RelationshipClassKinds.Default;
 
         /// <summary>
         /// A set of default possible <see cref="DisplayKind"/>.

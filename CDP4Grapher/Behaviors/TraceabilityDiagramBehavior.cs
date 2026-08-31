@@ -36,6 +36,7 @@ namespace CDP4Grapher.Behaviors
 
     using CDP4Composition.Navigation;
 
+    using CDP4Grapher.Helpers;
     using CDP4Grapher.ViewModels;
 
     using CommonServiceLocator;
@@ -194,7 +195,9 @@ namespace CDP4Grapher.Behaviors
             foreach (var item in nodeItems)
             {
                 var node = (TraceabilityNodeViewModel)item.Content;
-                var fill = node.IsRoot ? "#FFE082" : node.Level > 0 ? "#BBDEFB" : "#C8E6C9";
+
+                // the on-screen fill comes from the same converter, so the export cannot desync from the diagram
+                var fill = TraceabilityLevelToBrushConverter.GetHexColor(node.Level);
                 var centerX = item.Position.X + (item.ActualWidth / 2);
 
                 builder.AppendLine(string.Format(culture, "<rect x=\"{0:0.##}\" y=\"{1:0.##}\" width=\"{2:0.##}\" height=\"{3:0.##}\" rx=\"3\" fill=\"{4}\" stroke=\"dimgray\"/>", item.Position.X, item.Position.Y, item.ActualWidth, item.ActualHeight, fill));
@@ -215,6 +218,13 @@ namespace CDP4Grapher.Behaviors
         /// <param name="e">The event arguments</param>
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            // a reused panel keeps the old view-model alive; leaving this behavior on it would let it drive a diagram
+            // that no longer shows its graph
+            if (e.OldValue is RelationshipTraceabilityViewModel previousViewModel)
+            {
+                previousViewModel.Behavior = null;
+            }
+
             if (this.AssociatedObject.DataContext is RelationshipTraceabilityViewModel viewModel)
             {
                 viewModel.Behavior = this;

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TraceabilityCategoryListConverter.cs" company="Starion Group S.A.">
+// <copyright file="RelationshipClassKinds.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
@@ -23,18 +23,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Grapher.Helpers
+namespace CDP4Composition
 {
     using System.Collections.Generic;
 
-    using CDP4Common.SiteDirectoryData;
-
-    using CDP4Composition.Converters;
+    using CDP4Common.CommonData;
 
     /// <summary>
-    /// Converts the edit value of a checked combo box to a <see cref="List{T}"/> of <see cref="Category"/>
+    /// The curated sets of <see cref="ClassKind"/>s that the plugin pickers offer
     /// </summary>
-    public class TraceabilityCategoryListConverter : GenericObjectListConverter<Category>
+    public static class RelationshipClassKinds
     {
+        /// <summary>
+        /// The <see cref="ClassKind"/>s that the relationship oriented plugins offer as a source or a root, instead of
+        /// every categorizable <see cref="ClassKind"/> of the model. Shared so that the Relationship Matrix and the
+        /// relationship traceability diagram cannot drift apart.
+        /// </summary>
+        public static readonly IReadOnlyList<ClassKind> Default = new List<ClassKind>
+        {
+            ClassKind.ElementDefinition,
+            ClassKind.ElementUsage,
+            ClassKind.NestedElement,
+            ClassKind.Option,
+            ClassKind.Parameter,
+            ClassKind.ParametricConstraint,
+            ClassKind.RequirementsSpecification,
+            ClassKind.RequirementsGroup,
+            ClassKind.Requirement
+        };
     }
 }
