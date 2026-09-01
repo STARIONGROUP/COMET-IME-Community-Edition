@@ -320,7 +320,7 @@ namespace CDP4Requirements.Tests
             Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
             Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(2, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
             Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
             Assert.AreEqual(1, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
 
@@ -342,7 +342,7 @@ namespace CDP4Requirements.Tests
             Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
             Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 5 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 3 specification
-            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type,3 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
             Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 4 specRelation from 3 relationship
             Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 2 RelationGroup from 1 binaryRelationship
 
@@ -367,7 +367,7 @@ namespace CDP4Requirements.Tests
             Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
             Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
             Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
             Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
 
@@ -392,7 +392,7 @@ namespace CDP4Requirements.Tests
             Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
             Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
             Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
             Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
 
@@ -417,7 +417,7 @@ namespace CDP4Requirements.Tests
             Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
             Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
             Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
             Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
 
@@ -442,7 +442,7 @@ namespace CDP4Requirements.Tests
             Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
             Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(2, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
             Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
             Assert.AreEqual(1, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
 
@@ -450,6 +450,26 @@ namespace CDP4Requirements.Tests
 
             var serializer = new ReqIFSerializer(false);
             serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
+        }
+
+        [Test]
+        public void VerifyThatRequirementsWithIdenticalTypeShareASingleSpecObjectType()
+        {
+            // All exported requirements share the same category/rule and parameter type, so they must
+            // collapse onto a single requirement SpecObjectType instead of one per requirement (GH #1487)
+            var builder = new ReqIFBuilder();
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration);
+
+            var requirementSpecObjectTypes = reqif.CoreContent.SpecTypes
+                .OfType<SpecObjectType>()
+                .Where(x => !x.LongName.StartsWith(ThingToReqIfMapper.GroupNamePrefix))
+                .ToList();
+
+            Assert.AreEqual(1, requirementSpecObjectTypes.Count);
+
+            // the attribute definition created for the requirement's parameter value carries the parameter type name
+            Assert.IsTrue(requirementSpecObjectTypes.Single().SpecAttributes.Any(x => x.LongName == this.booleanParameterType.ShortName));
         }
 
         [Test]

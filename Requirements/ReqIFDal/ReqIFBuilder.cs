@@ -398,14 +398,34 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateRequirementType()
         {
+            var requirementTypes = new Dictionary<string, SpecObjectType>();
+
             foreach (var requirement in this.toBeExportedRequirements)
             {
-                // TODO: Next step in GH IME #255. Currently a short term fix. The intent of reuse of spec type with use of applied rules is a bit unintuitive and convoluted without clear reasoning. Needs to be completely looked over.
-                // current solution will create a spec type per requirement and not reuse them (which leads to errors due to no use of rules/different SPVs)
                 var appliedRules = this.toBeExportedParameterizedCategoryRules.Where(r => requirement.IsMemberOfCategory(r.Category)).ToArray();
+
+                var parameterTypeSignature =
+                    appliedRules.SelectMany(r => r.ParameterType)
+                        .Concat(requirement.ParameterValue.Select(pv => pv.ParameterType))
+                        .Where(pt => pt != null)
+                        .Select(pt => pt.Iid)
+                        .Distinct()
+                        .OrderBy(iid => iid);
+
+                var signature =
+                    string.Join(",", appliedRules.Select(r => r.Iid).OrderBy(iid => iid))
+                    + "|"
+                    + string.Join(",", parameterTypeSignature);
+
+                if (requirementTypes.TryGetValue(signature, out var existingReqType))
+                {
+                    this.specType.Add(requirement, existingReqType);
+                    continue;
+                }
 
                 var reqType = this.mapper.ToReqIfSpecObjectType(requirement, appliedRules, this.parameterTypeMap);
 
+                requirementTypes.Add(signature, reqType);
                 this.specTypeMap.Add(reqType, appliedRules);
                 this.specType.Add(requirement, reqType);
             }

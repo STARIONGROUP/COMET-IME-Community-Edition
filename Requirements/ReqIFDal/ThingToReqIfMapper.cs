@@ -751,6 +751,7 @@ namespace CDP4Requirements.ReqIFDal
             }
 
             attributeDefinition.Identifier = Guid.NewGuid().ToString();
+            attributeDefinition.LongName = parameterType.ShortName;
             return attributeDefinition;
         }
 
