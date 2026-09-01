@@ -182,6 +182,19 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyThatOnCreateIsActiveDefaultsToTrue()
+        {
+            var newRuleVerification = new UserRuleVerification(Guid.NewGuid(), this.cache, this.uri);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
+            var transaction = new ThingTransaction(transactionContext, this.ruleVerificationList);
+
+            var dialog = new UserRuleVerificationDialogViewModel(newRuleVerification, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.ruleVerificationList, null);
+
+            Assert.IsTrue(dialog.IsActive);
+        }
+
+        [Test]
         public void VerifyThatDeprecatedRulesAreHiddenWhenShowDeprecatedThingsIsOff()
         {
             this.filterStringService.Setup(x => x.ShowDeprecatedThings).Returns(false);

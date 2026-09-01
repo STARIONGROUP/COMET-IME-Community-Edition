@@ -441,6 +441,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             var violationRow = builtInRow.ContainedRows.OfType<RuleViolationRowViewModel>().Single();
             Assert.AreEqual(violation.Description, violationRow.Tooltip);
+            Assert.AreEqual(violation.Description, violationRow.Details);
 
             var violatingThingRow = violationRow.ContainedRows.OfType<ViolatingThingRowViewModel>().Single();
             Assert.AreEqual(elementDefinition, violatingThingRow.Thing);
