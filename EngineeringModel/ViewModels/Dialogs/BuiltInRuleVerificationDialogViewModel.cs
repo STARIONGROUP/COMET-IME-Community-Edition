@@ -143,6 +143,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.dialogKind == ThingDialogKind.Create)
             {
+                this.IsActive = true;
+
                 var container = (RuleVerificationList)this.Container;
                 this.Owner = string.Format("{0} [{1}]", container.Owner.Name, container.Owner.ShortName);
             }

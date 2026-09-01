@@ -183,6 +183,19 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyThatOnCreateIsActiveDefaultsToTrue()
+        {
+            var newRuleVerification = new BuiltInRuleVerification(Guid.NewGuid(), this.cache, this.uri);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
+            this.thingTransaction = new ThingTransaction(transactionContext, this.ruleVerificationList);
+
+            var viewModel = new BuiltInRuleVerificationDialogViewModel(newRuleVerification, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.ruleVerificationList, null);
+
+            Assert.IsTrue(viewModel.IsActive);
+        }
+
+        [Test]
         public void VerifyThatIfNameOfRuleMatchesAvailableRuleselectedRuleIsSet()
         {
             this.builtInRuleVerification.Name = this.builtInRuleName;

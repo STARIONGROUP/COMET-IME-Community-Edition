@@ -84,6 +84,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Update the <see cref="RowViewModelBase{T}.Details"/> so that the full, readable violation text is shown
+        /// in the details box at the bottom of the browser, rather than only the type of the selected row.
+        /// </summary>
+        protected override void UpdateDetails()
+        {
+            this.Details = this.Thing.Description;
+        }
+
+        /// <summary>
         /// Populates the child rows that represent the <see cref="Thing"/>s referenced by
         /// <see cref="RuleViolation.ViolatingThing"/>.
         /// </summary>
