@@ -175,8 +175,15 @@ namespace CDP4Requirements.ReqIFDal
         /// <param name="session">The <see cref="ISession"/> containing the <see cref="Iteration"/></param>
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="includeDeprecated">Indicates if Deprecated items should be included or not</param>
+        /// <param name="requirementsSpecifications">
+        /// The <see cref="RequirementsSpecification"/>s to export. When null, all the <see cref="RequirementsSpecification"/>s
+        /// of the <paramref name="iteration"/> are exported.
+        /// </param>
+        /// <param name="profile">
+        /// The <see cref="ReqIfExportProfile"/> to target. Defaults to <see cref="ReqIfExportProfile.DoorsCapella"/>.
+        /// </param>
         /// <returns>The <see cref="ReqIF"/> instance</returns>
-        public ReqIF BuildReqIF(ISession session, Iteration iteration, bool includeDeprecated = false)
+        public ReqIF BuildReqIF(ISession session, Iteration iteration, bool includeDeprecated = false, IEnumerable<RequirementsSpecification> requirementsSpecifications = null, ReqIfExportProfile profile = ReqIfExportProfile.DoorsCapella)
         {
             this.currentSession = session ?? throw new ArgumentNullException(nameof(session));
             var exportedIteration = iteration ?? throw new ArgumentNullException(nameof(iteration));
@@ -186,7 +193,9 @@ namespace CDP4Requirements.ReqIFDal
                 throw new InvalidOperationException("The iteration is not contained in the session's database.");
             }
 
-            this.SetIterationProperties(exportedIteration, includeDeprecated);
+            this.mapper.Profile = profile;
+
+            this.SetIterationProperties(exportedIteration, includeDeprecated, requirementsSpecifications);
 
             this.reqIFBuilt = new ReqIF { Lang = this.language };
             this.SetHeader();
@@ -204,21 +213,29 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         /// <param name="toBeExportedIteration">The <see cref="Iteration"/> to be Exported</param>
         /// <param name="includeDeprecated">Indicates if Deprecated items should be included or not</param>
-        private void SetIterationProperties(Iteration toBeExportedIteration, bool includeDeprecated)
+        /// <param name="requirementsSpecifications">
+        /// The <see cref="RequirementsSpecification"/>s to export. When null, all the <see cref="RequirementsSpecification"/>s
+        /// of the <paramref name="toBeExportedIteration"/> are exported.
+        /// </param>
+        private void SetIterationProperties(Iteration toBeExportedIteration, bool includeDeprecated, IEnumerable<RequirementsSpecification> requirementsSpecifications)
         {
             this.toBeExportedIteration = toBeExportedIteration;
 
             this.toBeExportedEngineeringModel = (EngineeringModel)toBeExportedIteration.Container;
 
-            this.toBeExportedParameterizedCategoryRules = 
+            this.toBeExportedParameterizedCategoryRules =
                 this.toBeExportedEngineeringModel.RequiredRdls
                     .SelectMany(rdl => rdl.Rule)
                     .OfType<ParameterizedCategoryRule>()
                     .ToArray();
 
+            var selectedRequirementsSpecifications = requirementsSpecifications?.ToArray();
+
             this.toBeExportedRequirementsSpecifications =
                 toBeExportedIteration.RequirementsSpecification
-                    .Where(x => includeDeprecated || !x.IsDeprecated).ToArray();
+                    .Where(x => includeDeprecated || !x.IsDeprecated)
+                    .Where(x => selectedRequirementsSpecifications == null || selectedRequirementsSpecifications.Contains(x))
+                    .ToArray();
 
             this.toBeExportedRequirements =
                 this.toBeExportedRequirementsSpecifications.SelectMany(x => x.Requirement)
@@ -281,6 +298,11 @@ namespace CDP4Requirements.ReqIFDal
             // add extra requirement datatype
             content.DataTypes.Add(this.mapper.TextDatatypeDefinition);
             content.DataTypes.Add(this.mapper.BooleanDatatypeDefinition);
+
+            if (this.mapper.ExportXhtmlText)
+            {
+                content.DataTypes.Add(this.mapper.XhtmlDatatypeDefinition);
+            }
 
             content.Specifications.AddRange(this.requirementSpecificationsMap.Values);
             content.SpecObjects.AddRange(this.requirementMap.Values);
@@ -398,36 +420,32 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateRequirementType()
         {
-            var requirementTypes = new Dictionary<string, SpecObjectType>();
+            // group the requirements by their set of applied rules; all requirements that share the same rule-set get
+            // a single SpecObjectType whose attributes are the union of the parameters used across the group. This
+            // avoids a separate type per parameter combination, matching what ReqIF tools such as DOORS and Capella expect.
+            var groupedByRuleSet = this.toBeExportedRequirements
+                .GroupBy(
+                    requirement => this.toBeExportedParameterizedCategoryRules.Where(r => requirement.IsMemberOfCategory(r.Category)).OrderBy(r => r.Iid).ToArray(),
+                    new RuleSetEqualityComparer());
 
-            foreach (var requirement in this.toBeExportedRequirements)
+            foreach (var group in groupedByRuleSet)
             {
-                var appliedRules = this.toBeExportedParameterizedCategoryRules.Where(r => requirement.IsMemberOfCategory(r.Category)).ToArray();
+                var appliedRules = group.Key;
 
-                var parameterTypeSignature =
-                    appliedRules.SelectMany(r => r.ParameterType)
-                        .Concat(requirement.ParameterValue.Select(pv => pv.ParameterType))
-                        .Where(pt => pt != null)
-                        .Select(pt => pt.Iid)
-                        .Distinct()
-                        .OrderBy(iid => iid);
+                var unionParameterTypes = appliedRules.SelectMany(r => r.ParameterType)
+                    .Concat(group.SelectMany(requirement => requirement.ParameterValue.Select(pv => pv.ParameterType)))
+                    .Where(pt => pt != null)
+                    .Distinct()
+                    .ToArray();
 
-                var signature =
-                    string.Join(",", appliedRules.Select(r => r.Iid).OrderBy(iid => iid))
-                    + "|"
-                    + string.Join(",", parameterTypeSignature);
+                var reqType = this.mapper.ToReqIfSpecObjectType(appliedRules, unionParameterTypes, this.parameterTypeMap);
 
-                if (requirementTypes.TryGetValue(signature, out var existingReqType))
-                {
-                    this.specType.Add(requirement, existingReqType);
-                    continue;
-                }
-
-                var reqType = this.mapper.ToReqIfSpecObjectType(requirement, appliedRules, this.parameterTypeMap);
-
-                requirementTypes.Add(signature, reqType);
                 this.specTypeMap.Add(reqType, appliedRules);
-                this.specType.Add(requirement, reqType);
+
+                foreach (var requirement in group)
+                {
+                    this.specType.Add(requirement, reqType);
+                }
             }
         }
 
@@ -704,6 +722,46 @@ namespace CDP4Requirements.ReqIFDal
         private void BuildToolExtension()
         {
             //TODO
+        }
+
+        /// <summary>
+        /// Compares two sets of <see cref="ParameterizedCategoryRule"/>s for equality, ignoring order, so that
+        /// requirements can be grouped by their applied rule-set.
+        /// </summary>
+        private sealed class RuleSetEqualityComparer : IEqualityComparer<ParameterizedCategoryRule[]>
+        {
+            /// <summary>
+            /// Determines whether two rule-sets contain the same rules, regardless of order.
+            /// </summary>
+            /// <param name="x">The first rule-set</param>
+            /// <param name="y">The second rule-set</param>
+            /// <returns>True if both rule-sets contain the same rules</returns>
+            public bool Equals(ParameterizedCategoryRule[] x, ParameterizedCategoryRule[] y)
+            {
+                if (x == null || y == null)
+                {
+                    return x == y;
+                }
+
+                return x.Length == y.Length && !x.Except(y).Any();
+            }
+
+            /// <summary>
+            /// Returns an order-independent hash-code for a rule-set.
+            /// </summary>
+            /// <param name="obj">The rule-set</param>
+            /// <returns>The hash-code</returns>
+            public int GetHashCode(ParameterizedCategoryRule[] obj)
+            {
+                var hash = 0;
+
+                foreach (var rule in obj)
+                {
+                    hash ^= rule.Iid.GetHashCode();
+                }
+
+                return hash;
+            }
         }
     }
 }

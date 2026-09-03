@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfExportDialogViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -32,6 +32,7 @@ namespace CDP4Requirements.Tests.Controls
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
+    using System.Xml.Schema;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -141,8 +142,120 @@ namespace CDP4Requirements.Tests.Controls
         }
 
         [Test]
+        public void VerifyThatSelectingIterationPopulatesRequirementsSpecificationsSelectedByDefault()
+        {
+            var spec1 = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "spec1", Name = "Specification 1" };
+            var spec2 = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "spec2", Name = "Specification 2" };
+            this.iteration.RequirementsSpecification.Add(spec1);
+            this.iteration.RequirementsSpecification.Add(spec2);
+
+            var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
+
+            Assert.IsEmpty(vm.RequirementsSpecifications);
+
+            vm.SelectedIteration = vm.Iterations.First();
+
+            Assert.AreEqual(2, vm.RequirementsSpecifications.Count);
+            Assert.IsTrue(vm.RequirementsSpecifications.All(x => x.IsSelected));
+        }
+
+        [Test]
+        public async Task VerifyThatExportWithoutSelectedSpecificationIsBlocked()
+        {
+            var spec1 = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "spec1", Name = "Specification 1" };
+            this.iteration.RequirementsSpecification.Add(spec1);
+
+            this.fileDialogService.Setup(
+                    x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1))
+                .Returns("test");
+
+            var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
+
+            vm.SelectedIteration = vm.Iterations.First();
+            await vm.BrowseCommand.Execute();
+
+            foreach (var row in vm.RequirementsSpecifications)
+            {
+                row.IsSelected = false;
+            }
+
+            await vm.ExecuteOk();
+
+            Assert.That(vm.ErrorMessage, Is.EqualTo("Select at least one requirements specification to export."));
+            this.serializer.Verify(x => x.Serialize(It.IsAny<ReqIF>(), It.IsAny<string>(), It.IsAny<ValidationEventHandler>()), Times.Never);
+        }
+
+        [Test]
+        public async Task VerifyThatPreviewSpecObjectTypesListsTheExportedTypes()
+        {
+            var spec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "spec", Name = "Specification" };
+            var requirement = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "req1", Name = "Requirement 1" };
+            spec.Requirement.Add(requirement);
+            this.iteration.RequirementsSpecification.Add(spec);
+
+            var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
+
+            vm.SelectedIteration = vm.Iterations.First();
+
+            Assert.IsEmpty(vm.SpecObjectTypesPreview);
+
+            await vm.PreviewSpecObjectTypesCommand.Execute();
+
+            var requirementType = vm.SpecObjectTypesPreview.Single(x => x.Name == "Requirement");
+            Assert.That(requirementType.NumberOfObjects, Is.EqualTo(1));
+            Assert.That(requirementType.DistinguishingAttributes, Is.EqualTo("(no extra parameters)"));
+        }
+
+        [Test]
+        public void VerifyThatDeprecatedSpecificationsAreHiddenUnlessIncludeDeprecatedIsChecked()
+        {
+            var normalSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "spec", Name = "Specification" };
+            var deprecatedSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "dep", Name = "Deprecated", IsDeprecated = true };
+            this.iteration.RequirementsSpecification.Add(normalSpec);
+            this.iteration.RequirementsSpecification.Add(deprecatedSpec);
+
+            var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
+
+            vm.SelectedIteration = vm.Iterations.First();
+
+            // the deprecated specification is hidden by default (Include Deprecated is off)
+            Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Contain(normalSpec));
+            Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Not.Contain(deprecatedSpec));
+
+            // turning on Include Deprecated reveals it, selected by default
+            vm.IncludeDeprecated = true;
+
+            Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Contain(deprecatedSpec));
+            Assert.IsTrue(vm.RequirementsSpecifications.All(x => x.IsSelected));
+        }
+
+        [Test]
+        public async Task VerifyThatPreviewWithoutSelectedSpecificationIsBlocked()
+        {
+            var spec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "spec", Name = "Specification" };
+            this.iteration.RequirementsSpecification.Add(spec);
+
+            var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
+
+            vm.SelectedIteration = vm.Iterations.First();
+
+            foreach (var row in vm.RequirementsSpecifications)
+            {
+                row.IsSelected = false;
+            }
+
+            await vm.PreviewSpecObjectTypesCommand.Execute();
+
+            Assert.IsEmpty(vm.SpecObjectTypesPreview);
+            Assert.That(vm.ErrorMessage, Is.EqualTo("Select at least one requirements specification to preview."));
+        }
+
+        [Test]
         public async Task VeriyThatOkCommandWorks()
         {
+            var spec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "spec", Name = "Specification" };
+            this.iteration.RequirementsSpecification.Add(spec);
+
             var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
 
             this.fileDialogService.Setup(

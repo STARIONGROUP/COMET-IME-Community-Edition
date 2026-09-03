@@ -10,11 +10,12 @@
     xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    Title="Export to ReqIF file..." 
+    Title="Export to ReqIF file..."
     dx:ThemeManager.ThemeName="Seven"
     navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
     Height="Auto"
-    Width="Auto">
+    Width="720"
+    SizeToContent="Height">
 
     <dx:DXWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -64,10 +65,93 @@
                     </dxg:GridControl>
                 </dxlc:LayoutItem>
 
+                <dxlc:LayoutItem Label="Export format"
+                                 LabelPosition="Left"
+                                 ToolTip="The 'ReqIF Implementation Guide' format exports rich text (XHTML) and the reserved ReqIF.* attribute names so DOORS and Capella map them automatically; the 'Original OMG Format' exports plain OMG ReqIF with the native COMET names.">
+                    <dxe:ComboBoxEdit IsTextEditable="False"
+                                      MaxHeight="25"
+                                      DisplayMember="DisplayName"
+                                      ValueMember="Profile"
+                                      ItemsSource="{Binding PossibleFormats}"
+                                      EditValue="{Binding SelectedFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem LabelVerticalAlignment="Top"
+                                 LabelPosition="Top"
+                                 Label="Select the requirements specifications to export:">
+                    <dxg:GridControl AllowLiveDataShaping="False"
+                                     ItemsSource="{Binding RequirementsSpecifications}"
+                                     Height="120">
+                        <dxg:GridControl.View>
+                            <dxg:TableView HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           AllowColumnMoving="False"
+                                           AllowEditing="True"
+                                           AllowGrouping="False"
+                                           AutoWidth="True"
+                                           NavigationStyle="Cell"
+                                           ShowGroupPanel="False"
+                                           IsDetailButtonVisibleBinding="{x:Null}" />
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn Header=""
+                                            Width="30"
+                                            FixedWidth="True"
+                                            AllowEditing="True"
+                                            AllowAutoFilter="False"
+                                            AllowColumnFiltering="False"
+                                            AllowSorting="False">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dxe:CheckEdit HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       IsChecked="{Binding RowData.Row.IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
+                            <dxg:GridColumn FieldName="Name" Header="Name" ReadOnly="True" />
+                            <dxg:GridColumn FieldName="ShortName" Header="Short Name" ReadOnly="True" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </dxlc:LayoutItem>
+
                 <dxlc:LayoutItem>
                     <dxe:CheckEdit MaxHeight="25"
                                    Content="Include Deprecated"
                                    EditValue="{Binding IncludeDeprecated, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem>
+                    <Button MaxHeight="25"
+                            HorizontalAlignment="Left"
+                            Command="{Binding PreviewSpecObjectTypesCommand}"
+                            Content="Preview export types"
+                            ToolTip="Show the spec-object types (and the rules that drive them) that the exporter will produce for the current selection." />
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem LabelVerticalAlignment="Top"
+                                 LabelPosition="Top"
+                                 Label="Spec-object types that will be exported:">
+                    <dxg:GridControl AllowLiveDataShaping="False"
+                                     ItemsSource="{Binding SpecObjectTypesPreview}"
+                                     Height="100">
+                        <dxg:GridControl.View>
+                            <dxg:TableView HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           AllowColumnMoving="False"
+                                           AllowEditing="False"
+                                           AllowGrouping="False"
+                                           AutoWidth="True"
+                                           ShowGroupPanel="False"
+                                           IsDetailButtonVisibleBinding="{x:Null}" />
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn FieldName="Name" Header="Type Name" ReadOnly="True" />
+                            <dxg:GridColumn FieldName="NumberOfObjects" Header="Requirements / Groups" ReadOnly="True" />
+                            <dxg:GridColumn FieldName="DistinguishingAttributes" Header="Distinguishing parameters" ReadOnly="True"
+                                            ToolTip="Types with the same name are exported separately when they carry different parameters. This shows the parameters that set each type apart." />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
                 </dxlc:LayoutItem>
 
                 <dxlc:LayoutItem AddColonToLabel="True" 

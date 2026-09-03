@@ -69,6 +69,11 @@ namespace CDP4Requirements.ViewModels
         private bool includeDeprecated;
 
         /// <summary>
+        /// Backing field for <see cref="SelectedFormat"/>
+        /// </summary>
+        private ReqIfExportProfile selectedFormat = ReqIfExportProfile.DoorsCapella;
+
+        /// <summary>
         /// Backing field for <see cref="SelectedIteration"/>
         /// </summary>
         private ReqIfExportIterationRowViewModel selectedIteration;
@@ -141,6 +146,8 @@ namespace CDP4Requirements.ViewModels
 
             this.Sessions = sessions.ToList();
             this.Iterations = new ReactiveList<ReqIfExportIterationRowViewModel>();
+            this.RequirementsSpecifications = new ReactiveList<ReqIfExportRequirementsSpecificationRowViewModel>();
+            this.SpecObjectTypesPreview = new ReactiveList<ReqIfExportSpecObjectTypeRowViewModel>();
             this.fileDialogService = fileDialogService;
             this.serializer = serializer;
 
@@ -149,10 +156,18 @@ namespace CDP4Requirements.ViewModels
                 this.Iterations.Add(new ReqIfExportIterationRowViewModel(iteration));
             }
 
+            this.WhenAnyValue(vm => vm.SelectedIteration).Subscribe(_ => this.PopulateRequirementsSpecifications());
+
+            this.WhenAnyValue(vm => vm.IncludeDeprecated).Subscribe(_ => this.PopulateRequirementsSpecifications());
+
             var canOk = this.WhenAnyValue(
                 vm => vm.Path,
                 vm => vm.SelectedIteration,
                 (path, iteration) => iteration != null && !string.IsNullOrEmpty(path));
+
+            var canPreview = this.WhenAnyValue(vm => vm.SelectedIteration).Select(iteration => iteration != null);
+
+            this.PreviewSpecObjectTypesCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecutePreviewSpecObjectTypes, canPreview);
 
             this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteOk, canOk);
 
@@ -215,6 +230,16 @@ namespace CDP4Requirements.ViewModels
         public ReactiveList<ReqIfExportIterationRowViewModel> Iterations { get; private set; }
 
         /// <summary>
+        /// Gets the selectable <see cref="RequirementsSpecification"/> rows of the <see cref="SelectedIteration"/>
+        /// </summary>
+        public ReactiveList<ReqIfExportRequirementsSpecificationRowViewModel> RequirementsSpecifications { get; private set; }
+
+        /// <summary>
+        /// Gets the preview of the <c>SpecObjectType</c>s that the exporter will produce for the current selection
+        /// </summary>
+        public ReactiveList<ReqIfExportSpecObjectTypeRowViewModel> SpecObjectTypesPreview { get; private set; }
+
+        /// <summary>
         /// Gets or sets the selected iteration to export
         /// </summary>
         public ReqIfExportIterationRowViewModel SelectedIteration
@@ -239,6 +264,24 @@ namespace CDP4Requirements.ViewModels
         {
             get => this.includeDeprecated;
             set => this.RaiseAndSetIfChanged(ref this.includeDeprecated, value);
+        }
+
+        /// <summary>
+        /// Gets the available export formats that can be selected, with human-readable names
+        /// </summary>
+        public IEnumerable<ReqIfExportProfileRowViewModel> PossibleFormats { get; } = new[]
+        {
+            new ReqIfExportProfileRowViewModel(ReqIfExportProfile.DoorsCapella, "ReqIF Implementation Guide (DOORS and Capella)"),
+            new ReqIfExportProfileRowViewModel(ReqIfExportProfile.Omg, "Original OMG Format")
+        };
+
+        /// <summary>
+        /// Gets or sets the <see cref="ReqIfExportProfile"/> that the export targets
+        /// </summary>
+        public ReqIfExportProfile SelectedFormat
+        {
+            get => this.selectedFormat;
+            set => this.RaiseAndSetIfChanged(ref this.selectedFormat, value);
         }
 
         /// <summary>
@@ -267,6 +310,11 @@ namespace CDP4Requirements.ViewModels
         public ReactiveCommand<Unit, Unit> BrowseCommand { get; private set; }
 
         /// <summary>
+        /// Gets the command that previews the <c>SpecObjectType</c>s that will be exported for the current selection
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> PreviewSpecObjectTypesCommand { get; private set; }
+
+        /// <summary>
         /// Executes the Ok Command
         /// </summary>
         public async Task ExecuteOk()
@@ -284,6 +332,12 @@ namespace CDP4Requirements.ViewModels
 
             try
             {
+                if (!this.RequirementsSpecifications.Any(x => x.IsSelected))
+                {
+                    this.ErrorMessage = "Select at least one requirements specification to export.";
+                    return;
+                }
+
                 this.LoadingMessage = "Pre checking model validity...";
 
                 if (!await Task.Run(this.CheckModelValidity, this.cancellationToken))
@@ -328,9 +382,106 @@ namespace CDP4Requirements.ViewModels
                     var session = this.Sessions.Single(x => x.Assembler.Cache == this.SelectedIteration.Iteration.Cache);
                     var reqifBuilder = new ReqIFBuilder();
 
-                    return reqifBuilder.BuildReqIF(session, this.SelectedIteration.Iteration, this.IncludeDeprecated);
+                    var selectedRequirementsSpecifications =
+                        this.RequirementsSpecifications.Where(x => x.IsSelected).Select(x => x.RequirementsSpecification).ToList();
+
+                    return reqifBuilder.BuildReqIF(session, this.SelectedIteration.Iteration, this.IncludeDeprecated, selectedRequirementsSpecifications, this.SelectedFormat);
                 },
                 this.cancellationToken);
+        }
+
+        /// <summary>
+        /// Builds the ReqIF in-memory for the current selection and populates <see cref="SpecObjectTypesPreview"/> with
+        /// the <c>SpecObjectType</c>s that the exporter would produce, together with the number of requirements or groups
+        /// that map to each of them.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        private async Task ExecutePreviewSpecObjectTypes()
+        {
+            this.SpecObjectTypesPreview.Clear();
+            this.ErrorMessage = string.Empty;
+
+            var selectedRequirementsSpecifications =
+                this.RequirementsSpecifications.Where(x => x.IsSelected).Select(x => x.RequirementsSpecification).ToList();
+
+            if (!selectedRequirementsSpecifications.Any())
+            {
+                this.ErrorMessage = "Select at least one requirements specification to preview.";
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+                this.LoadingMessage = "Building the type preview...";
+
+                var session = this.Sessions.Single(x => x.Assembler.Cache == this.SelectedIteration.Iteration.Cache);
+
+                var reqif = await Task.Run(() => new ReqIFBuilder().BuildReqIF(session, this.SelectedIteration.Iteration, this.IncludeDeprecated, selectedRequirementsSpecifications, this.SelectedFormat));
+
+                var specObjects = reqif.CoreContent.SpecObjects;
+
+                // the attributes every requirement/group type shares; the remaining attributes are the
+                // parameter-derived ones that explain why two same-named types are exported separately.
+                var commonAttributeNames = new HashSet<string>
+                {
+                    ThingToReqIfMapper.ShortNameAttributeDefName,
+                    ThingToReqIfMapper.NameAttributeDefName,
+                    ThingToReqIfMapper.ReqIfForeignIdAttributeDefName,
+                    ThingToReqIfMapper.ReqIfNameAttributeDefName,
+                    ThingToReqIfMapper.CategoryAttributeDefName,
+                    ThingToReqIfMapper.RequirementTextAttributeDefName,
+                    ThingToReqIfMapper.RequirementTextXhtmlAttributeDefName,
+                    ThingToReqIfMapper.IsDeprecatedAttributeDefName
+                };
+
+                foreach (var specObjectType in reqif.CoreContent.SpecTypes.OfType<SpecObjectType>().OrderBy(x => x.LongName))
+                {
+                    var numberOfObjects = specObjects.Count(x => x.Type == specObjectType);
+
+                    var distinguishingAttributes = specObjectType.SpecAttributes
+                        .Select(x => x.LongName)
+                        .Where(x => !commonAttributeNames.Contains(x))
+                        .ToList();
+
+                    var distinguishingAttributesText = distinguishingAttributes.Any() ? string.Join(", ", distinguishingAttributes) : "(no extra parameters)";
+
+                    this.SpecObjectTypesPreview.Add(new ReqIfExportSpecObjectTypeRowViewModel(specObjectType.LongName, numberOfObjects, distinguishingAttributesText));
+                }
+            }
+            catch (Exception ex)
+            {
+                this.ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                this.LoadingMessage = string.Empty;
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Populates the <see cref="RequirementsSpecifications"/> from the <see cref="SelectedIteration"/>,
+        /// selecting all of them by default.
+        /// </summary>
+        private void PopulateRequirementsSpecifications()
+        {
+            this.RequirementsSpecifications.Clear();
+            this.SpecObjectTypesPreview.Clear();
+
+            if (this.SelectedIteration == null)
+            {
+                return;
+            }
+
+            var requirementsSpecifications = this.SelectedIteration.Iteration.RequirementsSpecification
+                .Where(x => this.IncludeDeprecated || !x.IsDeprecated)
+                .OrderBy(x => x.ShortName);
+
+            foreach (var requirementsSpecification in requirementsSpecifications)
+            {
+                this.RequirementsSpecifications.Add(new ReqIfExportRequirementsSpecificationRowViewModel(requirementsSpecification));
+            }
         }
 
         /// <summary>
