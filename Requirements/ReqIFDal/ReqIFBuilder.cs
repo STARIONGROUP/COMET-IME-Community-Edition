@@ -180,10 +180,10 @@ namespace CDP4Requirements.ReqIFDal
         /// of the <paramref name="iteration"/> are exported.
         /// </param>
         /// <param name="profile">
-        /// The <see cref="ReqIfExportProfile"/> to target. Defaults to <see cref="ReqIfExportProfile.DoorsCapella"/>.
+        /// The <see cref="ReqIfExportProfile"/> to target. Defaults to <see cref="ReqIfExportProfile.Omg"/>.
         /// </param>
         /// <returns>The <see cref="ReqIF"/> instance</returns>
-        public ReqIF BuildReqIF(ISession session, Iteration iteration, bool includeDeprecated = false, IEnumerable<RequirementsSpecification> requirementsSpecifications = null, ReqIfExportProfile profile = ReqIfExportProfile.DoorsCapella)
+        public ReqIF BuildReqIF(ISession session, Iteration iteration, bool includeDeprecated = false, IEnumerable<RequirementsSpecification> requirementsSpecifications = null, ReqIfExportProfile profile = ReqIfExportProfile.Omg)
         {
             this.currentSession = session ?? throw new ArgumentNullException(nameof(session));
             var exportedIteration = iteration ?? throw new ArgumentNullException(nameof(iteration));

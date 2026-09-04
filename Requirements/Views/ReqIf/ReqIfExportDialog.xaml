@@ -13,9 +13,8 @@
     Title="Export to ReqIF file..."
     dx:ThemeManager.ThemeName="Seven"
     navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
-    Height="Auto"
-    Width="720"
-    SizeToContent="Height">
+    Height="750"
+    Width="720">
 
     <dx:DXWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -25,8 +24,9 @@
     </dxmvvm:Interaction.Behaviors>  
 
     <Grid>
-        <dxlc:LayoutControl Background="White" 
-                            Orientation="Vertical">
+        <dxlc:LayoutControl Background="White"
+                            Orientation="Vertical"
+                            ScrollBars="Auto">
             <dxlc:LayoutGroup Orientation="Vertical" 
                               Height="Auto"
                               View="GroupBox"

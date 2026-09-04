@@ -193,6 +193,28 @@ namespace CDP4Requirements.Tests.ReqIF
             //todo to complete
         }
 
+        [Test]
+        public void VerifyThatXhtmlAttributeValuesAreConvertedToPlainText()
+        {
+            // the plain-namespace form that the COMET exporter produces
+            Assert.AreEqual("Hello & welcome", ThingFactory.ConvertXhtmlToText("<div xmlns=\"http://www.w3.org/1999/xhtml\">Hello &amp; welcome</div>"));
+
+            // a DOORS-style, prefixed and formatted value must import as readable text, not as raw markup
+            var doorsStyle = "<xhtml:div><xhtml:p>Line 1<xhtml:br/>Line 2</xhtml:p></xhtml:div>";
+            var converted = ThingFactory.ConvertXhtmlToText(doorsStyle);
+
+            Assert.IsFalse(converted.Contains("<"), "no raw markup remains");
+            StringAssert.Contains("Line 1", converted);
+            StringAssert.Contains("Line 2", converted);
+
+            // entities are decoded and inline tags removed
+            Assert.AreEqual("a <b> bold", ThingFactory.ConvertXhtmlToText("<div xmlns=\"http://www.w3.org/1999/xhtml\">a &lt;b&gt; <b>bold</b></div>"));
+
+            // null / empty are passed through unchanged
+            Assert.IsNull(ThingFactory.ConvertXhtmlToText(null));
+            Assert.AreEqual(string.Empty, ThingFactory.ConvertXhtmlToText(string.Empty));
+        }
+
         private void SetupThings()
         {
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);

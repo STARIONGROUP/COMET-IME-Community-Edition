@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportDialogViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -302,7 +302,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void ExecuteBrowse()
         {
-            var result = this.fileDialogService.GetOpenFileDialog(true, true, false, "ReqIF files (*.reqif, *.xml)|*.reqif; *.xml|All Files (*.*)|*.*", ".reqif", this.Path, 1);
+            var result = this.fileDialogService.GetOpenFileDialog(true, true, false, "ReqIF files (*.reqif, *.reqifz, *.zip)|*.reqif; *.reqifz; *.zip|All Files (*.*)|*.*", ".reqif", this.Path, 1);
             
             if (result == null)
             {

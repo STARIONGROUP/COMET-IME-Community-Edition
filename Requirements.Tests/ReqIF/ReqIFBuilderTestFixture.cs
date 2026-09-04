@@ -318,7 +318,7 @@ namespace CDP4Requirements.Tests
             Assert.IsNotNull(reqif);
 
             // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(4, reqif.CoreContent.DataTypes.Count); // booleanPt, boolean, Text and XHTML datatype
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
             Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(2, reqif.CoreContent.Specifications.Count); // 2 specification
             Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
@@ -399,7 +399,7 @@ namespace CDP4Requirements.Tests
         {
             var builder = new ReqIFBuilder();
 
-            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true);
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true, null, ReqIfExportProfile.DoorsCapella);
 
             Assert.IsTrue(reqif.CoreContent.DataTypes.OfType<DatatypeDefinitionXHTML>().Any(), "an XHTML datatype is exported");
 
@@ -447,7 +447,7 @@ namespace CDP4Requirements.Tests
             Assert.IsNotNull(reqif);
 
             // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(4, reqif.CoreContent.DataTypes.Count); // booleanPt, boolean, Text and XHTML datatype
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
             Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 5 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 3 specification
             Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
@@ -472,7 +472,7 @@ namespace CDP4Requirements.Tests
             Assert.IsNotNull(reqif);
 
             // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(4, reqif.CoreContent.DataTypes.Count); // booleanPt, boolean, Text and XHTML datatype
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
             Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
             Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
@@ -497,7 +497,7 @@ namespace CDP4Requirements.Tests
             Assert.IsNotNull(reqif);
 
             // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(4, reqif.CoreContent.DataTypes.Count); // booleanPt, boolean, Text and XHTML datatype
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
             Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
             Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
@@ -522,7 +522,7 @@ namespace CDP4Requirements.Tests
             Assert.IsNotNull(reqif);
 
             // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(4, reqif.CoreContent.DataTypes.Count); // booleanPt, boolean, Text and XHTML datatype
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
             Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
             Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
@@ -547,7 +547,7 @@ namespace CDP4Requirements.Tests
             Assert.IsNotNull(reqif);
 
             // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(4, reqif.CoreContent.DataTypes.Count); // booleanPt, boolean, Text and XHTML datatype
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
             Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(2, reqif.CoreContent.Specifications.Count); // 2 specification
             Assert.AreEqual(5, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type

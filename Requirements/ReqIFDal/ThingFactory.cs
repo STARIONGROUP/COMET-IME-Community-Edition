@@ -1,27 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ThingFactory.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2021 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ReqIFDal
 {
@@ -30,6 +30,8 @@ namespace CDP4Requirements.ReqIFDal
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Net;
+    using System.Text.RegularExpressions;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -641,6 +643,13 @@ namespace CDP4Requirements.ReqIFDal
         /// <returns>The string value</returns>
         private string GetAttributeValue(AttributeValue value)
         {
+            // an XHTML (rich-text) value carries its content as XHTML markup; convert it to readable plain text
+            // instead of importing the raw &lt;div&gt;...&lt;/div&gt; markup as-is.
+            if (value is AttributeValueXHTML xhtmlValue)
+            {
+                return ConvertXhtmlToText(xhtmlValue.TheValue);
+            }
+
             var valueType = value.GetType();
 
             var valueProperty = valueType.GetProperty("TheValue");
@@ -679,6 +688,32 @@ namespace CDP4Requirements.ReqIFDal
 
             theValue = string.Join(" | ", stringList);
             return theValue;
+        }
+
+        /// <summary>
+        /// Converts an XHTML (rich-text) attribute value to readable plain text. Line-breaking elements become new
+        /// lines, the remaining tags are removed and the XML/HTML entities are decoded. This keeps the textual content
+        /// of DOORS/Capella (and other) XHTML attributes instead of importing the raw markup.
+        /// </summary>
+        /// <param name="xhtml">The XHTML markup</param>
+        /// <returns>The plain-text representation</returns>
+        internal static string ConvertXhtmlToText(string xhtml)
+        {
+            if (string.IsNullOrEmpty(xhtml))
+            {
+                return xhtml;
+            }
+
+            // turn line-breaking elements (with or without an xhtml prefix, opening or closing) into new lines
+            var text = Regex.Replace(xhtml, @"<\s*/?\s*(?:[a-zA-Z]+:)?(?:br|p|div|li|tr)(?:\s[^>]*)?/?\s*>", "\n", RegexOptions.IgnoreCase);
+
+            // remove any remaining tags
+            text = Regex.Replace(text, "<[^>]+>", string.Empty);
+
+            // decode XML/HTML entities such as &amp; and &lt;
+            text = WebUtility.HtmlDecode(text);
+
+            return text.Trim();
         }
     }
 }

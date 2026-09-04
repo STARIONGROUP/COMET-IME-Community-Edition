@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportDialogViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -186,7 +186,7 @@ namespace CDP4Requirements.Tests.ReqIF
         public async Task VerifyBrowseCommand()
         {
             await this.dialog.BrowseCommand.Execute();
-            this.fileDialogService.Verify(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1), Times.Once);
+            this.fileDialogService.Verify(x => x.GetOpenFileDialog(true, true, false, It.Is<string>(filter => filter.Contains(".reqifz") && filter.Contains(".zip")), It.IsAny<string>(), It.IsAny<string>(), 1), Times.Once);
             Assert.IsNotNull(this.dialog.Path);
         }
 

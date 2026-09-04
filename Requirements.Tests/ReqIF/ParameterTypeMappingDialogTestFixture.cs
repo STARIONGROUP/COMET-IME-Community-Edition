@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeMappingDialogTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -29,6 +29,7 @@ namespace CDP4Requirements.Tests.ReqIF
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
@@ -181,6 +182,20 @@ namespace CDP4Requirements.Tests.ReqIF
         }
 
         [Test]
+        public void VerifyThatEnumValueRowsHaveNoCreateCommands()
+        {
+            var enumRow = this.dialog.MappingRows.First(x => x.Identifiable == this.enumDatadef);
+
+            // the enumeration datatype row itself can create an Enumeration Parameter Type
+            this.dialog.SelectedRow = enumRow;
+            Assert.AreEqual(1, this.dialog.CreateParameterTypeCommands.Count);
+
+            // but its enum-value child rows (the literals) cannot create a parameter type
+            this.dialog.SelectedRow = enumRow.EnumValue.First();
+            Assert.AreEqual(0, this.dialog.CreateParameterTypeCommands.Count);
+        }
+
+        [Test]
         public void VerifyThatCreateGenericParameterTypeWorks()
         {
             this.thingDialogNavigationService.Setup(
@@ -206,6 +221,41 @@ namespace CDP4Requirements.Tests.ReqIF
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null));
+        }
+
+        [Test]
+        public void VerifyThatCreatedEnumValueDefinitionShortNamesAreValidAndUnique()
+        {
+            var enumDatatypeDefinition = new DatatypeDefinitionEnumeration { LongName = "T_LegalObligation" };
+            enumDatatypeDefinition.SpecifiedValues.Add(new EnumValue { LongName = "mandatory (>= 1)", Properties = new EmbeddedValue { Key = 1, OtherContent = "Other content for: mandatory (>= 1)" } });
+            enumDatatypeDefinition.SpecifiedValues.Add(new EnumValue { LongName = "mandatory (== 1)", Properties = new EmbeddedValue { Key = 2, OtherContent = "Other content for: mandatory (== 1)" } });
+            enumDatatypeDefinition.SpecifiedValues.Add(new EnumValue { LongName = "not applicable", Properties = new EmbeddedValue { Key = 3, OtherContent = "Other content for: not applicable" } });
+            enumDatatypeDefinition.SpecifiedValues.Add(new EnumValue { LongName = "ordinary", Properties = new EmbeddedValue { Key = 4, OtherContent = "Other content for: ordinary" } });
+
+            EnumerationParameterType capturedParameterType = null;
+
+            this.thingDialogNavigationService.Setup(
+                    x => x.Navigate(It.IsAny<ParameterType>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
+                .Callback<Thing, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, IEnumerable<Thing>>(
+                    (thing, transaction, session, isRoot, dialogKind, service, container, chain) => capturedParameterType = thing as EnumerationParameterType)
+                .Returns(false);
+
+            var dialog = new ParameterTypeMappingDialogViewModel(this.reqIf.Lang, new DatatypeDefinition[] { enumDatatypeDefinition }, null, this.iteration, this.session.Object, this.thingDialogNavigationService.Object);
+
+            dialog.SelectedRow = dialog.MappingRows.First(x => x.Identifiable == enumDatatypeDefinition);
+            dialog.CreateParameterTypeCommands.First().MenuCommand.Execute(null);
+
+            Assert.IsNotNull(capturedParameterType);
+
+            var shortNamePattern = new Regex("^[a-zA-Z0-9_]+$");
+            var shortNames = capturedParameterType.ValueDefinition.Select(x => x.ShortName).ToList();
+
+            Assert.That(shortNames, Has.All.Matches<string>(x => shortNamePattern.IsMatch(x)), "all short-names must be valid");
+            Assert.That(shortNames.Distinct().Count(), Is.EqualTo(shortNames.Count), "short-names must be unique");
+            Assert.That(shortNames, Has.None.Contains("Other content"), "the ReqIF OTHER-CONTENT placeholder must not be used as short-name");
+
+            // the human-readable name is preserved
+            Assert.That(capturedParameterType.ValueDefinition.Select(x => x.Name), Does.Contain("mandatory (>= 1)"));
         }
 
         [Test]

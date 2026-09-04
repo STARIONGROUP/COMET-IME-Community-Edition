@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeMappingDialogViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -30,6 +30,8 @@ namespace CDP4Requirements.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Windows.Input;
+
+    using CDP4Requirements.Rdl;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -230,7 +232,9 @@ namespace CDP4Requirements.ViewModels
         {
             this.CreateParameterTypeCommands.Clear();
 
-            if (this.SelectedRow == null)
+            // only the datatype-definition rows can create a parameter type; the enum-value child rows (the literals of
+            // an enumeration) cannot, so no create commands are offered for them.
+            if (this.SelectedRow == null || !(this.SelectedRow.Identifiable is DatatypeDefinition))
             {
                 return;
             }
@@ -315,12 +319,14 @@ namespace CDP4Requirements.ViewModels
             if (enumDatatype != null)
             {
                 var enumParameterType = new EnumerationParameterType { Name = enumDatatype.LongName };
+                var usedShortNames = new HashSet<string>();
+
                 foreach (var specifiedValue in enumDatatype.SpecifiedValues.OrderBy(x => x.Properties.Key))
                 {
                     var enumerationDefinition = new EnumerationValueDefinition
                     {
                         Name = specifiedValue.LongName,
-                        ShortName = specifiedValue.Properties.OtherContent
+                        ShortName = CreateUniqueEnumValueShortName(specifiedValue.LongName, usedShortNames)
                     };
 
                     enumParameterType.ValueDefinition.Add(enumerationDefinition);
@@ -346,6 +352,38 @@ namespace CDP4Requirements.ViewModels
             this.PopulateParameterTypes();
             ((DatatypeDefinitionMappingRowViewModel)this.SelectedRow).FilterPossibleParameterTypes();
             this.CastSelectedRow.MappedThing = this.ParameterTypes.Single(x => x.Iid == parameterType.Iid);
+        }
+
+        /// <summary>
+        /// Derives a valid and unique <see cref="CDP4Common.CommonData.DefinedThing.ShortName"/> for an
+        /// <see cref="EnumerationValueDefinition"/> from its name.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="EnumValue"/> that is being mapped</param>
+        /// <param name="usedShortNames">The short-names already assigned to the other value definitions of the same <see cref="EnumerationParameterType"/></param>
+        /// <returns>
+        /// A short-name that follows the short-name validation rules and is unique within the <see cref="EnumerationParameterType"/>.
+        /// The ReqIF <c>OTHER-CONTENT</c> is not used as it frequently contains free text (e.g. "Other content for: ordinary")
+        /// that is not a valid short-name.
+        /// </returns>
+        private static string CreateUniqueEnumValueShortName(string name, ISet<string> usedShortNames)
+        {
+            var candidate = string.IsNullOrWhiteSpace(name) ? string.Empty : VandVRdlManifest.ToShortName(name);
+
+            if (string.IsNullOrEmpty(candidate))
+            {
+                candidate = "value";
+            }
+
+            var uniqueShortName = candidate;
+            var counter = 1;
+
+            while (!usedShortNames.Add(uniqueShortName))
+            {
+                uniqueShortName = $"{candidate}_{counter}";
+                counter++;
+            }
+
+            return uniqueShortName;
         }
 
         /// <summary>

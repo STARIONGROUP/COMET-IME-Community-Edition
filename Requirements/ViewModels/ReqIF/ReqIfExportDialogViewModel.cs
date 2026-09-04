@@ -71,7 +71,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Backing field for <see cref="SelectedFormat"/>
         /// </summary>
-        private ReqIfExportProfile selectedFormat = ReqIfExportProfile.DoorsCapella;
+        private ReqIfExportProfile selectedFormat = ReqIfExportProfile.Omg;
 
         /// <summary>
         /// Backing field for <see cref="SelectedIteration"/>
@@ -271,8 +271,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public IEnumerable<ReqIfExportProfileRowViewModel> PossibleFormats { get; } = new[]
         {
-            new ReqIfExportProfileRowViewModel(ReqIfExportProfile.DoorsCapella, "ReqIF Implementation Guide (DOORS and Capella)"),
-            new ReqIfExportProfileRowViewModel(ReqIfExportProfile.Omg, "Original OMG Format")
+            new ReqIfExportProfileRowViewModel(ReqIfExportProfile.Omg, "Original OMG Format"),
+            new ReqIfExportProfileRowViewModel(ReqIfExportProfile.DoorsCapella, "prostep ivip Implementation Guide (DOORS and Capella)")
         };
 
         /// <summary>

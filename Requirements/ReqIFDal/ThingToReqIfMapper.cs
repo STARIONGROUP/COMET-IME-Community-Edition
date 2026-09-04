@@ -109,9 +109,9 @@ namespace CDP4Requirements.ReqIFDal
 
         /// <summary>
         /// Gets or sets the <see cref="ReqIfExportProfile"/> that the export targets. Defaults to
-        /// <see cref="ReqIfExportProfile.DoorsCapella"/>.
+        /// <see cref="ReqIfExportProfile.Omg"/>.
         /// </summary>
-        public ReqIfExportProfile Profile { get; set; } = ReqIfExportProfile.DoorsCapella;
+        public ReqIfExportProfile Profile { get; set; } = ReqIfExportProfile.Omg;
 
         /// <summary>
         /// Gets the profile-dependent <see cref="AttributeDefinition.LongName"/> for the name attribute.
