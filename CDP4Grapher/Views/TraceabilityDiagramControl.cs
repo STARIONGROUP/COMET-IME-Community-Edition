@@ -27,6 +27,9 @@ namespace CDP4Grapher.Views
 {
     using System.Collections.Generic;
 
+    using CDP4Common.CommonData;
+
+    using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
 
     using DevExpress.Xpf.Bars;
@@ -49,19 +52,59 @@ namespace CDP4Grapher.Views
                 yield break;
             }
 
+            if (viewModel.IsLinking)
+            {
+                yield return new BarButtonItem
+                {
+                    Content = "Cancel link",
+                    ToolTip = "Abandons the link that is being drawn",
+                    Command = viewModel.CancelLinkCommand,
+                    Glyph = SvgHelper.ToImageSource("Icon Builder/Actions_RemoveCircled.svg")
+                };
+
+                if (viewModel.SelectedNode != null && viewModel.SelectedNode.Thing.Iid != viewModel.LinkSourceThing.Iid)
+                {
+                    yield return BuildLinkSubItem("Create link from start (start → this)", viewModel, viewModel.LinkSourceThing, viewModel.SelectedNode.Thing);
+                    yield return BuildLinkSubItem("Create link to start (this → start)", viewModel, viewModel.SelectedNode.Thing, viewModel.LinkSourceThing);
+                }
+            }
+            else if (viewModel.SelectedNode != null)
+            {
+                yield return new BarButtonItem
+                {
+                    Content = "Start link from here",
+                    ToolTip = "Starts drawing a relationship from the selected node; right-click a target node next",
+                    Command = viewModel.StartLinkCommand,
+                    Glyph = SvgHelper.ToImageSource("Icon Builder/Actions_Hyperlink.svg")
+                };
+            }
+
+            if (viewModel.SelectedEdge != null)
+            {
+                yield return new BarButtonItem
+                {
+                    Content = "Delete relationship",
+                    ToolTip = "Deletes the selected relationship from the model",
+                    Command = viewModel.DeleteRelationshipCommand,
+                    Glyph = SvgHelper.ToImageSource("XAF/Action_Delete.svg")
+                };
+            }
+
             // the shortcuts themselves are bound on the view; the menu only advertises them
             yield return new BarButtonItem
             {
                 Content = "Edit (Ctrl+E)",
                 ToolTip = "Opens the update dialog of the selected node or relationship",
-                Command = viewModel.EditSelectedThingCommand
+                Command = viewModel.EditSelectedThingCommand,
+                Glyph = SvgHelper.ToImageSource("XAF/Action_Inline_Edit.svg")
             };
 
             yield return new BarButtonItem
             {
                 Content = "Inspect (Ctrl+I)",
                 ToolTip = "Opens the inspect dialog of the selected node or relationship",
-                Command = viewModel.InspectSelectedThingCommand
+                Command = viewModel.InspectSelectedThingCommand,
+                Glyph = SvgHelper.ToImageSource("Find/Find.svg")
             };
 
             yield return new BarButtonItem
@@ -91,7 +134,7 @@ namespace CDP4Grapher.Views
                 Command = viewModel.ResetExclusionsCommand
             };
 
-            var exportSubItem = new BarSubItem { Content = "Export as" };
+            var exportSubItem = new BarSubItem { Content = "Export as", Glyph = SvgHelper.ToImageSource("XAF/Action_Export_ToImage.svg") };
 
             foreach (var format in new[] { "PNG", "JPEG", "SVG" })
             {
@@ -104,6 +147,40 @@ namespace CDP4Grapher.Views
             }
 
             yield return exportSubItem;
+        }
+
+        /// <summary>
+        /// Builds the submenu that offers the applicable link kinds for a source-to-target direction, one item per
+        /// <see cref="LinkCreationOption"/>
+        /// </summary>
+        /// <param name="content">The caption of the submenu</param>
+        /// <param name="viewModel">The <see cref="RelationshipTraceabilityViewModel"/></param>
+        /// <param name="source">The <see cref="Thing"/> the relationship would run from</param>
+        /// <param name="target">The <see cref="Thing"/> the relationship would run to</param>
+        /// <returns>The submenu</returns>
+        private static BarSubItem BuildLinkSubItem(string content, RelationshipTraceabilityViewModel viewModel, Thing source, Thing target)
+        {
+            var subItem = new BarSubItem { Content = content, Glyph = SvgHelper.ToImageSource("Icon Builder/Actions_Hyperlink.svg") };
+            var options = viewModel.GetLinkOptions(source, target);
+
+            if (options.Count == 0)
+            {
+                // rules are the only way to create a link; without one there is nothing to offer
+                subItem.Items.Add(new BarButtonItem { Content = "No applicable relationship rule", IsEnabled = false });
+                return subItem;
+            }
+
+            foreach (var option in options)
+            {
+                subItem.Items.Add(new BarButtonItem
+                {
+                    Content = option.Label,
+                    Command = viewModel.CreateLinkCommand,
+                    CommandParameter = option
+                });
+            }
+
+            return subItem;
         }
     }
 }

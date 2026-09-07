@@ -53,6 +53,8 @@ namespace CDP4Grapher.Tests.ViewModels
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
+    using CDP4DalCommon.Protocol.Operations;
+
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Helpers;
     using CDP4Grapher.Settings;
@@ -216,6 +218,7 @@ namespace CDP4Grapher.Tests.ViewModels
 
             relationship.Category.AddRange(categories);
             this.iteration.Relationship.Add(relationship);
+            this.AddToCache(relationship);
 
             return relationship;
         }
@@ -968,6 +971,258 @@ namespace CDP4Grapher.Tests.ViewModels
 
                 Assert.That(recomputes, Is.Not.Zero);
             }
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatStartingAndCancellingALinkTogglesTheLinkingState()
+        {
+            this.spec1.Name = "Alpha";
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            Assert.That(viewModel.IsLinking, Is.False);
+
+            // nothing is selected, so a link cannot be started
+            Assert.That(await viewModel.StartLinkCommand.CanExecute.FirstAsync(), Is.False);
+
+            viewModel.SelectedNode = viewModel.Nodes.Single(x => x.Thing == this.spec1);
+            Assert.That(await viewModel.StartLinkCommand.CanExecute.FirstAsync(), Is.True);
+
+            await viewModel.StartLinkCommand.Execute();
+
+            Assert.That(viewModel.IsLinking, Is.True);
+            Assert.That(viewModel.LinkSourceThing, Is.EqualTo(this.spec1));
+            Assert.That(viewModel.LinkStatusMessage, Does.Contain(this.spec1.UserFriendlyName));
+
+            // the source node is outlined, the others are not
+            Assert.That(viewModel.Nodes.Single(x => x.Thing == this.spec1).IsLinkSource, Is.True);
+            Assert.That(viewModel.Nodes.Single(x => x.Thing == this.spec2).IsLinkSource, Is.False);
+
+            await viewModel.CancelLinkCommand.Execute();
+
+            Assert.That(viewModel.IsLinking, Is.False);
+            Assert.That(viewModel.LinkSourceThing, Is.Null);
+            Assert.That(viewModel.LinkStatusMessage, Is.Empty);
+            Assert.That(viewModel.Nodes.Any(x => x.IsLinkSource), Is.False);
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatLinkOptionsAreOnlyOfferedForMatchingRules()
+        {
+            var edCategory = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "ed", ShortName = "ed" };
+            edCategory.PermissibleClass.Add(ClassKind.ElementDefinition);
+            this.srdl.DefinedCategory.Add(edCategory);
+            this.elementDefinition.Category.Add(edCategory);
+
+            var rule = new BinaryRelationshipRule(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Name = "spec-to-ed",
+                SourceCategory = this.specCategory,
+                TargetCategory = edCategory,
+                RelationshipCategory = this.traceCategory
+            };
+
+            this.srdl.Rule.Add(rule);
+
+            var viewModel = this.CreateViewModel();
+
+            // spec1 carries the spec category, the element definition the ed category, so the rule applies one way
+            var matching = viewModel.GetLinkOptions(this.spec1, this.elementDefinition);
+            Assert.That(matching.Select(x => x.Label), Is.EqualTo(new[] { "spec-to-ed" }));
+            Assert.That(matching.Single().RelationshipCategory, Is.EqualTo(this.traceCategory));
+
+            // the reverse direction matches no rule, so nothing is offered - a link is only possible where a rule allows
+            Assert.That(viewModel.GetLinkOptions(this.elementDefinition, this.spec1), Is.Empty);
+
+            // a self link offers nothing
+            Assert.That(viewModel.GetLinkOptions(this.spec1, this.spec1), Is.Empty);
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatCreatingALinkWritesABinaryRelationship()
+        {
+            this.session.Setup(x => x.OpenIterations).Returns(
+                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
+
+            OperationContainer written = null;
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask).Callback<OperationContainer>(o => written = o);
+
+            var viewModel = this.CreateViewModel();
+
+            var option = new LinkCreationOption("trace", this.spec1, this.spec2, this.traceCategory);
+            await viewModel.CreateLinkCommand.Execute(option);
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            Assert.That(written, Is.Not.Null);
+
+            var dto = written.Operations
+                .Select(x => x.ModifiedThing)
+                .OfType<CDP4Common.DTO.BinaryRelationship>()
+                .Single();
+
+            Assert.That(dto.Source, Is.EqualTo(this.spec1.Iid));
+            Assert.That(dto.Target, Is.EqualTo(this.spec2.Iid));
+            Assert.That(dto.Category, Does.Contain(this.traceCategory.Iid));
+            Assert.That(dto.Owner, Is.EqualTo(this.domain.Iid));
+
+            // the link is finished once written
+            Assert.That(viewModel.LinkSourceThing, Is.Null);
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatDeletingARelationshipWritesADeletion()
+        {
+            var relationship = this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            OperationContainer written = null;
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask).Callback<OperationContainer>(o => written = o);
+
+            this.dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<ConfirmationDialogViewModel>()))
+                .Returns(new BaseDialogResult(true));
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            // no relationship is selected, so nothing can be deleted
+            Assert.That(await viewModel.DeleteRelationshipCommand.CanExecute.FirstAsync(), Is.False);
+
+            viewModel.SelectedEdge = viewModel.Edges.Single(x => x.Relationship == relationship);
+            Assert.That(await viewModel.DeleteRelationshipCommand.CanExecute.FirstAsync(), Is.True);
+
+            await viewModel.DeleteRelationshipCommand.Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            Assert.That(written.Operations.Any(x => x.OperationKind == OperationKind.Delete && x.ModifiedThing.Iid == relationship.Iid), Is.True);
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatCancellingTheDeleteConfirmationWritesNothing()
+        {
+            var relationship = this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            this.dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<ConfirmationDialogViewModel>()))
+                .Returns(new BaseDialogResult(false));
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            viewModel.SelectedEdge = viewModel.Edges.Single(x => x.Relationship == relationship);
+            await viewModel.DeleteRelationshipCommand.Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatBlockContentOptionsDriveTheNodeBoxes()
+        {
+            this.spec1.Definition.Add(new Definition(Guid.NewGuid(), this.cache, this.uri) { LanguageCode = "en-GB", Content = new string('x', 250) });
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            var node = viewModel.Nodes.Single(x => x.Thing == this.spec1);
+            Assert.That(node.ShowClassKind, Is.True);
+            Assert.That(node.ShowName, Is.True);
+
+            // the definition line is off by default
+            Assert.That(node.ShowDefinition, Is.False);
+
+            viewModel.ShowClassKind = false;
+            viewModel.ShowDefinition = true;
+            viewModel.DefinitionMaxLength = 50;
+
+            node = viewModel.Nodes.Single(x => x.Thing == this.spec1);
+            Assert.That(node.ShowClassKind, Is.False);
+            Assert.That(node.ShowDefinition, Is.True);
+            Assert.That(node.Definition.Length, Is.LessThanOrEqualTo(51));
+            Assert.That(node.Definition, Does.EndWith("…"));
+
+            // a node without a definition never shows the definition line, even when it is enabled
+            Assert.That(viewModel.Nodes.Single(x => x.Thing == this.spec2).ShowDefinition, Is.False);
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatTheDetailsFollowTheSelection()
+        {
+            this.spec1.Name = "Alpha";
+            this.spec2.Name = "Beta";
+            var relationship = this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            // nothing selected, no details
+            Assert.That(viewModel.SelectedThingDetails, Is.Empty);
+
+            viewModel.SelectedNode = viewModel.Nodes.Single(x => x.Thing == this.spec1);
+            Assert.That(viewModel.SelectedThingDetails, Does.Contain("Alpha"));
+            Assert.That(viewModel.SelectedThingDetails, Does.Contain(ClassKind.RequirementsSpecification.ToString()));
+
+            // the internal identifier is not part of the details
+            Assert.That(viewModel.SelectedThingDetails, Does.Not.Contain(this.spec1.Iid.ToString()));
+
+            // selecting the relationship shows its endpoints
+            viewModel.SelectedNode = null;
+            viewModel.SelectedEdge = viewModel.Edges.Single(x => x.Relationship == relationship);
+            Assert.That(viewModel.SelectedThingDetails, Does.Contain(ClassKind.BinaryRelationship.ToString()));
+            Assert.That(viewModel.SelectedThingDetails, Does.Contain(this.spec1.UserFriendlyName));
+            Assert.That(viewModel.SelectedThingDetails, Does.Contain(this.spec2.UserFriendlyName));
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatBlockContentIsSavedAndAppliedWithThePreset()
+        {
+            var viewModel = this.CreateViewModel();
+
+            viewModel.ShowClassKind = false;
+            viewModel.ShowDefinition = true;
+            viewModel.DefinitionMaxLength = 42;
+
+            this.SetupSaveConfigurationDialog("my preset", "the description");
+            await viewModel.SaveConfigurationCommand.Execute();
+
+            var saved = this.settings.SavedConfigurations.OfType<TraceabilityConfiguration>().Single();
+            Assert.That(saved.ShowClassKind, Is.False);
+            Assert.That(saved.ShowDefinition, Is.True);
+            Assert.That(saved.DefinitionMaxLength, Is.EqualTo(42));
+
+            // move away from the preset, then re-apply it
+            viewModel.ShowClassKind = true;
+            viewModel.ShowDefinition = false;
+            viewModel.DefinitionMaxLength = 100;
+
+            viewModel.SelectedConfiguration = null;
+            viewModel.SelectedConfiguration = viewModel.SavedConfigurations.Single();
+
+            Assert.That(viewModel.ShowClassKind, Is.False);
+            Assert.That(viewModel.ShowDefinition, Is.True);
+            Assert.That(viewModel.DefinitionMaxLength, Is.EqualTo(42));
 
             viewModel.Dispose();
         }
