@@ -36,11 +36,14 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4EngineeringModel.ViewModels.FileStoreBrowsers;
     using System.Threading.Tasks;
     using System;
+    using System.Globalization;
     using System.Linq;
     using System.Windows;
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Extensions;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The <see cref="CommonFileStore"/> row-view-model
@@ -53,6 +56,11 @@ namespace CDP4EngineeringModel.ViewModels
         private readonly IFileStoreFileAndFolderHandler fileStoreFileAndFolderHandler;
 
         /// <summary>
+        /// Backing field for the <see cref="CreationDate"/> property
+        /// </summary>
+        private string creationDate;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CommonFileStoreRowViewModel"/> class
         /// </summary>
         /// <param name="store">The associated <see cref="CommonFileStore"/></param>
@@ -63,6 +71,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.fileStoreFileAndFolderHandler = new FileStoreFileAndFolderHandler<CommonFileStore>(this);
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Gets the date of creation of the <see cref="CommonFileStore"/>, formatted consistently with the other file-store rows
+        /// </summary>
+        public string CreationDate
+        {
+            get => this.creationDate;
+            private set => this.RaiseAndSetIfChanged(ref this.creationDate, value);
         }
 
         /// <summary>
@@ -84,6 +101,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateProperties()
         {
             this.fileStoreFileAndFolderHandler.UpdateFileRows();
+            this.CreationDate = this.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture);
         }
 
                /// <summary>

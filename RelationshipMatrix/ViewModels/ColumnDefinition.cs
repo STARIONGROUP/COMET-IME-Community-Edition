@@ -60,12 +60,12 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         /// <param name="thing">The represented <see cref="Thing"/></param>
         /// <param name="displayKind">The <see cref="DisplayKind"/> of the column.</param>
-        public ColumnDefinition(DefinedThing thing, DisplayKind displayKind)
+        public ColumnDefinition(Thing thing, DisplayKind displayKind)
         {
             this.RelationshipCount = 0;
-            this.Header = displayKind == DisplayKind.Name ? thing.Name : thing.ShortName;
+            this.Header = displayKind == DisplayKind.Name ? thing.QueryDisplayName() : thing.QueryDisplayShortName();
             this.ToolTip = thing.Tooltip();
-            this.FieldName = thing.ShortName;
+            this.FieldName = thing.QueryDisplayShortName();
             this.ThingId = thing.Iid;
             this.IsHighlighted = false;
         }

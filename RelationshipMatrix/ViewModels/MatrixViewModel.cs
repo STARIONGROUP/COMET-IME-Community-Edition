@@ -460,30 +460,19 @@ namespace CDP4RelationshipMatrix.ViewModels
                 .Where(x => x.ClassKind == sourceX.SelectedClassKind.Value ||
                             x.ClassKind == sourceY.SelectedClassKind.Value).ToList();
 
-            List<DefinedThing> sourceXThing;
-            List<DefinedThing> sourceYThing;
-
-            try
-            {
-                sourceXThing = things.Where(x => x.ClassKind == sourceX.SelectedClassKind.Value).Cast<DefinedThing>()
-                    .ToList();
-
-                sourceYThing = things.Where(x => x.ClassKind == sourceY.SelectedClassKind.Value).Cast<DefinedThing>()
-                    .ToList();
-            }
-            catch (InvalidCastException)
-            {
-                return;
-            }
+            // Note: only DomainFileStore files (iteration partition) are offered - a BinaryRelationship is iteration-scoped and
+            // the server rejects a target that lives in the EngineeringModel partition, i.e. a CommonFileStore file (see GitHub issue #1490).
+            var sourceXThing = things.Where(x => x.ClassKind == sourceX.SelectedClassKind.Value).ToList();
+            var sourceYThing = things.Where(x => x.ClassKind == sourceY.SelectedClassKind.Value).ToList();
 
             if (sourceYThing.Count == 0 || sourceXThing.Count == 0)
             {
                 return;
             }
 
-            var sourceXToUse = new List<DefinedThing>(this.FilterAndSortSourceByCategoryAndOwner(sourceXThing, sourceX));
+            var sourceXToUse = new List<Thing>(this.FilterAndSortSourceByCategoryAndOwner(sourceXThing, sourceX));
 
-            var sourceYToUse = new List<DefinedThing>(this.FilterAndSortSourceByCategoryAndOwner(sourceYThing, sourceY));
+            var sourceYToUse = new List<Thing>(this.FilterAndSortSourceByCategoryAndOwner(sourceYThing, sourceY));
 
             if (sourceYToUse.Count == 0 || sourceXToUse.Count == 0)
             {
@@ -543,34 +532,34 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             foreach (var relationship in oldRelationships.Union(newRelationships))
             {
-                var definedSource = relationship.Source as DefinedThing;
-                var definedTarget = relationship.Target as DefinedThing;
+                var source = relationship.Source;
+                var target = relationship.Target;
 
-                if (definedSource == null || definedTarget == null)
+                if (source == null || target == null)
                 {
                     continue;
                 }
 
-                var sourceRow = this.QueryRow(relationship.Source.Iid);
-                var targetRow = this.QueryRow(relationship.Target.Iid);
+                var sourceRow = this.QueryRow(source.Iid);
+                var targetRow = this.QueryRow(target.Iid);
 
                 if (sourceRow != null)
                 {
-                    var cellValue = this.ComputeCell(definedSource, definedTarget, updatedRelationships,
+                    var cellValue = this.ComputeCell(source, target, updatedRelationships,
                         relationshipRule, false);
 
-                    sourceRow[definedTarget.ShortName] = cellValue;
-                    this.UpdateCurrentCell(definedSource, definedTarget, cellValue);
+                    sourceRow[target.QueryDisplayShortName()] = cellValue;
+                    this.UpdateCurrentCell(source, target, cellValue);
                 }
 
                 if (targetRow != null)
                 {
-                    var cellValue = this.ComputeCell(definedTarget, definedSource, updatedRelationships,
+                    var cellValue = this.ComputeCell(target, source, updatedRelationships,
                         relationshipRule, false);
 
-                    targetRow[definedSource.ShortName] = cellValue;
+                    targetRow[source.QueryDisplayShortName()] = cellValue;
 
-                    this.UpdateCurrentCell(definedTarget, definedSource, cellValue);
+                    this.UpdateCurrentCell(target, source, cellValue);
                 }
             }
         }
@@ -603,12 +592,12 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="displayKind">The <see cref="DisplayKind" /> of the column.</param>
         /// <param name="showRelatedOnly">Indicate whether to only show related elements.</param>
         /// <param name="relationships">The list of all relationships.</param>
-        private IList<ColumnDefinition> CreateColumns(IReadOnlyList<DefinedThing> source, DisplayKind displayKind,
+        private IList<ColumnDefinition> CreateColumns(IReadOnlyList<Thing> source, DisplayKind displayKind,
             bool showRelatedOnly, IList<BinaryRelationship> relationships)
         {
             var columns = new List<ColumnDefinition>();
 
-            foreach (var definedThing in IEnumerableExtensions.DistinctBy(source, x => x.ShortName))
+            foreach (var definedThing in IEnumerableExtensions.DistinctBy(source, x => x.QueryDisplayShortName()))
             {
                 if (showRelatedOnly && !relationships.Any(x =>
                         x.Source.Iid.Equals(definedThing.Iid) || x.Target.Iid.Equals(definedThing.Iid)))
@@ -617,7 +606,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                     continue;
                 }
 
-                if (columns.Any(x => x.FieldName == definedThing.ShortName))
+                if (columns.Any(x => x.FieldName == definedThing.QueryDisplayShortName()))
                 {
                     // skip duplicated shortname
                     continue;
@@ -647,8 +636,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="columnDefinitions">The defined columns.</param>
         /// <param name="showNonRelatedBackgroundColor">Indicates whether a background color should be shown for cells containing non related things</param>
         /// <returns>The <see cref="IDictionary{TKey,TValue}" /> that corresponds to a row</returns>
-        private IDictionary<string, MatrixCellViewModel> ComputeRow(DefinedThing rowThing,
-            IReadOnlyList<DefinedThing> columnThings,
+        private IDictionary<string, MatrixCellViewModel> ComputeRow(Thing rowThing,
+            IReadOnlyList<Thing> columnThings,
             IReadOnlyList<BinaryRelationship> relationships, BinaryRelationshipRule relationshipRule,
             DisplayKind displayKind, IList<ColumnDefinition> columnDefinitions, bool showNonRelatedBackgroundColor)
         {
@@ -685,7 +674,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 }
 
                 var cellValue = this.ComputeCell(rowThing, definedThing, relationships, relationshipRule, false);
-                record.Add(definedThing.ShortName, cellValue);
+                record.Add(definedThing.QueryDisplayShortName(), cellValue);
 
                 this.UpdateCurrentCell(rowThing, definedThing, cellValue);
 
@@ -704,7 +693,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="row">The thing in the current row context</param>
         /// <param name="col">The thing in the current column context</param>
         /// <param name="cellValue">The cell object</param>
-        private void UpdateCurrentCell(DefinedThing row, DefinedThing col, MatrixCellViewModel cellValue)
+        private void UpdateCurrentCell(Thing row, Thing col, MatrixCellViewModel cellValue)
         {
             var cellRef = $"{row.Iid}_{col.Iid}";
 
@@ -720,7 +709,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="relationshipRule">The current <see cref="BinaryRelationshipRule" /></param>
         /// <param name="showNonRelatedBackgroundColor">Indicates whether a background color should be shown for cells containing non related things</param>
         /// <returns>The <see cref="MatrixCellViewModel" /></returns>
-        private MatrixCellViewModel ComputeCell(DefinedThing rowThing, DefinedThing columnThing,
+        private MatrixCellViewModel ComputeCell(Thing rowThing, Thing columnThing,
             IReadOnlyList<BinaryRelationship> relationships, BinaryRelationshipRule relationshipRule, bool showNonRelatedBackgroundColor)
         {
             var relationship = relationships.Where(x =>
@@ -762,10 +751,10 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="source">The <see cref="Thing" /> to filter</param>
         /// <param name="sourceConfigurationViewModel">The filter and sort settings</param>
         /// <returns>The filtered <see cref="Thing" /></returns>
-        private IEnumerable<DefinedThing> FilterAndSortSourceByCategoryAndOwner(IReadOnlyList<DefinedThing> source,
+        private IEnumerable<Thing> FilterAndSortSourceByCategoryAndOwner(IReadOnlyList<Thing> source,
             SourceConfigurationViewModel sourceConfigurationViewModel)
         {
-            var sourceXCatThing = new List<DefinedThing>();
+            var sourceXCatThing = new List<Thing>();
 
             if (sourceConfigurationViewModel?.SelectedCategories == null ||
                 sourceConfigurationViewModel.SelectedCategories.Count == 0)
@@ -826,36 +815,36 @@ namespace CDP4RelationshipMatrix.ViewModels
             if (sourceConfigurationViewModel.SelectedSortOrder == SortOrder.Ascending)
             {
                 sourceXCatThing = sourceConfigurationViewModel.SelectedSortKind == DisplayKind.Name
-                    ? sourceXCatThing.OrderBy(x => x.Name).ToList()
-                    : sourceXCatThing.OrderBy(x => x.ShortName).ToList();
+                    ? sourceXCatThing.OrderBy(x => x.QueryDisplayName()).ToList()
+                    : sourceXCatThing.OrderBy(x => x.QueryDisplayShortName()).ToList();
             }
             else
             {
                 sourceXCatThing = sourceConfigurationViewModel.SelectedSortKind == DisplayKind.Name
-                    ? sourceXCatThing.OrderByDescending(x => x.Name).ToList()
-                    : sourceXCatThing.OrderByDescending(x => x.ShortName).ToList();
+                    ? sourceXCatThing.OrderByDescending(x => x.QueryDisplayName()).ToList()
+                    : sourceXCatThing.OrderByDescending(x => x.QueryDisplayShortName()).ToList();
             }
 
             return sourceXCatThing;
         }
 
         /// <summary>
-        /// Checks if a<see cref="DefinedThing" /> is allowed to be displayed in the UI
+        /// Checks if a <see cref="Thing" /> is allowed to be displayed in the UI
         /// </summary>
-        /// <param name="definedThing">
-        /// The <see cref="DefinedThing" /> to check
+        /// <param name="thing">
+        /// The <see cref="Thing" /> to check
         /// </param>
         /// <returns>
         /// true is display is allowed
         /// </returns>
-        private bool IsDefinedThingDisplayAllowed(DefinedThing definedThing)
+        private bool IsDefinedThingDisplayAllowed(Thing thing)
         {
             if (this.IsDeprecatedDisplayed)
             {
                 return true;
             }
 
-            if (!(definedThing is IDeprecatableThing deprecatableThing))
+            if (!(thing is IDeprecatableThing deprecatableThing))
             {
                 return true;
             }
@@ -1042,11 +1031,11 @@ namespace CDP4RelationshipMatrix.ViewModels
             var selectedRow = this.Records.FirstOrDefault(x => x.SingleOrDefault(y => y.Value == vm).Key != null);
             if (selectedRow != null)
             {
-                var thing = vm.SourceX as DefinedThing;
+                var thing = vm.SourceX;
 
                 var matrixAddress = new MatrixAddress
                 {
-                    Column = thing?.ShortName ?? string.Empty,
+                    Column = thing?.QueryDisplayShortName() ?? string.Empty,
                     Row = this.Records.IndexOf(selectedRow)
                 };
 

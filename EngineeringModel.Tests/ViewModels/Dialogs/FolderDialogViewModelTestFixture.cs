@@ -226,5 +226,26 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             folderDialogViewModel.SelectedOwner = this.domainOfExpertise;
             Assert.IsTrue(folderDialogViewModel.OkCanExecute);
         }
+
+        [Test]
+        public void VerifyThatOwnerIsPopulatedForFolderInCommonFileStore()
+        {
+            // A CommonFileStore hangs off the EngineeringModel, so its Folder has no Iteration container.
+            // The owner picker must still be populated from an open iteration of the model (see GitHub issue #1490).
+            var commonFileStore = new CommonFileStore(Guid.NewGuid(), this.cache, this.uri) { Container = this.engineeringModel };
+            this.engineeringModel.CommonFileStore.Add(commonFileStore);
+            var commonFileStoreClone = commonFileStore.Clone(false);
+            var newFolder = new Folder(Guid.NewGuid(), this.cache, this.uri);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(commonFileStore);
+            var transaction = new ThingTransaction(transactionContext, commonFileStoreClone);
+
+            var folderDialogViewModel =
+                new FolderDialogViewModel(newFolder, transaction, this.session.Object, true, ThingDialogKind.Create,
+                    this.thingDialogNavigationService.Object, commonFileStoreClone);
+
+            Assert.That(folderDialogViewModel.PossibleOwner, Is.Not.Empty);
+            Assert.That(folderDialogViewModel.SelectedOwner, Is.EqualTo(this.domainOfExpertise));
+        }
     }
 }

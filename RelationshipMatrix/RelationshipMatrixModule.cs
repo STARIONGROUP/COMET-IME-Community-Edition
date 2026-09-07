@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipMatrixModule.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2021 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
@@ -128,10 +128,26 @@ namespace CDP4RelationshipMatrix
             {
                 var settings = this.PluginSettingService.Read<RelationshipMatrixPluginSettings>();
 
+                var settingsChanged = false;
+
                 if (!settings.PossibleDisplayKinds.Any())
                 {
                     // if setting is empty, repopulate with default set and save it
                     settings.PossibleDisplayKinds = RelationshipMatrixPluginSettings.DefaultDisplayKinds.ToList();
+                    settingsChanged = true;
+                }
+
+                // merge in any class-kinds added to the defaults after this settings file was written (e.g. File, see GitHub issue #1490)
+                var missingClassKinds = RelationshipMatrixPluginSettings.DefaultClassKinds.Except(settings.PossibleClassKinds).ToList();
+
+                if (missingClassKinds.Any())
+                {
+                    settings.PossibleClassKinds.AddRange(missingClassKinds);
+                    settingsChanged = true;
+                }
+
+                if (settingsChanged)
+                {
                     this.PluginSettingService.Write(settings);
                 }
             }

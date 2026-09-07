@@ -137,7 +137,7 @@ namespace CDP4Composition.Mvvm
         /// <param name="engineeringModel">the engineering model</param>
         protected virtual void EngineeringModelRemovedEventHandler(EngineeringModel engineeringModel)
         {
-            var sessionEngineeringModelSetupMenuGroupViewModel = this.EngineeringModels.SingleOrDefault(x => x.Thing == engineeringModel.Container);
+            var sessionEngineeringModelSetupMenuGroupViewModel = this.EngineeringModels.SingleOrDefault(x => x.Thing == engineeringModel);
 
             if (sessionEngineeringModelSetupMenuGroupViewModel == null)
             {

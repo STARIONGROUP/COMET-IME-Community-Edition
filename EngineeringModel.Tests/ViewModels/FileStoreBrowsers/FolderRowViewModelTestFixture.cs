@@ -27,6 +27,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
@@ -193,6 +194,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             await row.Drop(dropinfo.Object);
             this.session.VerifyGet(x => x.OpenIterations, Times.Once);
+        }
+
+        [Test]
+        public void VerifyThatCreationDateIsPopulatedAndConsistentlyFormatted()
+        {
+            var row = new FolderRowViewModel(this.folder1, this.session.Object, null, this.fileStoreFileAndFolderHandler.Object);
+
+            Assert.That(row.CreationDate, Is.EqualTo(this.folder1.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture)));
         }
 
         [Test]

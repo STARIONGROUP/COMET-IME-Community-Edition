@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NamedThingDiagramContentItem.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -89,6 +89,13 @@ namespace CDP4Composition.Diagram
             {
                 this.FullName = parameterBaseThing.UserFriendlyName;
                 this.ShortName = parameterBaseThing.UserFriendlyShortName;
+            }
+
+            // a File is not a (Short)NamedThing; its name lives on the current FileRevision (see GitHub issue #1490)
+            if (this.Thing is File file)
+            {
+                this.FullName = file.CurrentFileRevision?.Name;
+                this.ShortName = file.CurrentFileRevision?.Name;
             }
         }
 

@@ -106,7 +106,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulatePossibleOwner();
 
-            var iteration = this.Container.GetContainerOfType<Iteration>();
+            var iteration = this.Session.QueryOwnedThingIteration(this.Container);
 
             if (iteration == null)
             {

@@ -25,8 +25,10 @@
 
 namespace CDP4Composition.Tests.Diagram
 {
+    using System;
     using System.Threading;
 
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Diagram;
@@ -57,6 +59,19 @@ namespace CDP4Composition.Tests.Diagram
 
             Assert.AreEqual(this.domainOfExpertise, namedThingDiagramContentItem.Thing);
             Assert.AreEqual(this.domainOfExpertise, namedThingDiagramContentItem.Content);
+        }
+
+        [Test]
+        public void VerifyThatFileUsesCurrentRevisionNameForNameAndShortName()
+        {
+            // A File is not a (Short)NamedThing; the diagram item must show its current revision name (see GitHub issue #1490)
+            var file = new File();
+            file.FileRevision.Add(new FileRevision { Name = "geometry.stp", CreatedOn = new DateTime(2024, 6, 1) });
+
+            var namedThingDiagramContentItem = new NamedThingDiagramContentItem(file, new CDPMessageBus());
+
+            Assert.AreEqual("geometry.stp", namedThingDiagramContentItem.FullName);
+            Assert.AreEqual("geometry.stp", namedThingDiagramContentItem.ShortName);
         }
     }
 }

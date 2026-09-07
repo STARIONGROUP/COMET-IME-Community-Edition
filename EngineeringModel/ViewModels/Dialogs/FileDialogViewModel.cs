@@ -219,7 +219,13 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
-            var iteration = this.Container.GetContainerOfType<Iteration>();
+            var iteration = this.Session.QueryOwnedThingIteration(this.Container);
+
+            if (iteration == null)
+            {
+                return;
+            }
+
             this.PossibleOwner.AddRange(this.Session.QueryAllowedOwners(iteration, this.Thing.Owner));
             this.CurrentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
 
