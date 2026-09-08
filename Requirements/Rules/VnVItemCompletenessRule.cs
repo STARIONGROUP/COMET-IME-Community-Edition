@@ -29,6 +29,7 @@ namespace CDP4Requirements.Rules
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Requirements.Extensions;
     using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
 
@@ -69,10 +70,8 @@ namespace CDP4Requirements.Rules
 
             var violations = new List<RuleViolation>();
 
-            foreach (var item in iteration.RequirementsSpecification
-                         .Where(specification => !specification.IsDeprecated)
-                         .SelectMany(specification => specification.Requirement)
-                         .Where(requirement => !requirement.IsDeprecated && VandVCoverageQuery.IsVnVItem(requirement) && !VandVProcedureWriter.IsStep(requirement)))
+            foreach (var item in iteration.QueryNonDeprecatedRequirements()
+                         .Where(requirement => VandVCoverageQuery.IsVnVItem(requirement) && !VandVProcedureWriter.IsStep(requirement)))
             {
                 var performingActivity = activityByItem.TryGetValue(item.Iid, out var activity) ? activity : null;
 

@@ -28,7 +28,10 @@ namespace CDP4Requirements.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
 
     using CDP4Requirements.ViewModels;
@@ -100,12 +103,15 @@ namespace CDP4Requirements.Tests.ViewModels
         {
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object);
 
-            Assert.That(vm.IsEditMode, Is.False);
-            Assert.That(vm.Title, Is.EqualTo("Create V&V Item"));
-            Assert.That(vm.LinkType, Is.EqualTo(VandVItemDialogViewModel.VerifiesLink));
-            Assert.That(vm.PossibleLinkTypes, Is.EqualTo(new[] { "verifies", "validates" }));
-            Assert.That(vm.ShortName, Is.EqualTo("VNV_REQ_1_1"));
-            Assert.That(vm.Owner, Is.EqualTo(this.domain));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.IsEditMode, Is.False);
+                Assert.That(vm.Title, Is.EqualTo("Create V&V Item"));
+                Assert.That(vm.LinkType, Is.EqualTo(VandVItemDialogViewModel.VerifiesLink));
+                Assert.That(vm.PossibleLinkTypes, Is.EqualTo(new[] { "verifies", "validates" }));
+                Assert.That(vm.ShortName, Is.EqualTo("VNV_REQ_1_1"));
+                Assert.That(vm.Owner, Is.EqualTo(this.domain));
+            });
         }
 
         [Test]
@@ -117,8 +123,11 @@ namespace CDP4Requirements.Tests.ViewModels
             this.AddCoveringItem("verifies");
 
             var second = new VandVItemDialogViewModel(this.requirement, this.session.Object);
-            Assert.That(second.Name, Is.EqualTo("Verify REQ-1 (2)"), "a second item must not repeat the first item's name");
-            Assert.That(second.ShortName, Is.Not.EqualTo(first.ShortName));
+            Assert.Multiple(() =>
+            {
+                Assert.That(second.Name, Is.EqualTo("Verify REQ-1 (2)"), "a second item must not repeat the first item's name");
+                Assert.That(second.ShortName, Is.Not.EqualTo(first.ShortName));
+            });
         }
 
         [Test]
@@ -144,24 +153,30 @@ namespace CDP4Requirements.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatAParametricConstraintCanBeCopiedIntoTheAcceptanceCriteria()
+        public async Task VerifyThatAParametricConstraintCanBeCopiedIntoTheAcceptanceCriteria()
         {
             this.AddConstraint("mass", RelationalOperatorKind.LT, "100");
 
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object);
 
-            Assert.That(vm.HasParametricConstraints, Is.True);
-            Assert.That(vm.PossibleParametricConstraints, Has.Count.EqualTo(1), "a single-expression constraint offers just the whole constraint");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.HasParametricConstraints, Is.True);
+                Assert.That(vm.PossibleParametricConstraints, Has.Count.EqualTo(1), "a single-expression constraint offers just the whole constraint");
+            });
 
             var choice = vm.PossibleParametricConstraints.Single();
             Assert.That(choice.Display, Is.Not.Empty, "the picker must render text; ParametricConstraint itself has no Name");
 
             vm.Acceptance = "Existing text";
             vm.SelectedParametricConstraint = choice;
-            ((ICommand)vm.UseParametricConstraintCommand).Execute(null);
+            await vm.UseParametricConstraintCommand.Execute(Unit.Default);
 
-            Assert.That(vm.Acceptance, Does.StartWith("Existing text"), "existing text is preserved, not replaced");
-            Assert.That(vm.Acceptance, Does.Contain("mass"), "the expression is appended");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.Acceptance, Does.StartWith("Existing text"), "existing text is preserved, not replaced");
+                Assert.That(vm.Acceptance, Does.Contain("mass"), "the expression is appended");
+            });
         }
 
         [Test]
@@ -177,16 +192,19 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object);
 
-            Assert.That(vm.PossibleParametricConstraints, Has.Count.EqualTo(3), "the whole constraint plus one entry per expression");
-            Assert.That(vm.PossibleParametricConstraints.Count(x => x.Expression != null), Is.EqualTo(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.PossibleParametricConstraints, Has.Count.EqualTo(3), "the whole constraint plus one entry per expression");
+                Assert.That(vm.PossibleParametricConstraints.Count(x => x.Expression != null), Is.EqualTo(2));
+            });
             Assert.That(
-                vm.PossibleParametricConstraints.Any(x => x.Expression != null && x.ExpressionText.Contains("power")),
+                vm.PossibleParametricConstraints.Any(x => x.Expression != null && x.QueryExpressionText().Contains("power")),
                 Is.True,
                 "each expression can be verified on its own");
         }
 
         [Test]
-        public void VerifyThatUsingAConstraintBoundToAParameterAlsoSetsTheCoverage()
+        public async Task VerifyThatUsingAConstraintBoundToAParameterAlsoSetsTheCoverage()
         {
             var constraint = this.AddConstraint("mass", RelationalOperatorKind.LT, "100");
             var expression = constraint.Expression.OfType<RelationalExpression>().Single();
@@ -202,10 +220,13 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object);
             vm.SelectedParametricConstraint = vm.PossibleParametricConstraints.First();
-            ((ICommand)vm.UseParametricConstraintCommand).Execute(null);
+            await vm.UseParametricConstraintCommand.Execute(Unit.Default);
 
-            Assert.That(vm.SelectedParameter, Is.EqualTo(parameter), "the parameter the constraint binds to is coupled automatically");
-            Assert.That(vm.SelectedElementDefinition, Is.EqualTo(elementDefinition), "and so is its element definition");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.SelectedParameter, Is.EqualTo(parameter), "the parameter the constraint binds to is coupled automatically");
+                Assert.That(vm.SelectedElementDefinition, Is.EqualTo(elementDefinition), "and so is its element definition");
+            });
         }
 
         [Test]
@@ -236,23 +257,32 @@ namespace CDP4Requirements.Tests.ViewModels
             vm.SelectedElementDefinition = elementDefinition;
             vm.SelectedParameter = plain;
 
-            Assert.That(vm.IsParameterOptionDependent, Is.False);
-            Assert.That(vm.IsParameterStateDependent, Is.False);
-            Assert.That(vm.PossibleOptions, Is.Empty);
-            Assert.That(vm.PossibleStates, Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.IsParameterOptionDependent, Is.False);
+                Assert.That(vm.IsParameterStateDependent, Is.False);
+                Assert.That(vm.PossibleOptions, Is.Empty);
+                Assert.That(vm.PossibleStates, Is.Empty);
+            });
 
             vm.SelectedParameter = dependent;
 
-            Assert.That(vm.IsParameterOptionDependent, Is.True);
-            Assert.That(vm.IsParameterStateDependent, Is.True);
-            Assert.That(vm.PossibleOptions, Has.Count.EqualTo(1));
-            Assert.That(vm.PossibleStates, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.IsParameterOptionDependent, Is.True);
+                Assert.That(vm.IsParameterStateDependent, Is.True);
+                Assert.That(vm.PossibleOptions, Has.Count.EqualTo(1));
+                Assert.That(vm.PossibleStates, Has.Count.EqualTo(1));
+            });
 
             vm.PossibleOptions.Single().IsSelected = true;
             vm.PossibleStates.Single().IsSelected = true;
 
-            Assert.That(vm.SelectedOptions, Has.Count.EqualTo(1), "ticking a row selects the option");
-            Assert.That(vm.SelectedStates, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.SelectedOptions, Has.Count.EqualTo(1), "ticking a row selects the option");
+                Assert.That(vm.SelectedStates, Has.Count.EqualTo(1));
+            });
 
             vm.SelectedParameter = plain;
 
@@ -264,8 +294,11 @@ namespace CDP4Requirements.Tests.ViewModels
         {
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object);
 
-            Assert.That(vm.HasParametricConstraints, Is.False);
-            Assert.That(((ICommand)vm.UseParametricConstraintCommand).CanExecute(null), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.HasParametricConstraints, Is.False);
+                Assert.That(((ICommand)vm.UseParametricConstraintCommand).CanExecute(null), Is.False);
+            });
         }
 
         [Test]
@@ -274,8 +307,11 @@ namespace CDP4Requirements.Tests.ViewModels
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object);
 
             // no dash character outside plain ASCII may reach the UI
-            Assert.That(vm.RequirementCaption.Any(c => c > 0x7F), Is.False, "the caption must stay plain ASCII");
-            Assert.That(vm.RequirementCaption, Is.EqualTo("REQ-1: A requirement"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.RequirementCaption.Any(c => c > 0x7F), Is.False, "the caption must stay plain ASCII");
+                Assert.That(vm.RequirementCaption, Is.EqualTo("REQ-1: A requirement"));
+            });
         }
 
         [Test]
@@ -283,17 +319,23 @@ namespace CDP4Requirements.Tests.ViewModels
         {
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object);
 
-            Assert.That(vm["Method"], Is.Not.Empty, "method is mandatory and not yet set");
-            Assert.That(vm["Stage"], Is.Not.Empty);
-            Assert.That(vm["Acceptance"], Is.Not.Empty);
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm["Method"], Is.Not.Empty, "method is mandatory and not yet set");
+                Assert.That(vm["Stage"], Is.Not.Empty);
+                Assert.That(vm["Acceptance"], Is.Not.Empty);
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+            });
 
             vm.Method = "Test";
             vm.Stage = "FAT";
             vm.Acceptance = "Endurance >= 24h";
 
-            Assert.That(vm["Method"], Is.Empty);
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm["Method"], Is.Empty);
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            });
         }
 
         [Test]
@@ -314,8 +356,11 @@ namespace CDP4Requirements.Tests.ViewModels
             Assert.That(vm["ShortName"], Is.Empty, "a leading digit is legal, the model itself allows short names like 10R");
 
             vm.ShortName = "VNV_EXISTING";
-            Assert.That(vm["ShortName"], Does.Contain("already uses this short name"));
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm["ShortName"], Does.Contain("already uses this short name"));
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+            });
         }
 
         [Test]
@@ -331,15 +376,18 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object, item, VandVItemDialogViewModel.ValidatesLink);
 
-            Assert.That(vm.IsEditMode, Is.True);
-            Assert.That(vm.Title, Is.EqualTo("Edit V&V Item"));
-            Assert.That(vm.OkButtonCaption, Is.EqualTo("OK"));
-            Assert.That(vm.LinkType, Is.EqualTo("validates"));
-            Assert.That(vm.Method, Is.EqualTo("Analysis"));
-            Assert.That(vm.Status, Is.EqualTo("Passed"));
-            Assert.That(vm.PlannedDate, Is.EqualTo(new DateTime(2026, 3, 1)));
-            Assert.That(vm["ShortName"], Is.Empty, "its own short name is not a duplicate of itself");
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.IsEditMode, Is.True);
+                Assert.That(vm.Title, Is.EqualTo("Edit V&V Item"));
+                Assert.That(vm.OkButtonCaption, Is.EqualTo("OK"));
+                Assert.That(vm.LinkType, Is.EqualTo("validates"));
+                Assert.That(vm.Method, Is.EqualTo("Analysis"));
+                Assert.That(vm.Status, Is.EqualTo("Passed"));
+                Assert.That(vm.PlannedDate, Is.EqualTo(new DateTime(2026, 3, 1)));
+                Assert.That(vm["ShortName"], Is.Empty, "its own short name is not a duplicate of itself");
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            });
         }
 
         [Test]
@@ -357,8 +405,11 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var attributes = vm.BuildAttributes();
 
-            Assert.That(attributes.ContainsKey("vnv_facility"), Is.True, "an emptied field must survive as empty so the update deletes it");
-            Assert.That(attributes["vnv_facility"], Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(attributes.ContainsKey("vnv_facility"), Is.True, "an emptied field must survive as empty so the update deletes it");
+                Assert.That(attributes["vnv_facility"], Is.Empty);
+            });
         }
 
         [Test]
@@ -371,8 +422,11 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var attributes = vm.BuildAttributes();
 
-            Assert.That(attributes.ContainsKey("vnv_facility"), Is.False, "blank fields are not written on create");
-            Assert.That(attributes["vnv_method"], Is.EqualTo("Test"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(attributes.ContainsKey("vnv_facility"), Is.False, "blank fields are not written on create");
+                Assert.That(attributes["vnv_method"], Is.EqualTo("Test"));
+            });
         }
 
         [Test]
@@ -384,8 +438,11 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object);
 
-            Assert.That(vm.PossibleStages, Is.EqualTo(new[] { "GATE-A" }));
-            Assert.That(vm.PossibleMethods, Does.Contain("Test"), "methods still fall back to the manifest");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.PossibleStages, Is.EqualTo(new[] { "GATE-A" }));
+                Assert.That(vm.PossibleMethods, Does.Contain("Test"), "methods still fall back to the manifest");
+            });
         }
 
         private ParametricConstraint AddConstraint(string parameterTypeShortName, RelationalOperatorKind relationalOperator, string value)

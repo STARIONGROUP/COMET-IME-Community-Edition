@@ -139,17 +139,19 @@ namespace CDP4Requirements.Tests.Services
             var createdRid = operations.Select(x => x.ModifiedThing).OfType<DTO.ReviewItemDiscrepancy>().SingleOrDefault();
             var createdReference = operations.Select(x => x.ModifiedThing).OfType<DTO.ModellingThingReference>().SingleOrDefault();
 
-            Assert.That(createdRid, Is.Not.Null, "the RID must be part of the transaction");
-            Assert.That(createdReference, Is.Not.Null, "the reference to the annotated thing must be part of the transaction");
-
-            Assert.That(createdRid.Title, Is.EqualTo("Mass exceeded"));
-            Assert.That(createdRid.ShortName, Is.EqualTo("RID-001"));
-            Assert.That(createdRid.Status, Is.EqualTo(AnnotationStatusKind.OPEN));
-            Assert.That(createdRid.Classification, Is.EqualTo(AnnotationClassificationKind.MAJOR));
-            Assert.That(createdRid.Author, Is.EqualTo(this.participant.Iid));
-            Assert.That(createdRid.Owner, Is.EqualTo(this.domain.Iid));
-            Assert.That(createdRid.PrimaryAnnotatedThing, Is.EqualTo(createdReference.Iid));
-            Assert.That(createdReference.ReferencedThing, Is.EqualTo(this.requirement.Iid));
+            Assert.Multiple(() =>
+            {
+                Assert.That(createdRid, Is.Not.Null, "the RID must be part of the transaction");
+                Assert.That(createdReference, Is.Not.Null, "the reference to the annotated thing must be part of the transaction");
+                Assert.That(createdRid.Title, Is.EqualTo("Mass exceeded"));
+                Assert.That(createdRid.ShortName, Is.EqualTo("RID-001"));
+                Assert.That(createdRid.Status, Is.EqualTo(AnnotationStatusKind.OPEN));
+                Assert.That(createdRid.Classification, Is.EqualTo(AnnotationClassificationKind.MAJOR));
+                Assert.That(createdRid.Author, Is.EqualTo(this.participant.Iid));
+                Assert.That(createdRid.Owner, Is.EqualTo(this.domain.Iid));
+                Assert.That(createdRid.PrimaryAnnotatedThing, Is.EqualTo(createdReference.Iid));
+                Assert.That(createdReference.ReferencedThing, Is.EqualTo(this.requirement.Iid));
+            });
         }
 
         [Test]
@@ -175,11 +177,14 @@ namespace CDP4Requirements.Tests.Services
             var createdNote = operations.Select(x => x.ModifiedThing).OfType<DTO.EngineeringModelDataNote>().SingleOrDefault();
             var modelUpdate = operations.Select(x => x.ModifiedThing).OfType<DTO.EngineeringModel>().SingleOrDefault();
 
-            Assert.That(createdNote, Is.Not.Null);
-            Assert.That(createdNote.Content, Is.EqualTo("a note about the requirement"));
-            Assert.That(modelUpdate, Is.Not.Null);
-            Assert.That(modelUpdate.GenericNote, Does.Contain(createdNote.Iid), "a note belongs in GenericNote, not ModellingAnnotation");
-            Assert.That(modelUpdate.ModellingAnnotation, Does.Not.Contain(createdNote.Iid));
+            Assert.Multiple(() =>
+            {
+                Assert.That(createdNote, Is.Not.Null);
+                Assert.That(createdNote.Content, Is.EqualTo("a note about the requirement"));
+                Assert.That(modelUpdate, Is.Not.Null);
+                Assert.That(modelUpdate.GenericNote, Does.Contain(createdNote.Iid), "a note belongs in GenericNote, not ModellingAnnotation");
+                Assert.That(modelUpdate.ModellingAnnotation, Does.Not.Contain(createdNote.Iid));
+            });
         }
 
         [Test]
@@ -197,8 +202,11 @@ namespace CDP4Requirements.Tests.Services
             Assert.That(reviewRequests, Is.EquivalentTo(new[] { "Review Item Discrepancy", "Request for Deviation", "Request for Waiver" }),
                 "a change request or a model note is an annotation but not a concession against a requirement");
 
-            Assert.That(AnnotationKind.All.Single(x => x.Name == "Model Note").HasIdentification, Is.False);
-            Assert.That(AnnotationKind.All.Single(x => x.Name == "Change Request").HasIdentification, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(AnnotationKind.All.Single(x => x.Name == "Model Note").HasIdentification, Is.False);
+                Assert.That(AnnotationKind.All.Single(x => x.Name == "Change Request").HasIdentification, Is.True);
+            });
         }
         [Test]
         public void VerifyThatEveryCreatedKindStaysVisibleButOnlyConcessionsCountAsReviewRequests()
@@ -210,20 +218,25 @@ namespace CDP4Requirements.Tests.Services
             // anything the register can create must be findable afterwards, or it is write-only
             var all = AnnotationQuery.QueryAllFor(this.iteration, this.requirement);
 
-            Assert.That(all, Does.Contain(rid));
-            Assert.That(all, Does.Contain(changeRequest), "a change request created here must still be listed");
-            Assert.That(all, Does.Contain(note), "a model note lives in GenericNote and must still be listed");
+            Assert.Multiple(() =>
+            {
+                Assert.That(all, Does.Contain(rid));
+                Assert.That(all, Does.Contain(changeRequest), "a change request created here must still be listed");
+                Assert.That(all, Does.Contain(note), "a model note lives in GenericNote and must still be listed");
+            });
 
             // but the non-conformance flow only counts concessions against the requirement
             var reviewRequests = AnnotationQuery.QueryFor(this.iteration, this.requirement);
 
-            Assert.That(reviewRequests, Does.Contain(rid));
-            Assert.That(reviewRequests, Does.Not.Contain(changeRequest));
-            Assert.That(reviewRequests, Does.Not.Contain(note));
-
-            Assert.That(AnnotationQuery.IsOpen(note), Is.False, "a kind with no status never needs action");
-            Assert.That(AnnotationQuery.DescribeStatus(note), Is.Empty);
-            Assert.That(AnnotationQuery.DescribeStatus(rid), Is.EqualTo("OPEN"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(reviewRequests, Does.Contain(rid));
+                Assert.That(reviewRequests, Does.Not.Contain(changeRequest));
+                Assert.That(reviewRequests, Does.Not.Contain(note));
+                Assert.That(AnnotationQuery.IsOpen(note), Is.False, "a kind with no status never needs action");
+                Assert.That(AnnotationQuery.DescribeStatus(note), Is.Empty);
+                Assert.That(AnnotationQuery.DescribeStatus(rid), Is.EqualTo("OPEN"));
+            });
         }
 
         private T Annotate<T>(T annotation) where T : EngineeringModelDataAnnotation

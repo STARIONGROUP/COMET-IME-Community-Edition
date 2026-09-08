@@ -167,34 +167,46 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public IReadOnlyList<SelectableThingRowViewModel> Items { get; }
 
-        /// <summary>Gets the possible <c>vnv_status</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_status</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleStatuses { get; }
 
-        /// <summary>Gets the possible <c>vnv_compliance</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_compliance</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleCompliances { get; }
 
-        /// <summary>Gets or sets the execution status applied to every ticked item.</summary>
+        /// <summary>
+        /// Gets or sets the execution status applied to every ticked item.
+        /// </summary>
         public string Status
         {
             get => this.status;
             set => this.RaiseAndSetIfChanged(ref this.status, value);
         }
 
-        /// <summary>Gets or sets the actual date applied to every ticked item.</summary>
+        /// <summary>
+        /// Gets or sets the actual date applied to every ticked item.
+        /// </summary>
         public DateTime? ActualDate
         {
             get => this.actualDate;
             set => this.RaiseAndSetIfChanged(ref this.actualDate, value);
         }
 
-        /// <summary>Gets or sets the result applied to every ticked item.</summary>
+        /// <summary>
+        /// Gets or sets the result applied to every ticked item.
+        /// </summary>
         public string Result
         {
             get => this.result;
             set => this.RaiseAndSetIfChanged(ref this.result, value);
         }
 
-        /// <summary>Gets or sets the evidence reference applied to every ticked item.</summary>
+        /// <summary>
+        /// Gets or sets the evidence reference applied to every ticked item.
+        /// </summary>
         public string EvidenceReference
         {
             get => this.evidenceReference;
@@ -211,14 +223,18 @@ namespace CDP4Requirements.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.alsoCloseOut, value);
         }
 
-        /// <summary>Gets or sets the compliance recorded when closing out.</summary>
+        /// <summary>
+        /// Gets or sets the compliance recorded when closing out.
+        /// </summary>
         public string Compliance
         {
             get => this.compliance;
             set => this.RaiseAndSetIfChanged(ref this.compliance, value);
         }
 
-        /// <summary>Gets or sets the close-out reason, mandatory when closing out.</summary>
+        /// <summary>
+        /// Gets or sets the close-out reason, mandatory when closing out.
+        /// </summary>
         public string CloseOutReason
         {
             get => this.closeOutReason;

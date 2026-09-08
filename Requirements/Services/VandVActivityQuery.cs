@@ -29,6 +29,7 @@ namespace CDP4Requirements.Services
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Requirements.Extensions;
     using CDP4Requirements.Rdl;
 
     using CDP4Common.EngineeringModelData;
@@ -69,10 +70,8 @@ namespace CDP4Requirements.Services
                 return new List<Requirement>();
             }
 
-            return iteration.RequirementsSpecification
-                .Where(specification => !specification.IsDeprecated)
-                .SelectMany(specification => specification.Requirement)
-                .Where(requirement => !requirement.IsDeprecated && IsActivity(requirement))
+            return iteration.QueryNonDeprecatedRequirements()
+                .Where(IsActivity)
                 .OrderBy(requirement => requirement.ShortName)
                 .ToList();
         }
@@ -314,10 +313,8 @@ namespace CDP4Requirements.Services
                 return new List<string>();
             }
 
-            return iteration.RequirementsSpecification
-                .Where(specification => !specification.IsDeprecated)
-                .SelectMany(specification => specification.Requirement)
-                .Where(requirement => !requirement.IsDeprecated && (VandVCoverageQuery.IsVnVItem(requirement) || IsActivity(requirement)))
+            return iteration.QueryNonDeprecatedRequirements()
+                .Where(requirement => VandVCoverageQuery.IsVnVItem(requirement) || IsActivity(requirement))
                 .Select(requirement => VandVCoverageQuery.Attribute(requirement, parameterTypeShortName))
                 .Where(value => !string.IsNullOrWhiteSpace(value))
                 .Distinct(StringComparer.OrdinalIgnoreCase)

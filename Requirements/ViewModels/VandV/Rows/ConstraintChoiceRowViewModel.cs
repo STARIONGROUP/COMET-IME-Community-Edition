@@ -98,38 +98,12 @@ namespace CDP4Requirements.ViewModels.Rows
         public RelationalExpression Expression { get; }
 
         /// <summary>
-        /// Gets the expression text this choice contributes to the acceptance criteria.
-        /// </summary>
-        /// <remarks>
-        /// The SDK's own <see cref="RelationalExpression.StringValue"/> is used rather than a hand-built string,
-        /// because it appends the <see cref="CDP4Common.SiteDirectoryData.MeasurementScale"/> short-name. Formatting
-        /// the parts here dropped it, so a constraint copied into the acceptance criteria read "mass &gt; 10" where the
-        /// requirement says "mass &gt; 10 kg", which is a different acceptance criterion. It trails a space when the
-        /// expression carries no scale, hence the trim, and it dereferences the parameter type unguarded, hence the
-        /// fallback for an expression that has none.
-        /// </remarks>
-        public string ExpressionText
-        {
-            get
-            {
-                if (this.Expression == null)
-                {
-                    return this.Constraint.ToExpressionString();
-                }
-
-                return this.Expression.ParameterType == null
-                    ? $"{this.Expression.RelationalOperator.ToScientificNotationString()} {string.Join(", ", this.Expression.Value)}"
-                    : this.Expression.StringValue.Trim();
-            }
-        }
-
-        /// <summary>
         /// Gets the text shown in the picker.
         /// </summary>
         public string Display =>
             this.Expression != null
-                ? $"expression: {this.ExpressionText}"
-                : $"whole constraint: {this.ExpressionText}";
+                ? $"expression: {this.QueryExpressionText()}"
+                : $"whole constraint: {this.QueryExpressionText()}";
 
         /// <summary>
         /// Gets the <see cref="ParameterOrOverrideBase"/> this choice is bound to, resolved through the
@@ -160,6 +134,32 @@ namespace CDP4Requirements.ViewModels.Rows
                     .OfType<ParameterOrOverrideBase>()
                     .FirstOrDefault();
             }
+        }
+
+        /// <summary>
+        /// Returns the expression text this choice contributes to the acceptance criteria.
+        /// </summary>
+        /// <returns>
+        /// The single expression rendered by the SDK, or the whole constraint's expression string.
+        /// </returns>
+        /// <remarks>
+        /// The SDK's own <see cref="RelationalExpression.StringValue"/> is used rather than a hand-built string,
+        /// because it appends the <see cref="CDP4Common.SiteDirectoryData.MeasurementScale"/> short-name. Formatting
+        /// the parts here dropped it, so a constraint copied into the acceptance criteria read "mass &gt; 10" where the
+        /// requirement says "mass &gt; 10 kg", which is a different acceptance criterion. It trails a space when the
+        /// expression carries no scale, hence the trim, and it dereferences the parameter type unguarded, hence the
+        /// fallback for an expression that has none.
+        /// </remarks>
+        public string QueryExpressionText()
+        {
+            if (this.Expression == null)
+            {
+                return this.Constraint.ToExpressionString();
+            }
+
+            return this.Expression.ParameterType == null
+                ? $"{this.Expression.RelationalOperator.ToScientificNotationString()} {string.Join(", ", this.Expression.Value)}"
+                : this.Expression.StringValue.Trim();
         }
     }
 }

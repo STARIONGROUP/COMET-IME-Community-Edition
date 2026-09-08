@@ -108,13 +108,19 @@ namespace CDP4Requirements.Tests.Services
 
             var result = VandVCoverageQuery.Build(this.iteration);
 
-            Assert.That(result.Coverages, Has.Count.EqualTo(2), "V&V items are not themselves rows");
-            Assert.That(result.UncoveredCount, Is.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Coverages, Has.Count.EqualTo(2), "V&V items are not themselves rows");
+                Assert.That(result.UncoveredCount, Is.EqualTo(1));
+            });
 
             var coveredEntry = result.Coverages.Single(x => x.Requirement.ShortName == "REQ-1");
-            Assert.That(coveredEntry.VandVItems, Has.Count.EqualTo(1));
-            Assert.That(coveredEntry.CellText("FAT"), Is.EqualTo("VNV-1: Test (Passed)"));
-            Assert.That(coveredEntry.CellText("PDR"), Is.Empty, "nothing is planned at PDR");
+            Assert.Multiple(() =>
+            {
+                Assert.That(coveredEntry.VandVItems, Has.Count.EqualTo(1));
+                Assert.That(coveredEntry.CellText("FAT"), Is.EqualTo("VNV-1: Test (Passed)"));
+                Assert.That(coveredEntry.CellText("PDR"), Is.Empty, "nothing is planned at PDR");
+            });
         }
 
         [Test]
@@ -140,8 +146,11 @@ namespace CDP4Requirements.Tests.Services
 
             var result = VandVCoverageQuery.Build(this.iteration);
 
-            Assert.That(result.Stages, Does.Contain("PDR"), "manifest defaults are used when the RDL has no vnv_stage");
-            Assert.That(result.Stages, Does.Contain("CUSTOM-GATE"), "a stage actually in use is always a column");
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Stages, Does.Contain("PDR"), "manifest defaults are used when the RDL has no vnv_stage");
+                Assert.That(result.Stages, Does.Contain("CUSTOM-GATE"), "a stage actually in use is always a column");
+            });
         }
 
         [Test]
@@ -295,8 +304,11 @@ namespace CDP4Requirements.Tests.Services
 
             rid.Status = AnnotationStatusKind.DONE;
 
-            Assert.That(AnnotationQuery.SummarizeState(AnnotationQuery.QueryFor(this.iteration, vandVItem)), Is.EqualTo(AnnotationState.Resolved));
-            Assert.That(AnnotationQuery.IsOpen(rfd), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(AnnotationQuery.SummarizeState(AnnotationQuery.QueryFor(this.iteration, vandVItem)), Is.EqualTo(AnnotationState.Resolved));
+                Assert.That(AnnotationQuery.IsOpen(rfd), Is.False);
+            });
         }
 
         private ModellingAnnotationItem AddRequest(ModellingAnnotationItem annotation, string shortName, Thing annotatedThing, AnnotationStatusKind status)
@@ -337,12 +349,7 @@ namespace CDP4Requirements.Tests.Services
 
         private void SetAttribute(Requirement item, string parameterTypeShortName, string value)
         {
-            var parameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = parameterTypeShortName, Name = parameterTypeShortName };
-            item.ParameterValue.Add(new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            {
-                ParameterType = parameterType,
-                Value = new ValueArray<string>(new[] { value })
-            });
+            item.SetVandVAttribute(parameterTypeShortName, value, this.assembler.Cache, this.uri);
         }
     }
 }

@@ -146,20 +146,28 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public IReadOnlyList<VandVBulkItemRowViewModel> PossibleRequirements { get; }
 
-        /// <summary>Gets the possible link types (<c>verifies</c> / <c>validates</c>).</summary>
+        /// <summary>
+        /// Gets the possible link types (<c>verifies</c> / <c>validates</c>).
+        /// </summary>
         public IReadOnlyList<string> PossibleLinkTypes { get; }
 
-        /// <summary>Gets the possible owning <see cref="DomainOfExpertise"/>s.</summary>
+        /// <summary>
+        /// Gets the possible owning <see cref="DomainOfExpertise"/>s.
+        /// </summary>
         public IReadOnlyList<DomainOfExpertise> PossibleOwners { get; }
 
-        /// <summary>Gets or sets whether the created items verify or validate their requirement.</summary>
+        /// <summary>
+        /// Gets or sets whether the created items verify or validate their requirement.
+        /// </summary>
         public string LinkType
         {
             get => this.linkType;
             set => this.RaiseAndSetIfChanged(ref this.linkType, value);
         }
 
-        /// <summary>Gets or sets the owner of the created items.</summary>
+        /// <summary>
+        /// Gets or sets the owner of the created items.
+        /// </summary>
         public DomainOfExpertise Owner
         {
             get => this.owner;

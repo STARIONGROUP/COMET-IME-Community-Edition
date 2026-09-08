@@ -27,7 +27,10 @@ namespace CDP4Requirements.Tests.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
 
     using CDP4Requirements.Rdl;
@@ -113,9 +116,12 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVLinkItemsDialogViewModel(this.activity, this.iteration);
 
-            Assert.That(vm.Items.Select(x => x.Item), Is.EqualTo(new[] { free }), "an item this activity already performs is not offered");
-            Assert.That(vm.Items.Single().Display, Does.Not.Contain("moves from"), "an unlinked item is not described as moving");
-            Assert.That(performed.ShortName, Is.EqualTo("VNV-2"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.Items.Select(x => x.Item), Is.EqualTo(new[] { free }), "an item this activity already performs is not offered");
+                Assert.That(vm.Items.Single().Display, Does.Not.Contain("moves from"), "an unlinked item is not described as moving");
+                Assert.That(performed.ShortName, Is.EqualTo("VNV-2"));
+            });
         }
 
         [Test]
@@ -134,13 +140,15 @@ namespace CDP4Requirements.Tests.ViewModels
             Assert.That(differingRow.Display, Does.Contain("states its own Test"), "a method of its own that differs from the activity's is flagged, since linking keeps it");
 
             var followingRow = vm.Items.Single(x => x.Item == following);
-            Assert.That(followingRow.Display, Does.Not.Contain("states its own"));
-
-            Assert.That(vm.ClearOwnPlanning, Is.False, "nothing is overwritten unless asked");
+            Assert.Multiple(() =>
+            {
+                Assert.That(followingRow.Display, Does.Not.Contain("states its own"));
+                Assert.That(vm.ClearOwnPlanning, Is.False, "nothing is overwritten unless asked");
+            });
         }
 
         [Test]
-        public void VerifyThatOkRequiresATickedItem()
+        public async Task VerifyThatOkRequiresATickedItem()
         {
             var requirement = this.AddRequirement("REQ-1");
             this.AddItem("VNV-1", requirement, null);
@@ -149,12 +157,15 @@ namespace CDP4Requirements.Tests.ViewModels
 
             Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
 
-            ((ICommand)vm.SelectAllCommand).Execute(null);
+            await vm.SelectAllCommand.Execute(Unit.Default);
 
-            Assert.That(vm.SelectedItems, Has.Count.EqualTo(1));
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.SelectedItems, Has.Count.EqualTo(1));
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            });
 
-            ((ICommand)vm.ClearSelectionCommand).Execute(null);
+            await vm.ClearSelectionCommand.Execute(Unit.Default);
 
             Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
         }
@@ -199,13 +210,7 @@ namespace CDP4Requirements.Tests.ViewModels
 
         private void SetAttribute(Requirement requirement, string parameterTypeShortName, string value)
         {
-            var simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            {
-                ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = parameterTypeShortName },
-                Value = new ValueArray<string>(new[] { value })
-            };
-
-            requirement.ParameterValue.Add(simpleParameterValue);
+            requirement.SetVandVAttribute(parameterTypeShortName, value, this.assembler.Cache, this.uri);
         }
     }
 }

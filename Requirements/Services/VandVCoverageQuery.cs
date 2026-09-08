@@ -58,10 +58,14 @@ namespace CDP4Requirements.Services
             this.activityByItem = activityByItem;
         }
 
-        /// <summary>Gets the covered <see cref="Requirement"/>.</summary>
+        /// <summary>
+        /// Gets the covered <see cref="Requirement"/>.
+        /// </summary>
         public Requirement Requirement { get; }
 
-        /// <summary>Gets the V&amp;V items covering the requirement.</summary>
+        /// <summary>
+        /// Gets the V&amp;V items covering the requirement.
+        /// </summary>
         public IReadOnlyList<Requirement> VandVItems { get; }
 
         /// <summary>
@@ -137,10 +141,14 @@ namespace CDP4Requirements.Services
             this.ActivityByItem = activityByItem ?? new Dictionary<Guid, Requirement>();
         }
 
-        /// <summary>Gets the per-requirement coverage.</summary>
+        /// <summary>
+        /// Gets the per-requirement coverage.
+        /// </summary>
         public IReadOnlyList<VandVCoverage> Coverages { get; }
 
-        /// <summary>Gets the stage gates forming the matrix columns.</summary>
+        /// <summary>
+        /// Gets the stage gates forming the matrix columns.
+        /// </summary>
         public IReadOnlyList<string> Stages { get; }
 
         /// <summary>
@@ -149,7 +157,9 @@ namespace CDP4Requirements.Services
         /// </summary>
         public IReadOnlyDictionary<Guid, Requirement> ActivityByItem { get; }
 
-        /// <summary>Gets the number of requirements with no covering V&amp;V item.</summary>
+        /// <summary>
+        /// Gets the number of requirements with no covering V&amp;V item.
+        /// </summary>
         public int UncoveredCount => this.Coverages.Count(x => !x.VandVItems.Any());
     }
 
@@ -167,7 +177,7 @@ namespace CDP4Requirements.Services
         /// <returns>The <see cref="ModelReferenceDataLibrary"/>.</returns>
         public static ModelReferenceDataLibrary QueryRequiredRdl(Iteration iteration)
         {
-            var mrdl = (iteration.Container as EngineeringModel)?.EngineeringModelSetup?.RequiredRdl.FirstOrDefault();
+            var mrdl = ((EngineeringModel)iteration.Container)?.EngineeringModelSetup?.RequiredRdl.FirstOrDefault();
 
             if (mrdl == null)
             {
@@ -223,7 +233,7 @@ namespace CDP4Requirements.Services
         /// <returns>The ordered stage gates.</returns>
         private static IReadOnlyList<string> QueryStages(Iteration iteration, IReadOnlyList<VandVCoverage> coverages, IReadOnlyDictionary<Guid, Requirement> activityByItem)
         {
-            var mrdl = (iteration.Container as EngineeringModel)?.EngineeringModelSetup?.RequiredRdl.FirstOrDefault();
+            var mrdl = ((EngineeringModel)iteration.Container)?.EngineeringModelSetup?.RequiredRdl.FirstOrDefault();
 
             var stages = mrdl?
                 .QueryParameterTypesFromChainOfRdls()

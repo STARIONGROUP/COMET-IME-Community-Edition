@@ -102,7 +102,9 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string Title => "Create V&V Report";
 
-        /// <summary>Gets the possible owning <see cref="DomainOfExpertise"/>s.</summary>
+        /// <summary>
+        /// Gets the possible owning <see cref="DomainOfExpertise"/>s.
+        /// </summary>
         public IReadOnlyList<DomainOfExpertise> PossibleOwners { get; }
 
         /// <summary>
@@ -123,7 +125,9 @@ namespace CDP4Requirements.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets or sets the owning <see cref="DomainOfExpertise"/>. Required.</summary>
+        /// <summary>
+        /// Gets or sets the owning <see cref="DomainOfExpertise"/>. Required.
+        /// </summary>
         public DomainOfExpertise Owner
         {
             get => this.owner;

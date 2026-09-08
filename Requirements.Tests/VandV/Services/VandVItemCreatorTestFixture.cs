@@ -179,14 +179,19 @@ namespace CDP4Requirements.Tests.Services
             var written = this.capturedOperationContainer.Operations.Select(o => o.ModifiedThing).ToList();
 
             var vandVItem = written.OfType<DTO.Requirement>().Single(x => x.ShortName == "VNV_REQ_1_1");
-            Assert.That(vandVItem.Category, Is.Not.Empty, "the V&V item must be categorized VnV Item");
-
-            Assert.That(written.OfType<DTO.SimpleParameterValue>().Count(), Is.EqualTo(4), "one SimpleParameterValue per supplied attribute");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vandVItem.Category, Is.Not.Empty, "the V&V item must be categorized VnV Item");
+                Assert.That(written.OfType<DTO.SimpleParameterValue>().Count(), Is.EqualTo(4), "one SimpleParameterValue per supplied attribute");
+            });
 
             var relationship = written.OfType<DTO.BinaryRelationship>().Single();
-            Assert.That(relationship.Source, Is.EqualTo(vandVItem.Iid));
-            Assert.That(relationship.Target, Is.EqualTo(this.requirement.Iid));
-            Assert.That(relationship.Category, Is.Not.Empty, "the relationship must be categorized verifies");
+            Assert.Multiple(() =>
+            {
+                Assert.That(relationship.Source, Is.EqualTo(vandVItem.Iid));
+                Assert.That(relationship.Target, Is.EqualTo(this.requirement.Iid));
+                Assert.That(relationship.Category, Is.Not.Empty, "the relationship must be categorized verifies");
+            });
 
             Assert.That(
                 written.OfType<DTO.RequirementsSpecification>().Any(x => x.ShortName == VandVItemCreator.VandVSpecificationShortName),

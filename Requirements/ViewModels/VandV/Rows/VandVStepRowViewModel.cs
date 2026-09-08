@@ -25,7 +25,7 @@
 
 namespace CDP4Requirements.ViewModels.Rows
 {
-    using System.Text.RegularExpressions;
+    using System;
 
     using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
@@ -87,42 +87,54 @@ namespace CDP4Requirements.ViewModels.Rows
             this.SetProperties();
         }
 
-        /// <summary>Gets the step name.</summary>
+        /// <summary>
+        /// Gets the step name.
+        /// </summary>
         public string Name
         {
             get => this.name;
             private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets the step short-name.</summary>
+        /// <summary>
+        /// Gets the step short-name.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;
             private set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
-        /// <summary>Gets what the operator must do.</summary>
+        /// <summary>
+        /// Gets what the operator must do.
+        /// </summary>
         public string StepAction
         {
             get => this.stepAction;
             private set => this.RaiseAndSetIfChanged(ref this.stepAction, value);
         }
 
-        /// <summary>Gets what should be observed if the step passes.</summary>
+        /// <summary>
+        /// Gets what should be observed if the step passes.
+        /// </summary>
         public string StepExpected
         {
             get => this.stepExpected;
             private set => this.RaiseAndSetIfChanged(ref this.stepExpected, value);
         }
 
-        /// <summary>Gets what was actually observed.</summary>
+        /// <summary>
+        /// Gets what was actually observed.
+        /// </summary>
         public string StepActual
         {
             get => this.stepActual;
             private set => this.RaiseAndSetIfChanged(ref this.stepActual, value);
         }
 
-        /// <summary>Gets the step outcome.</summary>
+        /// <summary>
+        /// Gets the step outcome.
+        /// </summary>
         public string StepResult
         {
             get => this.stepResult;
@@ -168,7 +180,7 @@ namespace CDP4Requirements.ViewModels.Rows
                 return value;
             }
 
-            return Regex.Replace(value, @"\s+", " ").Trim();
+            return string.Join(" ", value.Split((char[])null, StringSplitOptions.RemoveEmptyEntries));
         }
     }
 }

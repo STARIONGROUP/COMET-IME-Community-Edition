@@ -39,16 +39,24 @@ namespace CDP4Requirements.Rdl
     /// </summary>
     public enum VandVParameterKind
     {
-        /// <summary>A <see cref="CDP4Common.SiteDirectoryData.TextParameterType"/></summary>
+        /// <summary>
+        /// A <see cref="CDP4Common.SiteDirectoryData.TextParameterType"/>
+        /// </summary>
         Text,
 
-        /// <summary>A <see cref="CDP4Common.SiteDirectoryData.DateParameterType"/></summary>
+        /// <summary>
+        /// A <see cref="CDP4Common.SiteDirectoryData.DateParameterType"/>
+        /// </summary>
         Date,
 
-        /// <summary>A <see cref="CDP4Common.SiteDirectoryData.BooleanParameterType"/></summary>
+        /// <summary>
+        /// A <see cref="CDP4Common.SiteDirectoryData.BooleanParameterType"/>
+        /// </summary>
         Boolean,
 
-        /// <summary>An <see cref="CDP4Common.SiteDirectoryData.EnumerationParameterType"/></summary>
+        /// <summary>
+        /// An <see cref="CDP4Common.SiteDirectoryData.EnumerationParameterType"/>
+        /// </summary>
         Enumeration
     }
 
@@ -72,16 +80,24 @@ namespace CDP4Requirements.Rdl
             this.EnumerationValues = enumerationValues ?? new string[0];
         }
 
-        /// <summary>Gets the unique short-name.</summary>
+        /// <summary>
+        /// Gets the unique short-name.
+        /// </summary>
         public string ShortName { get; }
 
-        /// <summary>Gets the human readable name.</summary>
+        /// <summary>
+        /// Gets the human readable name.
+        /// </summary>
         public string Name { get; }
 
-        /// <summary>Gets the <see cref="VandVParameterKind"/>.</summary>
+        /// <summary>
+        /// Gets the <see cref="VandVParameterKind"/>.
+        /// </summary>
         public VandVParameterKind Kind { get; }
 
-        /// <summary>Gets the enumeration value names, empty for non-enumeration kinds.</summary>
+        /// <summary>
+        /// Gets the enumeration value names, empty for non-enumeration kinds.
+        /// </summary>
         public IReadOnlyList<string> EnumerationValues { get; }
     }
 
@@ -105,16 +121,24 @@ namespace CDP4Requirements.Rdl
             this.SuperCategoryShortName = superCategoryShortName;
         }
 
-        /// <summary>Gets the unique short-name.</summary>
+        /// <summary>
+        /// Gets the unique short-name.
+        /// </summary>
         public string ShortName { get; }
 
-        /// <summary>Gets the human readable name.</summary>
+        /// <summary>
+        /// Gets the human readable name.
+        /// </summary>
         public string Name { get; }
 
-        /// <summary>Gets the <see cref="ClassKind"/>s the category may be applied to.</summary>
+        /// <summary>
+        /// Gets the <see cref="ClassKind"/>s the category may be applied to.
+        /// </summary>
         public IReadOnlyList<ClassKind> PermissibleClasses { get; }
 
-        /// <summary>Gets the short-name of the super-category, or null when the category has none.</summary>
+        /// <summary>
+        /// Gets the short-name of the super-category, or null when the category has none.
+        /// </summary>
         public string SuperCategoryShortName { get; }
     }
 
@@ -138,16 +162,24 @@ namespace CDP4Requirements.Rdl
             this.ParameterTypeShortNames = parameterTypeShortNames;
         }
 
-        /// <summary>Gets the unique short-name.</summary>
+        /// <summary>
+        /// Gets the unique short-name.
+        /// </summary>
         public string ShortName { get; }
 
-        /// <summary>Gets the human readable name.</summary>
+        /// <summary>
+        /// Gets the human readable name.
+        /// </summary>
         public string Name { get; }
 
-        /// <summary>Gets the short-name of the <see cref="CDP4Common.SiteDirectoryData.Category"/> the rule applies to.</summary>
+        /// <summary>
+        /// Gets the short-name of the <see cref="CDP4Common.SiteDirectoryData.Category"/> the rule applies to.
+        /// </summary>
         public string CategoryShortName { get; }
 
-        /// <summary>Gets the short-names of the mandatory <see cref="CDP4Common.SiteDirectoryData.ParameterType"/>s.</summary>
+        /// <summary>
+        /// Gets the short-names of the mandatory <see cref="CDP4Common.SiteDirectoryData.ParameterType"/>s.
+        /// </summary>
         public IReadOnlyList<string> ParameterTypeShortNames { get; }
     }
 
@@ -178,22 +210,34 @@ namespace CDP4Requirements.Rdl
             this.SourceCategoryShortName = sourceCategoryShortName;
         }
 
-        /// <summary>Gets the unique short-name.</summary>
+        /// <summary>
+        /// Gets the unique short-name.
+        /// </summary>
         public string ShortName { get; }
 
-        /// <summary>Gets the human readable name.</summary>
+        /// <summary>
+        /// Gets the human readable name.
+        /// </summary>
         public string Name { get; }
 
-        /// <summary>Gets the forward relationship name (source → target).</summary>
+        /// <summary>
+        /// Gets the forward relationship name (source → target).
+        /// </summary>
         public string ForwardRelationshipName { get; }
 
-        /// <summary>Gets the inverse relationship name (target → source).</summary>
+        /// <summary>
+        /// Gets the inverse relationship name (target → source).
+        /// </summary>
         public string InverseRelationshipName { get; }
 
-        /// <summary>Gets the short-name of the <see cref="CDP4Common.SiteDirectoryData.Category"/> applied to the relationship itself.</summary>
+        /// <summary>
+        /// Gets the short-name of the <see cref="CDP4Common.SiteDirectoryData.Category"/> applied to the relationship itself.
+        /// </summary>
         public string RelationshipCategoryShortName { get; }
 
-        /// <summary>Gets the short-name of the required source <see cref="CDP4Common.SiteDirectoryData.Category"/>.</summary>
+        /// <summary>
+        /// Gets the short-name of the required source <see cref="CDP4Common.SiteDirectoryData.Category"/>.
+        /// </summary>
         public string SourceCategoryShortName { get; }
     }
 
@@ -209,37 +253,59 @@ namespace CDP4Requirements.Rdl
     /// </remarks>
     public static class VandVStatus
     {
-        /// <summary>The activity is planned but not yet ready to run.</summary>
+        /// <summary>
+        /// The activity is planned but not yet ready to run.
+        /// </summary>
         public const string Planned = "Planned";
 
-        /// <summary>The activity is ready to run.</summary>
+        /// <summary>
+        /// The activity is ready to run.
+        /// </summary>
         public const string Ready = "Ready";
 
-        /// <summary>The activity is under way.</summary>
+        /// <summary>
+        /// The activity is under way.
+        /// </summary>
         public const string InProgress = "In Progress";
 
-        /// <summary>The activity has run but has no verdict yet.</summary>
+        /// <summary>
+        /// The activity has run but has no verdict yet.
+        /// </summary>
         public const string Executed = "Executed";
 
-        /// <summary>The activity passed.</summary>
+        /// <summary>
+        /// The activity passed.
+        /// </summary>
         public const string Passed = "Passed";
 
-        /// <summary>The activity failed.</summary>
+        /// <summary>
+        /// The activity failed.
+        /// </summary>
         public const string Failed = "Failed";
 
-        /// <summary>The requirement was waived rather than verified.</summary>
+        /// <summary>
+        /// The requirement was waived rather than verified.
+        /// </summary>
         public const string Waived = "Waived";
 
-        /// <summary>A deviation was accepted rather than the requirement verified.</summary>
+        /// <summary>
+        /// A deviation was accepted rather than the requirement verified.
+        /// </summary>
         public const string Deviated = "Deviated";
 
-        /// <summary>The activity does not apply.</summary>
+        /// <summary>
+        /// The activity does not apply.
+        /// </summary>
         public const string NotApplicable = "Not Applicable";
 
-        /// <summary>The activity was cancelled.</summary>
+        /// <summary>
+        /// The activity was cancelled.
+        /// </summary>
         public const string Cancelled = "Cancelled";
 
-        /// <summary>Gets every status, in the order the enumeration is seeded.</summary>
+        /// <summary>
+        /// Gets every status, in the order the enumeration is seeded.
+        /// </summary>
         public static string[] All { get; } = { Planned, Ready, InProgress, Executed, Passed, Failed, Waived, Deviated, NotApplicable, Cancelled };
 
         /// <summary>
@@ -259,19 +325,29 @@ namespace CDP4Requirements.Rdl
     /// </summary>
     public static class VandVCompliance
     {
-        /// <summary>Nobody has judged the compliance yet.</summary>
+        /// <summary>
+        /// Nobody has judged the compliance yet.
+        /// </summary>
         public const string NotAssessed = "Not Assessed";
 
-        /// <summary>The design meets the requirement.</summary>
+        /// <summary>
+        /// The design meets the requirement.
+        /// </summary>
         public const string Compliant = "Compliant";
 
-        /// <summary>The design meets the requirement only in part.</summary>
+        /// <summary>
+        /// The design meets the requirement only in part.
+        /// </summary>
         public const string PartiallyCompliant = "Partially Compliant";
 
-        /// <summary>The design does not meet the requirement.</summary>
+        /// <summary>
+        /// The design does not meet the requirement.
+        /// </summary>
         public const string NonCompliant = "Non-Compliant";
 
-        /// <summary>Compliance does not apply.</summary>
+        /// <summary>
+        /// Compliance does not apply.
+        /// </summary>
         public const string NotApplicable = "Not Applicable";
 
         /// <summary>
@@ -298,13 +374,19 @@ namespace CDP4Requirements.Rdl
     /// </remarks>
     public static class VandVClosure
     {
-        /// <summary>Nobody has stated whether more V&amp;V is owed after this item. This is the planning gap.</summary>
+        /// <summary>
+        /// Nobody has stated whether more V&amp;V is owed after this item. This is the planning gap.
+        /// </summary>
         public const string NotAssessed = "Not Assessed";
 
-        /// <summary>Completing this item completes the verification of the requirement; nothing further is owed.</summary>
+        /// <summary>
+        /// Completing this item completes the verification of the requirement; nothing further is owed.
+        /// </summary>
         public const string ClosesOut = "Closes Out Requirement";
 
-        /// <summary>This item contributes evidence, but the requirement needs further V&amp;V at a later stage.</summary>
+        /// <summary>
+        /// This item contributes evidence, but the requirement needs further V&amp;V at a later stage.
+        /// </summary>
         public const string FurtherRequired = "Further V&V Required";
 
         /// <summary>
@@ -319,22 +401,34 @@ namespace CDP4Requirements.Rdl
     /// </summary>
     public static class VandVStepResult
     {
-        /// <summary>The step has not been run.</summary>
+        /// <summary>
+        /// The step has not been run.
+        /// </summary>
         public const string NotRun = "Not Run";
 
-        /// <summary>The step passed.</summary>
+        /// <summary>
+        /// The step passed.
+        /// </summary>
         public const string Pass = "Pass";
 
-        /// <summary>The step failed.</summary>
+        /// <summary>
+        /// The step failed.
+        /// </summary>
         public const string Fail = "Fail";
 
-        /// <summary>The step could not be run.</summary>
+        /// <summary>
+        /// The step could not be run.
+        /// </summary>
         public const string Blocked = "Blocked";
 
-        /// <summary>The step does not apply.</summary>
+        /// <summary>
+        /// The step does not apply.
+        /// </summary>
         public const string NotApplicable = "Not Applicable";
 
-        /// <summary>Gets every step result, in the order the enumeration is seeded and offered.</summary>
+        /// <summary>
+        /// Gets every step result, in the order the enumeration is seeded and offered.
+        /// </summary>
         public static string[] All { get; } = { NotRun, Pass, Fail, Blocked, NotApplicable };
     }
 
@@ -345,94 +439,154 @@ namespace CDP4Requirements.Rdl
     /// </summary>
     public static class VandVParameter
     {
-        /// <summary>The verification method.</summary>
+        /// <summary>
+        /// The verification method.
+        /// </summary>
         public const string Method = "vnv_method";
 
-        /// <summary>The stage gate the activity is planned for.</summary>
+        /// <summary>
+        /// The stage gate the activity is planned for.
+        /// </summary>
         public const string Stage = "vnv_stage";
 
-        /// <summary>The integration level the activity runs at.</summary>
+        /// <summary>
+        /// The integration level the activity runs at.
+        /// </summary>
         public const string Level = "vnv_level";
 
-        /// <summary>The activity number.</summary>
+        /// <summary>
+        /// The activity number.
+        /// </summary>
         public const string ActivityNumber = "vnv_activity_no";
 
-        /// <summary>The activity description.</summary>
+        /// <summary>
+        /// The activity description.
+        /// </summary>
         public const string Description = "vnv_description";
 
-        /// <summary>The preconditions of the activity.</summary>
+        /// <summary>
+        /// The preconditions of the activity.
+        /// </summary>
         public const string Preconditions = "vnv_preconditions";
 
-        /// <summary>The conditions the activity runs under.</summary>
+        /// <summary>
+        /// The conditions the activity runs under.
+        /// </summary>
         public const string Conditions = "vnv_conditions";
 
-        /// <summary>The acceptance criteria.</summary>
+        /// <summary>
+        /// The acceptance criteria.
+        /// </summary>
         public const string AcceptanceCriteria = "vnv_acceptance";
 
-        /// <summary>The facility the activity runs at.</summary>
+        /// <summary>
+        /// The facility the activity runs at.
+        /// </summary>
         public const string Facility = "vnv_facility";
 
-        /// <summary>The external party responsible for the activity.</summary>
+        /// <summary>
+        /// The external party responsible for the activity.
+        /// </summary>
         public const string ExternalResponsible = "vnv_responsible_ext";
 
-        /// <summary>The planned date.</summary>
+        /// <summary>
+        /// The planned date.
+        /// </summary>
         public const string PlannedDate = "vnv_planned_date";
 
-        /// <summary>The criticality of the activity.</summary>
+        /// <summary>
+        /// The criticality of the activity.
+        /// </summary>
         public const string Criticality = "vnv_criticality";
 
-        /// <summary>The free-text coverage note.</summary>
+        /// <summary>
+        /// The free-text coverage note.
+        /// </summary>
         public const string CoverageNote = "vnv_coverage_note";
 
-        /// <summary>The execution status.</summary>
+        /// <summary>
+        /// The execution status.
+        /// </summary>
         public const string Status = "vnv_status";
 
-        /// <summary>The date the activity actually ran.</summary>
+        /// <summary>
+        /// The date the activity actually ran.
+        /// </summary>
         public const string ActualDate = "vnv_actual_date";
 
-        /// <summary>The recorded result.</summary>
+        /// <summary>
+        /// The recorded result.
+        /// </summary>
         public const string Result = "vnv_result";
 
-        /// <summary>The reference to the evidence backing the result.</summary>
+        /// <summary>
+        /// The reference to the evidence backing the result.
+        /// </summary>
         public const string EvidenceReference = "vnv_evidence_ref";
 
-        /// <summary>The compliance status of the design against the requirement.</summary>
+        /// <summary>
+        /// The compliance status of the design against the requirement.
+        /// </summary>
         public const string Compliance = "vnv_compliance";
 
-        /// <summary>The close-out flag.</summary>
+        /// <summary>
+        /// The close-out flag.
+        /// </summary>
         public const string Closed = "vnv_closed";
 
-        /// <summary>Whether closing this item closes the requirement out, or further V&amp;V is owed at a later stage.</summary>
+        /// <summary>
+        /// Whether closing this item closes the requirement out, or further V&amp;V is owed at a later stage.
+        /// </summary>
         public const string Closure = "vnv_closure";
 
-        /// <summary>The reason the item was closed out.</summary>
+        /// <summary>
+        /// The reason the item was closed out.
+        /// </summary>
         public const string CloseOutReason = "vnv_closeout_reason";
 
-        /// <summary>The person who closed the item out.</summary>
+        /// <summary>
+        /// The person who closed the item out.
+        /// </summary>
         public const string ClosedBy = "vnv_closed_by";
 
-        /// <summary>The date the item was closed out.</summary>
+        /// <summary>
+        /// The date the item was closed out.
+        /// </summary>
         public const string ClosedOn = "vnv_closed_on";
 
-        /// <summary>The reference to the verification plan.</summary>
+        /// <summary>
+        /// The reference to the verification plan.
+        /// </summary>
         public const string PlanReference = "vnv_plan_ref";
 
-        /// <summary>The reference to the procedure document.</summary>
+        /// <summary>
+        /// The reference to the procedure document.
+        /// </summary>
         public const string ProcedureReference = "vnv_procedure_ref";
 
-        /// <summary>The number of a procedure step.</summary>
+        /// <summary>
+        /// The number of a procedure step.
+        /// </summary>
         public const string StepNumber = "vnv_step_no";
 
-        /// <summary>The action a procedure step prescribes.</summary>
+        /// <summary>
+        /// The action a procedure step prescribes.
+        /// </summary>
         public const string StepAction = "vnv_step_action";
 
-        /// <summary>The result a procedure step expects.</summary>
+        /// <summary>
+        /// The result a procedure step expects.
+        /// </summary>
         public const string StepExpectedResult = "vnv_step_expected";
 
-        /// <summary>The result a procedure step actually produced.</summary>
+        /// <summary>
+        /// The result a procedure step actually produced.
+        /// </summary>
         public const string StepActualResult = "vnv_step_actual";
 
-        /// <summary>The verdict of a procedure step.</summary>
+        /// <summary>
+        /// The verdict of a procedure step.
+        /// </summary>
         public const string StepResult = "vnv_step_result";
     }
 
@@ -444,13 +598,19 @@ namespace CDP4Requirements.Rdl
     /// </summary>
     public static class VandVCategory
     {
-        /// <summary>The category identifying a V&amp;V item.</summary>
+        /// <summary>
+        /// The category identifying a V&amp;V item.
+        /// </summary>
         public const string VnVItem = "VnVItem";
 
-        /// <summary>The sub-category identifying a verification item.</summary>
+        /// <summary>
+        /// The sub-category identifying a verification item.
+        /// </summary>
         public const string VerificationItem = "VerificationItem";
 
-        /// <summary>The sub-category identifying a validation item.</summary>
+        /// <summary>
+        /// The sub-category identifying a validation item.
+        /// </summary>
         public const string ValidationItem = "ValidationItem";
 
         /// <summary>
@@ -469,34 +629,54 @@ namespace CDP4Requirements.Rdl
         /// </summary>
         public const string VnVReport = "VnVReport";
 
-        /// <summary>The category identifying a non-conformance report.</summary>
+        /// <summary>
+        /// The category identifying a non-conformance report.
+        /// </summary>
         public const string Ncr = "NCR";
 
-        /// <summary>The category identifying a procedure step.</summary>
+        /// <summary>
+        /// The category identifying a procedure step.
+        /// </summary>
         public const string VnVStep = "VnVStep";
 
-        /// <summary>The category of the relationship by which a V&amp;V item verifies a requirement.</summary>
+        /// <summary>
+        /// The category of the relationship by which a V&amp;V item verifies a requirement.
+        /// </summary>
         public const string Verifies = "verifies";
 
-        /// <summary>The category of the relationship by which a V&amp;V item validates a requirement.</summary>
+        /// <summary>
+        /// The category of the relationship by which a V&amp;V item validates a requirement.
+        /// </summary>
         public const string Validates = "validates";
 
-        /// <summary>The category of the relationship by which a V&amp;V item covers an option.</summary>
+        /// <summary>
+        /// The category of the relationship by which a V&amp;V item covers an option.
+        /// </summary>
         public const string CoversOption = "coversOption";
 
-        /// <summary>The category of the relationship by which a V&amp;V item covers an actual finite state.</summary>
+        /// <summary>
+        /// The category of the relationship by which a V&amp;V item covers an actual finite state.
+        /// </summary>
         public const string CoversState = "coversState";
 
-        /// <summary>The category of the relationship by which a V&amp;V item covers a parameter.</summary>
+        /// <summary>
+        /// The category of the relationship by which a V&amp;V item covers a parameter.
+        /// </summary>
         public const string CoversParameter = "coversParameter";
 
-        /// <summary>The category of the relationship by which a V&amp;V item is verified on an element definition.</summary>
+        /// <summary>
+        /// The category of the relationship by which a V&amp;V item is verified on an element definition.
+        /// </summary>
         public const string VerifiedOn = "verifiedOn";
 
-        /// <summary>The category of the relationship by which a V&amp;V item owns a procedure step.</summary>
+        /// <summary>
+        /// The category of the relationship by which a V&amp;V item owns a procedure step.
+        /// </summary>
         public const string HasStep = "hasStep";
 
-        /// <summary>The category of the relationship by which a V&amp;V item is performed by a shared V&amp;V activity.</summary>
+        /// <summary>
+        /// The category of the relationship by which a V&amp;V item is performed by a shared V&amp;V activity.
+        /// </summary>
         public const string PerformedBy = "performedBy";
 
         /// <summary>

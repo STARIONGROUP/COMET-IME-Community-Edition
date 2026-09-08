@@ -199,7 +199,7 @@ namespace CDP4Requirements.Services
                     var gateCell = gateRow.Cells[stageIndex];
                     var cell = sheet.Cell(row, 3 + stageIndex);
 
-                    cell.Value = gateCell.Text;
+                    cell.Value = gateCell.QueryText();
                     cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                     Colour(cell, gateCell.State);
                 }

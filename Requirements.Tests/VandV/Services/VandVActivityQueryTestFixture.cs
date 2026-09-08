@@ -80,8 +80,11 @@ namespace CDP4Requirements.Tests.Services
             var activity = this.AddActivity("ACT_1");
             var requirement = new Requirement(Guid.NewGuid(), this.cache, this.uri) { ShortName = "REQ-1" };
 
-            Assert.That(VandVActivityQuery.IsActivity(activity), Is.True);
-            Assert.That(VandVActivityQuery.IsActivity(requirement), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(VandVActivityQuery.IsActivity(activity), Is.True);
+                Assert.That(VandVActivityQuery.IsActivity(requirement), Is.False);
+            });
         }
 
         [Test]
@@ -106,9 +109,12 @@ namespace CDP4Requirements.Tests.Services
 
             this.AddPerformedByRelationship(item, activity);
 
-            Assert.That(VandVActivityQuery.QueryActivity(this.iteration, item), Is.EqualTo(activity));
-            Assert.That(VandVActivityQuery.QueryActivity(this.iteration, standalone), Is.Null);
-            Assert.That(VandVActivityQuery.QueryPerformedItems(this.iteration, activity), Is.EqualTo(new[] { item }));
+            Assert.Multiple(() =>
+            {
+                Assert.That(VandVActivityQuery.QueryActivity(this.iteration, item), Is.EqualTo(activity));
+                Assert.That(VandVActivityQuery.QueryActivity(this.iteration, standalone), Is.Null);
+                Assert.That(VandVActivityQuery.QueryPerformedItems(this.iteration, activity), Is.EqualTo(new[] { item }));
+            });
         }
 
         [Test]
@@ -122,9 +128,12 @@ namespace CDP4Requirements.Tests.Services
             this.SetAttribute(item, VandVParameter.Method, "Test");
             this.AddPerformedByRelationship(item, activity);
 
-            Assert.That(VandVActivityQuery.EffectiveAttribute(item, VandVParameter.Method), Is.EqualTo("Test"), "the item's own value wins");
-            Assert.That(VandVActivityQuery.EffectiveAttribute(item, VandVParameter.Stage), Is.EqualTo("FAT"), "an empty field inherits from the activity");
-            Assert.That(VandVActivityQuery.EffectiveAttribute(item, VandVParameter.Facility), Is.Null, "absent on both stays absent");
+            Assert.Multiple(() =>
+            {
+                Assert.That(VandVActivityQuery.EffectiveAttribute(item, VandVParameter.Method), Is.EqualTo("Test"), "the item's own value wins");
+                Assert.That(VandVActivityQuery.EffectiveAttribute(item, VandVParameter.Stage), Is.EqualTo("FAT"), "an empty field inherits from the activity");
+                Assert.That(VandVActivityQuery.EffectiveAttribute(item, VandVParameter.Facility), Is.Null, "absent on both stays absent");
+            });
         }
 
         [Test]
@@ -140,9 +149,12 @@ namespace CDP4Requirements.Tests.Services
 
             var activityByItem = VandVActivityQuery.QueryActivityMap(this.iteration);
 
-            Assert.That(activityByItem[first.Iid], Is.EqualTo(activity));
-            Assert.That(activityByItem[second.Iid], Is.EqualTo(activity));
-            Assert.That(activityByItem.ContainsKey(standalone.Iid), Is.False, "an item performed by nothing is absent");
+            Assert.Multiple(() =>
+            {
+                Assert.That(activityByItem[first.Iid], Is.EqualTo(activity));
+                Assert.That(activityByItem[second.Iid], Is.EqualTo(activity));
+                Assert.That(activityByItem.ContainsKey(standalone.Iid), Is.False, "an item performed by nothing is absent");
+            });
 
             var itemsByActivity = VandVActivityQuery.QueryPerformedItemsMap(this.iteration);
 
@@ -162,8 +174,11 @@ namespace CDP4Requirements.Tests.Services
             activity.Category.Add(this.activityCategory);
             report.Requirement.Add(activity);
 
-            Assert.That(VandVActivityQuery.QueryReport(activity), Is.EqualTo(report), "an activity's report is its containing specification");
-            Assert.That(VandVActivityQuery.QueryReport(this.AddActivity("ACT_2")), Is.Null, "an activity in the V&V specification belongs to no report");
+            Assert.Multiple(() =>
+            {
+                Assert.That(VandVActivityQuery.QueryReport(activity), Is.EqualTo(report), "an activity's report is its containing specification");
+                Assert.That(VandVActivityQuery.QueryReport(this.AddActivity("ACT_2")), Is.Null, "an activity in the V&V specification belongs to no report");
+            });
         }
 
         [Test]
@@ -194,8 +209,11 @@ namespace CDP4Requirements.Tests.Services
 
             var rollUp = VandVCoverageQuery.RollUp(new[] { item });
 
-            Assert.That(rollUp.Passed, Is.EqualTo(1), "the activity passing moves the item it performs");
-            Assert.That(rollUp.Open, Is.EqualTo(0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(rollUp.Passed, Is.EqualTo(1), "the activity passing moves the item it performs");
+                Assert.That(rollUp.Open, Is.EqualTo(0));
+            });
         }
 
         private Requirement AddActivity(string shortName)
@@ -225,13 +243,7 @@ namespace CDP4Requirements.Tests.Services
 
         private void SetAttribute(Requirement requirement, string parameterTypeShortName, string value)
         {
-            var simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), this.cache, this.uri)
-            {
-                ParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri) { ShortName = parameterTypeShortName },
-                Value = new ValueArray<string>(new[] { value })
-            };
-
-            requirement.ParameterValue.Add(simpleParameterValue);
+            requirement.SetVandVAttribute(parameterTypeShortName, value, this.cache, this.uri);
         }
     }
 }

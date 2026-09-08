@@ -122,9 +122,12 @@ namespace CDP4Requirements.Tests.Services
 
             var result = VandVAnalysisChecker.Check(this.iteration, this.vandVItem);
 
-            Assert.That(result.State, Is.EqualTo(VandVAnalysisState.NotApplicable));
-            Assert.That(result.Display, Does.StartWith("Not checked:"), "a blank cell would read as checked and fine");
-            Assert.That(result.Display, Does.Contain("no covered parameter"), "it must say why it was skipped");
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.State, Is.EqualTo(VandVAnalysisState.NotApplicable));
+                Assert.That(result.Display, Does.StartWith("Not checked:"), "a blank cell would read as checked and fine");
+                Assert.That(result.Display, Does.Contain("no covered parameter"), "it must say why it was skipped");
+            });
         }
 
         [Test]
@@ -135,8 +138,11 @@ namespace CDP4Requirements.Tests.Services
 
             var result = VandVAnalysisChecker.Check(this.iteration, this.vandVItem);
 
-            Assert.That(result.State, Is.EqualTo(VandVAnalysisState.Satisfied));
-            Assert.That(result.Display, Is.EqualTo("Meets constraint: m, 1 check(s) passed"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.State, Is.EqualTo(VandVAnalysisState.Satisfied));
+                Assert.That(result.Display, Is.EqualTo("Meets constraint: m, 1 check(s) passed"));
+            });
         }
 
         [Test]
@@ -147,9 +153,12 @@ namespace CDP4Requirements.Tests.Services
 
             var result = VandVAnalysisChecker.Check(this.iteration, this.vandVItem);
 
-            Assert.That(result.State, Is.EqualTo(VandVAnalysisState.Violated));
-            Assert.That(result.Detail, Does.Contain("m"));
-            Assert.That(result.Detail, Does.Contain("28.4"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.State, Is.EqualTo(VandVAnalysisState.Violated));
+                Assert.That(result.Detail, Does.Contain("m"));
+                Assert.That(result.Detail, Does.Contain("28.4"));
+            });
             // asserted through the SDK's own renderer rather than a hard-coded glyph, so the test follows the SDK
             Assert.That(result.Detail, Does.Contain($"{RelationalOperatorKind.LE.ToScientificNotationString()} 25"));
         }

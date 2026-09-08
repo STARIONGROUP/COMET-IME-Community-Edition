@@ -117,8 +117,11 @@ namespace CDP4Requirements.Tests.Rdl
                 .Select(x => x.Name)
                 .ToList();
 
-            Assert.That(valueDefinitions, Is.EquivalentTo(projectGates), "the project's gates are seeded, not the examples");
-            Assert.That(valueDefinitions, Does.Not.Contain("SRR"), "no hard-coded example survives");
+            Assert.Multiple(() =>
+            {
+                Assert.That(valueDefinitions, Is.EquivalentTo(projectGates), "the project's gates are seeded, not the examples");
+                Assert.That(valueDefinitions, Does.Not.Contain("SRR"), "no hard-coded example survives");
+            });
 
             // the other enumerations are untouched by the override
             var methodType = this.capturedOperationContainer.Operations
@@ -157,10 +160,13 @@ namespace CDP4Requirements.Tests.Rdl
         {
             var result = this.service.Check(this.mrdl);
 
-            Assert.That(result.HasMissingItems, Is.True);
-            Assert.That(result.MissingParameterTypes, Has.Count.EqualTo(VandVRdlManifest.ParameterTypes.Count));
-            Assert.That(result.MissingCategories, Has.Count.EqualTo(VandVRdlManifest.Categories.Count));
-            Assert.That(result.MissingParameterizedCategoryRules, Has.Count.EqualTo(VandVRdlManifest.ParameterizedCategoryRules.Count));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HasMissingItems, Is.True);
+                Assert.That(result.MissingParameterTypes, Has.Count.EqualTo(VandVRdlManifest.ParameterTypes.Count));
+                Assert.That(result.MissingCategories, Has.Count.EqualTo(VandVRdlManifest.Categories.Count));
+                Assert.That(result.MissingParameterizedCategoryRules, Has.Count.EqualTo(VandVRdlManifest.ParameterizedCategoryRules.Count));
+            });
         }
 
         [Test]
@@ -170,10 +176,13 @@ namespace CDP4Requirements.Tests.Rdl
 
             var result = this.service.Check(this.mrdl);
 
-            Assert.That(result.HasMissingItems, Is.False);
-            Assert.That(result.MissingParameterTypes, Is.Empty);
-            Assert.That(result.MissingCategories, Is.Empty);
-            Assert.That(result.MissingParameterizedCategoryRules, Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HasMissingItems, Is.False);
+                Assert.That(result.MissingParameterTypes, Is.Empty);
+                Assert.That(result.MissingCategories, Is.Empty);
+                Assert.That(result.MissingParameterizedCategoryRules, Is.Empty);
+            });
         }
 
         [Test]
@@ -184,9 +193,12 @@ namespace CDP4Requirements.Tests.Rdl
 
             var result = this.service.Check(this.mrdl);
 
-            Assert.That(result.MissingParameterTypes, Has.Count.EqualTo(VandVRdlManifest.ParameterTypes.Count - 2));
-            Assert.That(result.MissingParameterTypes.Select(x => x.ShortName), Does.Not.Contain("vnv_method"));
-            Assert.That(result.MissingParameterTypes.Select(x => x.ShortName), Does.Not.Contain("vnv_status"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.MissingParameterTypes, Has.Count.EqualTo(VandVRdlManifest.ParameterTypes.Count - 2));
+                Assert.That(result.MissingParameterTypes.Select(x => x.ShortName), Does.Not.Contain("vnv_method"));
+                Assert.That(result.MissingParameterTypes.Select(x => x.ShortName), Does.Not.Contain("vnv_status"));
+            });
         }
 
         [Test]
@@ -201,9 +213,12 @@ namespace CDP4Requirements.Tests.Rdl
 
             var operations = this.capturedOperationContainer.Operations.ToList();
 
-            Assert.That(operations.Count(o => o.ModifiedThing is DTO.ParameterType), Is.EqualTo(VandVRdlManifest.ParameterTypes.Count));
-            Assert.That(operations.Count(o => o.ModifiedThing is DTO.Category), Is.EqualTo(VandVRdlManifest.Categories.Count));
-            Assert.That(operations.Count(o => o.ModifiedThing is DTO.ParameterizedCategoryRule), Is.EqualTo(VandVRdlManifest.ParameterizedCategoryRules.Count));
+            Assert.Multiple(() =>
+            {
+                Assert.That(operations.Count(o => o.ModifiedThing is DTO.ParameterType), Is.EqualTo(VandVRdlManifest.ParameterTypes.Count));
+                Assert.That(operations.Count(o => o.ModifiedThing is DTO.Category), Is.EqualTo(VandVRdlManifest.Categories.Count));
+                Assert.That(operations.Count(o => o.ModifiedThing is DTO.ParameterizedCategoryRule), Is.EqualTo(VandVRdlManifest.ParameterizedCategoryRules.Count));
+            });
         }
 
         [Test]
@@ -219,8 +234,11 @@ namespace CDP4Requirements.Tests.Rdl
             Assert.That(subCategory.SuperCategory, Is.Not.Empty, "the Verification Item sub-category must reference its VnV Item super-category");
 
             var rule = operations.Select(o => o.ModifiedThing).OfType<DTO.ParameterizedCategoryRule>().Single();
-            Assert.That(rule.Category, Is.Not.EqualTo(Guid.Empty), "the rule must reference a category");
-            Assert.That(rule.ParameterType, Has.Count.EqualTo(4), "the rule must make the four mandatory attributes required");
+            Assert.Multiple(() =>
+            {
+                Assert.That(rule.Category, Is.Not.EqualTo(Guid.Empty), "the rule must reference a category");
+                Assert.That(rule.ParameterType, Has.Count.EqualTo(4), "the rule must make the four mandatory attributes required");
+            });
         }
 
         [Test]
@@ -232,8 +250,11 @@ namespace CDP4Requirements.Tests.Rdl
 
             var result = this.service.Check(this.mrdl);
 
-            Assert.That(result.RequirementTargetCategory, Is.EqualTo(requirementCategory));
-            Assert.That(result.MissingBinaryRelationshipRules, Has.Count.EqualTo(VandVRdlManifest.BinaryRelationshipRules.Count));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.RequirementTargetCategory, Is.EqualTo(requirementCategory));
+                Assert.That(result.MissingBinaryRelationshipRules, Has.Count.EqualTo(VandVRdlManifest.BinaryRelationshipRules.Count));
+            });
         }
 
         [Test]
@@ -260,10 +281,13 @@ namespace CDP4Requirements.Tests.Rdl
                 .OfType<DTO.BinaryRelationshipRule>()
                 .ToList();
 
-            Assert.That(relationshipRules, Has.Count.EqualTo(VandVRdlManifest.BinaryRelationshipRules.Count));
-            Assert.That(relationshipRules.Select(x => x.TargetCategory), Is.All.EqualTo(requirementCategory.Iid));
-            Assert.That(relationshipRules.All(x => x.RelationshipCategory != Guid.Empty), Is.True);
-            Assert.That(relationshipRules.All(x => x.SourceCategory != Guid.Empty), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(relationshipRules, Has.Count.EqualTo(VandVRdlManifest.BinaryRelationshipRules.Count));
+                Assert.That(relationshipRules.Select(x => x.TargetCategory), Is.All.EqualTo(requirementCategory.Iid));
+                Assert.That(relationshipRules.All(x => x.RelationshipCategory != Guid.Empty), Is.True);
+                Assert.That(relationshipRules.All(x => x.SourceCategory != Guid.Empty), Is.True);
+            });
         }
 
         [Test]

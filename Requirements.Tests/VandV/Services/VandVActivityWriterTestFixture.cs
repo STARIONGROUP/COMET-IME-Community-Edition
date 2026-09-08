@@ -137,9 +137,11 @@ namespace CDP4Requirements.Tests.Services
             var written = this.capturedOperationContainer.Operations.Select(o => o.ModifiedThing).ToList();
 
             var activity = written.OfType<DTO.Requirement>().Single(x => x.ShortName == "ACT_1");
-            Assert.That(activity.Category, Is.Not.Empty, "the activity must be categorized VnV Activity");
-
-            Assert.That(written.OfType<DTO.SimpleParameterValue>().Count(), Is.EqualTo(2), "one SimpleParameterValue per supplied attribute");
+            Assert.Multiple(() =>
+            {
+                Assert.That(activity.Category, Is.Not.Empty, "the activity must be categorized VnV Activity");
+                Assert.That(written.OfType<DTO.SimpleParameterValue>().Count(), Is.EqualTo(2), "one SimpleParameterValue per supplied attribute");
+            });
 
             var writtenReport = written.OfType<DTO.RequirementsSpecification>().Single(x => x.ShortName == "FAT_Report");
             Assert.That(writtenReport.Requirement, Does.Contain(activity.Iid), "the activity is created inside the report it was given");
@@ -208,9 +210,12 @@ namespace CDP4Requirements.Tests.Services
                 .OfType<DTO.BinaryRelationship>()
                 .Single();
 
-            Assert.That(relationship.Source, Is.EqualTo(item.Iid));
-            Assert.That(relationship.Target, Is.EqualTo(activity.Iid));
-            Assert.That(relationship.Category, Is.Not.Empty, "the relationship must be categorized performedBy");
+            Assert.Multiple(() =>
+            {
+                Assert.That(relationship.Source, Is.EqualTo(item.Iid));
+                Assert.That(relationship.Target, Is.EqualTo(activity.Iid));
+                Assert.That(relationship.Category, Is.Not.Empty, "the relationship must be categorized performedBy");
+            });
         }
 
         [Test]
@@ -266,15 +271,20 @@ namespace CDP4Requirements.Tests.Services
             var written = this.capturedOperationContainer.Operations.Select(o => o.ModifiedThing).ToList();
 
             var items = written.OfType<DTO.Requirement>().ToList();
-            Assert.That(items.Select(x => x.ShortName), Is.EquivalentTo(new[] { "VNV_REQ_1_1", "VNV_REQ_2_1" }));
-
-            Assert.That(written.OfType<DTO.BinaryRelationship>().Count(), Is.EqualTo(4), "a verifies and a performedBy link per item");
-            Assert.That(written.OfType<DTO.SimpleParameterValue>().Count(), Is.EqualTo(4), "status and acceptance criteria per item");
+            Assert.Multiple(() =>
+            {
+                Assert.That(items.Select(x => x.ShortName), Is.EquivalentTo(new[] { "VNV_REQ_1_1", "VNV_REQ_2_1" }));
+                Assert.That(written.OfType<DTO.BinaryRelationship>().Count(), Is.EqualTo(4), "a verifies and a performedBy link per item");
+                Assert.That(written.OfType<DTO.SimpleParameterValue>().Count(), Is.EqualTo(4), "status and acceptance criteria per item");
+            });
 
             var criteria = written.OfType<DTO.SimpleParameterValue>().SelectMany(x => x.Value).ToList();
 
-            Assert.That(criteria, Does.Contain("as per mass budget"));
-            Assert.That(criteria, Does.Contain("as per the speed trial"), "each requirement keeps its own acceptance criteria");
+            Assert.Multiple(() =>
+            {
+                Assert.That(criteria, Does.Contain("as per mass budget"));
+                Assert.That(criteria, Does.Contain("as per the speed trial"), "each requirement keeps its own acceptance criteria");
+            });
         }
 
         [Test]
@@ -346,9 +356,12 @@ namespace CDP4Requirements.Tests.Services
                 .OfType<DTO.BinaryRelationship>()
                 .ToList();
 
-            Assert.That(relationships, Has.Count.EqualTo(2));
-            Assert.That(relationships.All(x => x.Target == activity.Iid), Is.True, "both items end up performed by the picked activity");
-            Assert.That(relationships.Any(x => x.Iid == existingLink.Iid), Is.True, "an item performed elsewhere is retargeted, not given a second link");
+            Assert.Multiple(() =>
+            {
+                Assert.That(relationships, Has.Count.EqualTo(2));
+                Assert.That(relationships.All(x => x.Target == activity.Iid), Is.True, "both items end up performed by the picked activity");
+                Assert.That(relationships.Any(x => x.Iid == existingLink.Iid), Is.True, "an item performed elsewhere is retargeted, not given a second link");
+            });
         }
 
         [Test]

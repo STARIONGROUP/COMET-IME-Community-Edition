@@ -94,11 +94,14 @@ namespace CDP4Requirements.Tests.ViewModels
         {
             var vm = new VandVActivityDialogViewModel(this.iteration, this.session.Object);
 
-            Assert.That(vm.IsEditMode, Is.False);
-            Assert.That(vm.Title, Is.EqualTo("Create V&V Activity"));
-            Assert.That(vm.ShortName, Is.EqualTo("ACT_1"));
-            Assert.That(vm.Owner, Is.EqualTo(this.domain));
-            Assert.That(vm.PossibleMethods, Is.Not.Empty, "the manifest defaults must back an unseeded library");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.IsEditMode, Is.False);
+                Assert.That(vm.Title, Is.EqualTo("Create V&V Activity"));
+                Assert.That(vm.ShortName, Is.EqualTo("ACT_1"));
+                Assert.That(vm.Owner, Is.EqualTo(this.domain));
+                Assert.That(vm.PossibleMethods, Is.Not.Empty, "the manifest defaults must back an unseeded library");
+            });
 
             this.specification.Requirement.Add(new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "ACT_1" });
 
@@ -127,16 +130,22 @@ namespace CDP4Requirements.Tests.ViewModels
         {
             var vm = new VandVActivityDialogViewModel(this.iteration, this.session.Object) { Name = "Produce mass budget" };
 
-            Assert.That(vm[nameof(vm.Method)], Does.Contain("mandatory"));
-            Assert.That(vm[nameof(vm.Stage)], Does.Contain("mandatory"));
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm[nameof(vm.Method)], Does.Contain("mandatory"));
+                Assert.That(vm[nameof(vm.Stage)], Does.Contain("mandatory"));
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+            });
 
             vm.Method = "Analysis";
             vm.Stage = "CDR";
 
-            Assert.That(vm[nameof(vm.Method)], Is.Empty);
-            Assert.That(vm[nameof(vm.Stage)], Is.Empty);
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm[nameof(vm.Method)], Is.Empty);
+                Assert.That(vm[nameof(vm.Stage)], Is.Empty);
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            });
         }
 
         [Test]
@@ -163,12 +172,15 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVActivityDialogViewModel(this.iteration, this.session.Object, activity);
 
-            Assert.That(vm.IsEditMode, Is.True);
-            Assert.That(vm.ShortName, Is.EqualTo("ACT_1"));
-            Assert.That(vm.Report, Is.EqualTo(report), "the report is the activity's containing specification");
-            Assert.That(vm.PossibleReports, Does.Contain(report), "only existing reports are offered");
-            Assert.That(vm.Method, Is.EqualTo("Analysis"));
-            Assert.That(vm.BuildAttributes()[VandVParameter.Method], Is.EqualTo("Analysis"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.IsEditMode, Is.True);
+                Assert.That(vm.ShortName, Is.EqualTo("ACT_1"));
+                Assert.That(vm.Report, Is.EqualTo(report), "the report is the activity's containing specification");
+                Assert.That(vm.PossibleReports, Does.Contain(report), "only existing reports are offered");
+                Assert.That(vm.Method, Is.EqualTo("Analysis"));
+                Assert.That(vm.BuildAttributes()[VandVParameter.Method], Is.EqualTo("Analysis"));
+            });
         }
     }
 }

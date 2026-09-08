@@ -149,9 +149,12 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var browser = this.CreateBrowser();
 
-            Assert.That(browser.RequirementRows, Has.Count.EqualTo(1), "V&V items are children, not root rows");
-            Assert.That(browser.RequirementRows.Single().ShortName, Is.EqualTo("REQ-1"));
-            Assert.That(browser.RequirementRows.Single().Coverage, Is.EqualTo("Not covered"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(browser.RequirementRows, Has.Count.EqualTo(1), "V&V items are children, not root rows");
+                Assert.That(browser.RequirementRows.Single().ShortName, Is.EqualTo("REQ-1"));
+                Assert.That(browser.RequirementRows.Single().Coverage, Is.EqualTo("Not covered"));
+            });
         }
 
         [Test]
@@ -164,9 +167,12 @@ namespace CDP4Requirements.Tests.ViewModels
             var browser = this.CreateBrowser();
             var row = browser.RequirementRows.Single();
 
-            Assert.That(row.ContainedRows, Has.Count.EqualTo(1));
-            Assert.That(row.ContainedRows.OfType<VandVItemRowViewModel>().Single().ShortName, Is.EqualTo("VNV-1"));
-            Assert.That(row.Coverage, Does.Contain("1 item(s)"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.ContainedRows, Has.Count.EqualTo(1));
+                Assert.That(row.ContainedRows.OfType<VandVItemRowViewModel>().Single().ShortName, Is.EqualTo("VNV-1"));
+                Assert.That(row.Coverage, Does.Contain("1 item(s)"));
+            });
         }
 
         [Test]
@@ -181,9 +187,12 @@ namespace CDP4Requirements.Tests.ViewModels
             var browser = this.CreateBrowser();
             var row = browser.RequirementRows.Single().ContainedRows.OfType<VandVItemRowViewModel>().Single();
 
-            Assert.That(row.Method, Is.EqualTo("Test"));
-            Assert.That(row.Status, Is.EqualTo("Passed"));
-            Assert.That(row.Owner, Is.EqualTo("SYS"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Method, Is.EqualTo("Test"));
+                Assert.That(row.Status, Is.EqualTo("Passed"));
+                Assert.That(row.Owner, Is.EqualTo("SYS"));
+            });
         }
 
         [Test]
@@ -191,8 +200,11 @@ namespace CDP4Requirements.Tests.ViewModels
         {
             var browser = this.CreateBrowser();
 
-            Assert.That(browser.Caption, Does.Contain("V&V Register"));
-            Assert.That(browser.TargetName, Is.Not.Null.And.Not.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(browser.Caption, Does.Contain("V&V Register"));
+                Assert.That(browser.TargetName, Is.Not.Null.And.Not.Empty);
+            });
         }
 
         [Test]
@@ -243,13 +255,18 @@ namespace CDP4Requirements.Tests.ViewModels
             var browser = this.CreateBrowser();
 
             var requirementRow = browser.RequirementRows.Single(x => x.ShortName == "REQ-1");
-            Assert.That(requirementRow.Coverage, Is.EqualTo("2 item(s): 1 passed, 1 open"));
-            Assert.That(requirementRow.IsVerified, Is.False, "one item is still open");
+            Assert.Multiple(() =>
+            {
+                Assert.That(requirementRow.Coverage, Is.EqualTo("2 item(s): 1 passed, 1 open"));
+                Assert.That(requirementRow.IsVerified, Is.False, "one item is still open");
+            });
 
             var otherRow = browser.RequirementRows.Single(x => x.ShortName == "REQ-2");
-            Assert.That(otherRow.Coverage, Is.EqualTo("1 item(s): 1 failed"));
-
-            Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("0/2 verified, 1 failed"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(otherRow.Coverage, Is.EqualTo("1 item(s): 1 failed"));
+                Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("0/2 verified, 1 failed"));
+            });
         }
 
         [Test]
@@ -263,8 +280,11 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var browser = this.CreateBrowser();
 
-            Assert.That(browser.RequirementRows.Single().IsVerified, Is.True, "a waived item is dispositioned, not outstanding");
-            Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("1/1 verified"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(browser.RequirementRows.Single().IsVerified, Is.True, "a waived item is dispositioned, not outstanding");
+                Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("1/1 verified"));
+            });
         }
 
         [Test]
@@ -278,16 +298,22 @@ namespace CDP4Requirements.Tests.ViewModels
             var browser = this.CreateBrowser();
             var requirementRow = browser.RequirementRows.Single();
 
-            Assert.That(requirementRow.Coverage, Is.EqualTo("1 item(s): 1 open"), "Executed is not yet a verdict");
-            Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("0/1 verified"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(requirementRow.Coverage, Is.EqualTo("1 item(s): 1 open"), "Executed is not yet a verdict");
+                Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("0/1 verified"));
+            });
 
             var statusValue = item.ParameterValue.Single(x => x.ParameterType.ShortName == "vnv_status");
             statusValue.Value = new ValueArray<string>(new[] { "Passed" });
 
             this.messageBus.SendObjectChangeEvent(statusValue, EventKind.Updated);
 
-            Assert.That(requirementRow.Coverage, Is.EqualTo("1 item(s): 1 passed"), "the roll-up must follow the status write");
-            Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("1/1 verified"), "and so must the container roll-up");
+            Assert.Multiple(() =>
+            {
+                Assert.That(requirementRow.Coverage, Is.EqualTo("1 item(s): 1 passed"), "the roll-up must follow the status write");
+                Assert.That(browser.SpecificationRows.OfType<VandVSpecificationRowViewModel>().Single().Coverage, Is.EqualTo("1/1 verified"), "and so must the container roll-up");
+            });
         }
 
         [Test]
@@ -322,21 +348,30 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var browser = this.CreateBrowser();
 
-            Assert.That(browser.RequirementRows.Single(x => x.ShortName == "REQ-1").ContainedRows, Has.Count.EqualTo(2), "every stage shows by default");
-            Assert.That(browser.RequirementRows.Select(x => x.ShortName), Does.Contain("REQ-2"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(browser.RequirementRows.Single(x => x.ShortName == "REQ-1").ContainedRows, Has.Count.EqualTo(2), "every stage shows by default");
+                Assert.That(browser.RequirementRows.Select(x => x.ShortName), Does.Contain("REQ-2"));
+            });
 
             browser.SelectedStage = "CDR";
 
             var filtered = browser.RequirementRows.Single();
 
-            Assert.That(filtered.ShortName, Is.EqualTo("REQ-1"), "a requirement with nothing at this stage drops out");
-            Assert.That(filtered.ContainedRows.OfType<VandVItemRowViewModel>().Select(x => x.ShortName), Is.EqualTo(new[] { "VNV-CDR" }));
-            Assert.That(filtered.Coverage, Is.Not.EqualTo("Not covered"), "the roll-up must not invent a gap the model does not have");
+            Assert.Multiple(() =>
+            {
+                Assert.That(filtered.ShortName, Is.EqualTo("REQ-1"), "a requirement with nothing at this stage drops out");
+                Assert.That(filtered.ContainedRows.OfType<VandVItemRowViewModel>().Select(x => x.ShortName), Is.EqualTo(new[] { "VNV-CDR" }));
+                Assert.That(filtered.Coverage, Is.Not.EqualTo("Not covered"), "the roll-up must not invent a gap the model does not have");
+            });
 
             browser.SelectedStage = browser.PossibleStages.First();
 
-            Assert.That(browser.RequirementRows.Single(x => x.ShortName == "REQ-1").ContainedRows, Has.Count.EqualTo(2), "the first entry filters nothing");
-            Assert.That(browser.RequirementRows.Select(x => x.ShortName), Does.Contain("REQ-2"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(browser.RequirementRows.Single(x => x.ShortName == "REQ-1").ContainedRows, Has.Count.EqualTo(2), "the first entry filters nothing");
+                Assert.That(browser.RequirementRows.Select(x => x.ShortName), Does.Contain("REQ-2"));
+            });
         }
 
         [Test]
@@ -365,12 +400,14 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var stepRow = itemRow.ContainedRows.OfType<VandVStepRowViewModel>().SingleOrDefault();
 
-            Assert.That(stepRow, Is.Not.Null, "the Register view nests the procedure under its item");
-            Assert.That(stepRow.StepAction, Is.EqualTo("Power on"));
-            Assert.That(stepRow.StepExpected, Is.EqualTo("Green LED"));
-            Assert.That(itemRow.Procedure, Is.EqualTo("0 of 1 step(s) recorded"), "nothing has been run yet");
-
-            Assert.That(browser.RequirementRows.Single().RollUp.Total, Is.EqualTo(1), "the roll-up counts the item, not its steps");
+            Assert.Multiple(() =>
+            {
+                Assert.That(stepRow, Is.Not.Null, "the Register view nests the procedure under its item");
+                Assert.That(stepRow.StepAction, Is.EqualTo("Power on"));
+                Assert.That(stepRow.StepExpected, Is.EqualTo("Green LED"));
+                Assert.That(itemRow.Procedure, Is.EqualTo("0 of 1 step(s) recorded"), "nothing has been run yet");
+                Assert.That(browser.RequirementRows.Single().RollUp.Total, Is.EqualTo(1), "the roll-up counts the item, not its steps");
+            });
         }
 
         [Test]
@@ -390,8 +427,11 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var compliance = browser.PossibleViews.Single(x => x.Name == "Compliance");
 
-            Assert.That(compliance.ShowsCompliance, Is.True);
-            Assert.That(compliance.ShowsPlanning, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(compliance.ShowsCompliance, Is.True);
+                Assert.That(compliance.ShowsPlanning, Is.False);
+            });
         }
 
         [Test]
@@ -411,16 +451,22 @@ namespace CDP4Requirements.Tests.ViewModels
             this.SetStatus(item, "Passed");
             this.messageBus.SendObjectChangeEvent(item, EventKind.Updated);
 
-            Assert.That(browser.SpecificationRows.Single().IsExpanded, Is.True, "the specification must stay open");
-            Assert.That(browser.RequirementRows.Single().IsExpanded, Is.True, "and so must the requirement the user opened");
+            Assert.Multiple(() =>
+            {
+                Assert.That(browser.SpecificationRows.Single().IsExpanded, Is.True, "the specification must stay open");
+                Assert.That(browser.RequirementRows.Single().IsExpanded, Is.True, "and so must the requirement the user opened");
+            });
         }
 
         [Test]
         public void VerifyThatBothEnumValueSpellingsRollUpTheSame()
         {
-            Assert.That(VandVCoverageQuery.AreSameEnumValue("Not Applicable", "Not_Applicable"), Is.True);
-            Assert.That(VandVCoverageQuery.AreSameEnumValue("Failed", "failed"), Is.True, "casing must not matter either");
-            Assert.That(VandVCoverageQuery.AreSameEnumValue("Passed", "In Progress"), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(VandVCoverageQuery.AreSameEnumValue("Not Applicable", "Not_Applicable"), Is.True);
+                Assert.That(VandVCoverageQuery.AreSameEnumValue("Failed", "failed"), Is.True, "casing must not matter either");
+                Assert.That(VandVCoverageQuery.AreSameEnumValue("Passed", "In Progress"), Is.False);
+            });
 
             var requirement = this.AddRequirement("REQ-1", false);
             var passed = this.AddRequirement("VNV-1", true);
@@ -434,8 +480,11 @@ namespace CDP4Requirements.Tests.ViewModels
             var browser = this.CreateBrowser();
             var rollUp = browser.RequirementRows.Single().RollUp;
 
-            Assert.That(rollUp.Passed, Is.EqualTo(1), "the shortName spelling still counts as closed out");
-            Assert.That(rollUp.Open, Is.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(rollUp.Passed, Is.EqualTo(1), "the shortName spelling still counts as closed out");
+                Assert.That(rollUp.Open, Is.EqualTo(1));
+            });
         }
 
         [Test]
@@ -493,13 +542,7 @@ namespace CDP4Requirements.Tests.ViewModels
 
         private void SetAttribute(Requirement vandVItem, string parameterTypeShortName, string value)
         {
-            var simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            {
-                ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = parameterTypeShortName },
-                Value = new ValueArray<string>(new[] { value })
-            };
-
-            vandVItem.ParameterValue.Add(simpleParameterValue);
+            vandVItem.SetVandVAttribute(parameterTypeShortName, value, this.assembler.Cache, this.uri);
         }
 
         private void AddVerifiesRelationship(Requirement source, Requirement target)

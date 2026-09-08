@@ -113,10 +113,14 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string ActivityCaption => $"{this.Activity.ShortName}: {this.Activity.Name}";
 
-        /// <summary>Gets the activity's verification method.</summary>
+        /// <summary>
+        /// Gets the activity's verification method.
+        /// </summary>
         public string ActivityMethod { get; }
 
-        /// <summary>Gets the activity's stage gate.</summary>
+        /// <summary>
+        /// Gets the activity's stage gate.
+        /// </summary>
         public string ActivityStage { get; }
 
         /// <summary>
@@ -242,7 +246,9 @@ namespace CDP4Requirements.ViewModels
             this.Display = notes.Any() ? $"{display}  [{string.Join("; ", notes)}]" : display;
         }
 
-        /// <summary>Gets the V&amp;V item this row stands for.</summary>
+        /// <summary>
+        /// Gets the V&amp;V item this row stands for.
+        /// </summary>
         public Requirement Item { get; }
 
         /// <summary>

@@ -73,14 +73,18 @@ namespace CDP4Requirements.ViewModels.Rows
             this.SetProperties();
         }
 
-        /// <summary>Gets the requirement name.</summary>
+        /// <summary>
+        /// Gets the requirement name.
+        /// </summary>
         public string Name
         {
             get => this.name;
             private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets the requirement short-name.</summary>
+        /// <summary>
+        /// Gets the requirement short-name.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;

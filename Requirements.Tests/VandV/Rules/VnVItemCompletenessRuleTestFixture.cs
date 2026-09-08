@@ -88,8 +88,11 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("states no reason"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("states no reason"));
+            });
 
             this.SetAttribute(item, "vnv_closeout_reason", "accepted at CDR");
             this.SetAttribute(item, "vnv_closure", "Closes Out Requirement");
@@ -111,8 +114,11 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("closes the requirement out or further V&V is required"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("closes the requirement out or further V&V is required"));
+            });
 
             this.SetAttribute(item, "vnv_closure", "Further V&V Required");
 
@@ -135,8 +141,11 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("without an accepted waiver or deviation"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("without an accepted waiver or deviation"));
+            });
 
             this.AddRequestForWaiver(item, AnnotationStatusKind.CLOSED);
 
@@ -158,8 +167,11 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("still open"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("still open"));
+            });
         }
 
         [Test]
@@ -187,12 +199,15 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().ViolatingThing, Does.Contain(item.Iid));
-            Assert.That(violations.Single().Description, Does.Contain("not linked"));
-            Assert.That(violations.Single().Description, Does.Contain("verification method"));
-            Assert.That(violations.Single().Description, Does.Contain("stage gate"));
-            Assert.That(violations.Single().Description, Does.Contain("acceptance criteria"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().ViolatingThing, Does.Contain(item.Iid));
+                Assert.That(violations.Single().Description, Does.Contain("not linked"));
+                Assert.That(violations.Single().Description, Does.Contain("verification method"));
+                Assert.That(violations.Single().Description, Does.Contain("stage gate"));
+                Assert.That(violations.Single().Description, Does.Contain("acceptance criteria"));
+            });
         }
 
         [Test]
@@ -207,8 +222,11 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("no result was recorded"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("no result was recorded"));
+            });
 
             this.SetAttribute(item, "vnv_result", "measured 28.4 kg");
 
@@ -291,21 +309,7 @@ namespace CDP4Requirements.Tests.Rules
 
         private void SetAttribute(Requirement item, string parameterTypeShortName, string value)
         {
-            var existing = item.ParameterValue.FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == parameterTypeShortName);
-
-            if (existing != null)
-            {
-                existing.Value = new ValueArray<string>(new[] { value });
-                return;
-            }
-
-            var simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), this.cache, this.uri)
-            {
-                ParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri) { ShortName = parameterTypeShortName },
-                Value = new ValueArray<string>(new[] { value })
-            };
-
-            item.ParameterValue.Add(simpleParameterValue);
+            item.SetVandVAttribute(parameterTypeShortName, value, this.cache, this.uri);
         }
 
         private void AddVerifiesRelationship(Requirement item)

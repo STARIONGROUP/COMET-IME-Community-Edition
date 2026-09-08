@@ -50,34 +50,30 @@ namespace CDP4Requirements.Converters
     public class VandVGateStateToBrushConverter : IValueConverter
     {
         /// <summary>
-        /// The label each state reports itself with, resolved once. <see cref="Convert"/> runs for every visible cell
-        /// on every rebuild and every scroll tick, so it may not enumerate the states and rebuild their labels per call.
-        /// </summary>
-        private static readonly KeyValuePair<string, VandVGateState>[] LabelledStates = Enum.GetValues(typeof(VandVGateState))
-            .Cast<VandVGateState>()
-            .Select(state => new KeyValuePair<string, VandVGateState>(VandVStageGateQuery.Describe(state), state))
-            .Where(pair => !string.IsNullOrEmpty(pair.Key))
-            .ToArray();
-
-        /// <summary>
         /// The brush a cell that needs no attention gets, frozen so WPF does not clone it per cell.
         /// </summary>
         private static readonly SolidColorBrush Plain = CreateFrozen(Brushes.Transparent.Color);
 
         /// <summary>
-        /// The brush of an undefined cell.
+        /// The state a cell reports, keyed by the label it leads with. Resolved once, because <see cref="Convert"/>
+        /// runs for every visible cell on every rebuild and every scroll tick and may not rebuild the labels per call.
         /// </summary>
-        private static readonly SolidColorBrush Undefined = CreateFrozen(((SolidColorBrush)CDP4Color.Inconclusive.GetBrush()).Color);
+        private static readonly IReadOnlyDictionary<string, VandVGateState> StateByLabel = Enum.GetValues(typeof(VandVGateState))
+            .Cast<VandVGateState>()
+            .Select(state => new KeyValuePair<string, VandVGateState>(VandVStageGateQuery.Describe(state), state))
+            .Where(pair => !string.IsNullOrEmpty(pair.Key))
+            .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
 
         /// <summary>
-        /// The brush of a failed cell or a compliance shortfall.
+        /// The background brush each state gets, the three a gate review must act on coloured and the rest plain.
+        /// Frozen so WPF shares one instance across every cell instead of cloning per binding.
         /// </summary>
-        private static readonly SolidColorBrush Failed = CreateFrozen(((SolidColorBrush)CDP4Color.Failed.GetBrush()).Color);
-
-        /// <summary>
-        /// The brush of a closed-out cell.
-        /// </summary>
-        private static readonly SolidColorBrush ClosedOut = CreateFrozen(((SolidColorBrush)CDP4Color.Succeeded.GetBrush()).Color);
+        private static readonly IReadOnlyDictionary<VandVGateState, SolidColorBrush> BrushByState = new Dictionary<VandVGateState, SolidColorBrush>
+        {
+            { VandVGateState.Undefined, CreateFrozen(((SolidColorBrush)CDP4Color.Inconclusive.GetBrush()).Color) },
+            { VandVGateState.Failed, CreateFrozen(((SolidColorBrush)CDP4Color.Failed.GetBrush()).Color) },
+            { VandVGateState.ClosedOut, CreateFrozen(((SolidColorBrush)CDP4Color.Succeeded.GetBrush()).Color) }
+        };
 
         /// <summary>
         /// Converts a matrix cell's text to the background brush for that cell.
@@ -98,20 +94,10 @@ namespace CDP4Requirements.Converters
 
             if (VandVCompliance.Shortfalls.Any(shortfall => VandVCoverageQuery.AreSameEnumValue(text, shortfall)))
             {
-                return Failed;
+                return BrushByState[VandVGateState.Failed];
             }
 
-            switch (QueryState(text))
-            {
-                case VandVGateState.Undefined:
-                    return Undefined;
-                case VandVGateState.Failed:
-                    return Failed;
-                case VandVGateState.ClosedOut:
-                    return ClosedOut;
-                default:
-                    return Plain;
-            }
+            return BrushByState.TryGetValue(QueryState(text), out var brush) ? brush : Plain;
         }
 
         /// <summary>
@@ -134,38 +120,19 @@ namespace CDP4Requirements.Converters
         /// <returns>The state, or <see cref="VandVGateState.Complete"/> when the text carries no state label.</returns>
         /// <remarks>
         /// The style that uses this converter is applied to every cell of the grid, requirement short-names and names
-        /// included, because the stage gate columns are generated and cannot be styled individually. A bare
-        /// <c>StartsWith</c> therefore coloured a requirement named "Closed out actions from PDR" green in the very
-        /// artifact a gate review decides from. Every cell that really does report a state is either the label alone
-        /// (<see cref="VandVGateCell.Text"/> with no detail, and the State at Gate column) or the label followed by
-        /// ": " (the same cell with detail, and the verdict column), so requiring one of those two shapes accepts
-        /// every genuine cell and rejects free text.
+        /// included, because the stage gate columns are generated and cannot be styled individually. Matching the
+        /// whole label loosely (a bare <c>StartsWith</c>) coloured a requirement named "Closed out actions from PDR"
+        /// green in the very artifact a gate review decides from. Every cell that really does report a state is either
+        /// the label alone (<see cref="VandVGateCell.QueryText"/> with no detail, and the State at Gate column) or the
+        /// label followed by ": " and the detail (the same cell with detail, and the verdict column), so the leading
+        /// token up to the first colon is the label, and only an exact dictionary hit on it counts.
         /// </remarks>
         private static VandVGateState QueryState(string text)
         {
-            foreach (var labelled in LabelledStates)
-            {
-                var label = labelled.Key;
+            var colon = text.IndexOf(':');
+            var label = colon < 0 ? text : text.Substring(0, colon);
 
-                if (text.Length == label.Length)
-                {
-                    if (string.Equals(text, label, StringComparison.Ordinal))
-                    {
-                        return labelled.Value;
-                    }
-
-                    continue;
-                }
-
-                if (text.Length > label.Length
-                    && text.StartsWith(label, StringComparison.Ordinal)
-                    && text[label.Length] == ':')
-                {
-                    return labelled.Value;
-                }
-            }
-
-            return VandVGateState.Complete;
+            return StateByLabel.TryGetValue(label, out var state) ? state : VandVGateState.Complete;
         }
 
         /// <summary>

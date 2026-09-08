@@ -54,22 +54,34 @@ namespace CDP4Requirements.ViewModels.Rows
             this.CloseOut = VandVCloseOut.IsClosed(item) ? "Closed" : "Open";
         }
 
-        /// <summary>Gets the short-name of the V&amp;V item.</summary>
+        /// <summary>
+        /// Gets the short-name of the V&amp;V item.
+        /// </summary>
         public string ShortName { get; }
 
-        /// <summary>Gets the name of the V&amp;V item.</summary>
+        /// <summary>
+        /// Gets the name of the V&amp;V item.
+        /// </summary>
         public string Name { get; }
 
-        /// <summary>Gets the requirement the item verifies or validates.</summary>
+        /// <summary>
+        /// Gets the requirement the item verifies or validates.
+        /// </summary>
         public string Requirement { get; }
 
-        /// <summary>Gets the execution status, the activity's when the item states none of its own.</summary>
+        /// <summary>
+        /// Gets the execution status, the activity's when the item states none of its own.
+        /// </summary>
         public string Status { get; }
 
-        /// <summary>Gets the compliance status, which is always the item's own judgement.</summary>
+        /// <summary>
+        /// Gets the compliance status, which is always the item's own judgement.
+        /// </summary>
         public string Compliance { get; }
 
-        /// <summary>Gets whether the item has been closed out.</summary>
+        /// <summary>
+        /// Gets whether the item has been closed out.
+        /// </summary>
         public string CloseOut { get; }
     }
 }

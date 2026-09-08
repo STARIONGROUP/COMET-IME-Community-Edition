@@ -122,7 +122,7 @@ namespace CDP4Requirements.ViewModels.Rows
         /// </summary>
         private void ExecuteUseParametricConstraint()
         {
-            var expression = this.SelectedParametricConstraint?.ExpressionText;
+            var expression = this.SelectedParametricConstraint?.QueryExpressionText();
 
             if (string.IsNullOrWhiteSpace(expression))
             {

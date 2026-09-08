@@ -262,7 +262,7 @@ namespace CDP4Requirements.ViewModels
 
                 foreach (var cell in gateRow.Cells)
                 {
-                    row[stageColumns[cell.Stage]] = cell.Text;
+                    row[stageColumns[cell.Stage]] = cell.QueryText();
                 }
 
                 row[VerdictColumn] = gateRow.VerdictText;

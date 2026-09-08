@@ -99,9 +99,12 @@ namespace CDP4Requirements.Tests.Services
 
             var row = Build(this.iteration).Rows.Single();
 
-            Assert.That(row.Cells.Select(cell => cell.State), Is.All.EqualTo(VandVGateState.Undefined));
-            Assert.That(row.HasGap, Is.True);
-            Assert.That(row.VerdictText, Does.Contain("no V&V planned"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Cells.Select(cell => cell.State), Is.All.EqualTo(VandVGateState.Undefined));
+                Assert.That(row.HasGap, Is.True);
+                Assert.That(row.VerdictText, Does.Contain("no V&V planned"));
+            });
         }
 
         [Test]
@@ -112,9 +115,12 @@ namespace CDP4Requirements.Tests.Services
 
             var row = Build(this.iteration).Rows.Single();
 
-            Assert.That(row.Cell("PDR").State, Is.EqualTo(VandVGateState.Deferred), "it cannot be verified at PDR, that is planned, not a gap");
-            Assert.That(row.Cell("CDR").State, Is.EqualTo(VandVGateState.Deferred));
-            Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.Planned));
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Cell("PDR").State, Is.EqualTo(VandVGateState.Deferred), "it cannot be verified at PDR, that is planned, not a gap");
+                Assert.That(row.Cell("CDR").State, Is.EqualTo(VandVGateState.Deferred));
+                Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.Planned));
+            });
         }
 
         [Test]
@@ -126,11 +132,14 @@ namespace CDP4Requirements.Tests.Services
 
             var row = Build(this.iteration).Rows.Single();
 
-            Assert.That(row.Cell("PDR").State, Is.EqualTo(VandVGateState.Verified), "passed at PDR but the requirement is not finished");
-            Assert.That(row.Cell("CDR").State, Is.EqualTo(VandVGateState.Deferred), "a hole between two populated gates is not a gap");
-            Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.ClosedOut));
-            Assert.That(row.Verdict, Is.EqualTo(VandVGateState.ClosedOut));
-            Assert.That(row.HasGap, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Cell("PDR").State, Is.EqualTo(VandVGateState.Verified), "passed at PDR but the requirement is not finished");
+                Assert.That(row.Cell("CDR").State, Is.EqualTo(VandVGateState.Deferred), "a hole between two populated gates is not a gap");
+                Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.ClosedOut));
+                Assert.That(row.Verdict, Is.EqualTo(VandVGateState.ClosedOut));
+                Assert.That(row.HasGap, Is.False);
+            });
         }
 
         [Test]
@@ -141,10 +150,13 @@ namespace CDP4Requirements.Tests.Services
 
             var row = Build(this.iteration).Rows.Single();
 
-            Assert.That(row.Cell("PDR").State, Is.EqualTo(VandVGateState.Verified));
-            Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.Undefined), "the plan simply stops, so the later gates are undefined");
-            Assert.That(row.HasGap, Is.True);
-            Assert.That(row.VerdictText, Does.Contain("closes this requirement out"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Cell("PDR").State, Is.EqualTo(VandVGateState.Verified));
+                Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.Undefined), "the plan simply stops, so the later gates are undefined");
+                Assert.That(row.HasGap, Is.True);
+                Assert.That(row.VerdictText, Does.Contain("closes this requirement out"));
+            });
         }
 
         [Test]
@@ -166,8 +178,11 @@ namespace CDP4Requirements.Tests.Services
 
             var row = Build(this.iteration).Rows.Single();
 
-            Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.Complete));
-            Assert.That(row.Cell("FAT").Text, Is.Empty, "a gate with nothing left to do is best shown blank");
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.Complete));
+                Assert.That(row.Cell("FAT").QueryText(), Is.Empty, "a gate with nothing left to do is best shown blank");
+            });
         }
 
         [Test]
@@ -179,9 +194,12 @@ namespace CDP4Requirements.Tests.Services
 
             var row = Build(this.iteration).Rows.Single();
 
-            Assert.That(row.Cell("PDR").State, Is.EqualTo(VandVGateState.Failed));
-            Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.ClosedOut));
-            Assert.That(row.Verdict, Is.EqualTo(VandVGateState.Failed), "a failure anywhere outranks the close-out");
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Cell("PDR").State, Is.EqualTo(VandVGateState.Failed));
+                Assert.That(row.Cell("FAT").State, Is.EqualTo(VandVGateState.ClosedOut));
+                Assert.That(row.Verdict, Is.EqualTo(VandVGateState.Failed), "a failure anywhere outranks the close-out");
+            });
         }
 
         [Test]
@@ -200,8 +218,11 @@ namespace CDP4Requirements.Tests.Services
 
             var row = Build(this.iteration).Rows.Single();
 
-            Assert.That(row.Cell("PDR").Compliance, Is.EqualTo(VandVCompliance.PartiallyCompliant));
-            Assert.That(row.Cell("FAT").Compliance, Is.EqualTo(VandVCompliance.Compliant), "compliance may differ from one gate to the next");
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Cell("PDR").Compliance, Is.EqualTo(VandVCompliance.PartiallyCompliant));
+                Assert.That(row.Cell("FAT").Compliance, Is.EqualTo(VandVCompliance.Compliant), "compliance may differ from one gate to the next");
+            });
         }
 
         [Test]
@@ -212,8 +233,11 @@ namespace CDP4Requirements.Tests.Services
 
             var row = Build(this.iteration).Rows.Single();
 
-            Assert.That(row.HasGap, Is.True);
-            Assert.That(row.VerdictText, Does.Contain("no stage gate"), "an unplaced item must not silently close a requirement out");
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.HasGap, Is.True);
+                Assert.That(row.VerdictText, Does.Contain("no stage gate"), "an unplaced item must not silently close a requirement out");
+            });
         }
 
         [Test]
@@ -226,10 +250,13 @@ namespace CDP4Requirements.Tests.Services
             var review = Build(this.iteration);
             var counts = review.Summarize("FAT");
 
-            Assert.That(counts[VandVGateState.ClosedOut], Is.EqualTo(1));
-            Assert.That(counts[VandVGateState.Undefined], Is.EqualTo(1));
-            Assert.That(review.UndefinedCount, Is.EqualTo(1));
-            Assert.That(review.ClosedOutCount, Is.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(counts[VandVGateState.ClosedOut], Is.EqualTo(1));
+                Assert.That(counts[VandVGateState.Undefined], Is.EqualTo(1));
+                Assert.That(review.UndefinedCount, Is.EqualTo(1));
+                Assert.That(review.ClosedOutCount, Is.EqualTo(1));
+            });
         }
 
         /// <summary>
@@ -282,13 +309,7 @@ namespace CDP4Requirements.Tests.Services
 
         private void SetAttribute(Requirement item, string parameterTypeShortName, string value)
         {
-            var parameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = parameterTypeShortName, Name = parameterTypeShortName };
-
-            item.ParameterValue.Add(new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            {
-                ParameterType = parameterType,
-                Value = new ValueArray<string>(new[] { value })
-            });
+            item.SetVandVAttribute(parameterTypeShortName, value, this.assembler.Cache, this.uri);
         }
     }
 }

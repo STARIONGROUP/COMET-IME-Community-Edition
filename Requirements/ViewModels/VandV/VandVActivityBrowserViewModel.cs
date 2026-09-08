@@ -903,19 +903,22 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Disposes of the rows.
+        /// Disposes of the report rows, which the base class does not know about because they are not the inherited
+        /// root rows.
         /// </summary>
         /// <param name="disposing">A value indicating whether the class is being disposed of.</param>
+        /// <remarks>
+        /// <see cref="ReportRows"/> is a <see cref="DisposableReactiveList{T}"/>, so its own
+        /// <see cref="DisposableReactiveList{T}.ClearAndDispose"/> disposes every row and empties the list, which is
+        /// the list's intended disposal path rather than a hand-written loop that leaves the disposed rows referenced.
+        /// </remarks>
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
 
             if (disposing)
             {
-                foreach (var row in this.ReportRows)
-                {
-                    row.Dispose();
-                }
+                this.ReportRows.ClearAndDispose();
             }
         }
     }

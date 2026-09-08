@@ -118,14 +118,18 @@ namespace CDP4Requirements.ViewModels.Rows
             this.SetProperties();
         }
 
-        /// <summary>Gets the name of the activity.</summary>
+        /// <summary>
+        /// Gets the name of the activity.
+        /// </summary>
         public string Name
         {
             get => this.name;
             private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets the activity number, the activity's short-name.</summary>
+        /// <summary>
+        /// Gets the activity number, the activity's short-name.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;
@@ -141,63 +145,81 @@ namespace CDP4Requirements.ViewModels.Rows
             private set => this.RaiseAndSetIfChanged(ref this.coverage, value);
         }
 
-        /// <summary>Gets the verification method (<c>vnv_method</c>).</summary>
+        /// <summary>
+        /// Gets the verification method (<c>vnv_method</c>).
+        /// </summary>
         public string Method
         {
             get => this.method;
             private set => this.RaiseAndSetIfChanged(ref this.method, value);
         }
 
-        /// <summary>Gets the stage gate (<c>vnv_stage</c>).</summary>
+        /// <summary>
+        /// Gets the stage gate (<c>vnv_stage</c>).
+        /// </summary>
         public string Stage
         {
             get => this.stage;
             private set => this.RaiseAndSetIfChanged(ref this.stage, value);
         }
 
-        /// <summary>Gets the integration level (<c>vnv_level</c>).</summary>
+        /// <summary>
+        /// Gets the integration level (<c>vnv_level</c>).
+        /// </summary>
         public string Level
         {
             get => this.level;
             private set => this.RaiseAndSetIfChanged(ref this.level, value);
         }
 
-        /// <summary>Gets the execution status (<c>vnv_status</c>).</summary>
+        /// <summary>
+        /// Gets the execution status (<c>vnv_status</c>).
+        /// </summary>
         public string Status
         {
             get => this.status;
             private set => this.RaiseAndSetIfChanged(ref this.status, value);
         }
 
-        /// <summary>Gets the planned date (<c>vnv_planned_date</c>).</summary>
+        /// <summary>
+        /// Gets the planned date (<c>vnv_planned_date</c>).
+        /// </summary>
         public string PlannedDate
         {
             get => this.plannedDate;
             private set => this.RaiseAndSetIfChanged(ref this.plannedDate, value);
         }
 
-        /// <summary>Gets the actual date (<c>vnv_actual_date</c>).</summary>
+        /// <summary>
+        /// Gets the actual date (<c>vnv_actual_date</c>).
+        /// </summary>
         public string ActualDate
         {
             get => this.actualDate;
             private set => this.RaiseAndSetIfChanged(ref this.actualDate, value);
         }
 
-        /// <summary>Gets the recorded result (<c>vnv_result</c>).</summary>
+        /// <summary>
+        /// Gets the recorded result (<c>vnv_result</c>).
+        /// </summary>
         public string Result
         {
             get => this.result;
             private set => this.RaiseAndSetIfChanged(ref this.result, value);
         }
 
-        /// <summary>Gets the evidence reference (<c>vnv_evidence_ref</c>).</summary>
+        /// <summary>
+        /// Gets the evidence reference (<c>vnv_evidence_ref</c>).
+        /// </summary>
         public string EvidenceReference
         {
             get => this.evidenceReference;
             private set => this.RaiseAndSetIfChanged(ref this.evidenceReference, value);
         }
 
-        /// <summary>Gets the responsible domain (native <c>Owner</c>).</summary>
+        /// <summary>
+        /// Gets the responsible domain (native <c>Owner</c>).
+        /// </summary>
         public string Owner
         {
             get => this.owner;

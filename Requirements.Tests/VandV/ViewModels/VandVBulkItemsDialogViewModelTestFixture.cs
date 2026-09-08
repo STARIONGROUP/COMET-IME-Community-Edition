@@ -28,7 +28,10 @@ namespace CDP4Requirements.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
 
     using CDP4Requirements.Rdl;
@@ -116,55 +119,73 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVBulkItemsDialogViewModel(this.activity, this.iteration, this.session.Object);
 
-            Assert.That(vm.PossibleRequirements.Select(x => ((Requirement)x.Thing).ShortName), Is.EqualTo(new[] { "REQ-2", "REQ-3" }));
-            Assert.That(vm.PossibleRequirements.First().Display, Does.Contain("already covered by 1 item(s)"), "existing coverage is stated, not hidden");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.PossibleRequirements.Select(x => ((Requirement)x.Thing).ShortName), Is.EqualTo(new[] { "REQ-2", "REQ-3" }));
+                Assert.That(vm.PossibleRequirements.First().Display, Does.Contain("already covered by 1 item(s)"), "existing coverage is stated, not hidden");
+            });
         }
 
         [Test]
-        public void VerifyThatOkRequiresATickedRequirement()
+        public async Task VerifyThatOkRequiresATickedRequirement()
         {
             this.AddRequirement("REQ-1");
             this.AddRequirement("REQ-2");
 
             var vm = new VandVBulkItemsDialogViewModel(this.activity, this.iteration, this.session.Object);
 
-            Assert.That(vm.LinkType, Is.EqualTo(VandVItemDialogViewModel.VerifiesLink));
-            Assert.That(vm.Owner, Is.EqualTo(this.domain));
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False, "nothing is ticked yet");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.LinkType, Is.EqualTo(VandVItemDialogViewModel.VerifiesLink));
+                Assert.That(vm.Owner, Is.EqualTo(this.domain));
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False, "nothing is ticked yet");
+            });
 
             vm.AcceptanceCriteria = "as per the mass budget";
 
-            ((ICommand)vm.SelectAllCommand).Execute(null);
+            await vm.SelectAllCommand.Execute(Unit.Default);
 
-            Assert.That(vm.SelectedRequirements, Has.Count.EqualTo(2));
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.SelectedRequirements, Has.Count.EqualTo(2));
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+            });
 
-            ((ICommand)vm.ClearSelectionCommand).Execute(null);
+            await vm.ClearSelectionCommand.Execute(Unit.Default);
 
-            Assert.That(vm.SelectedRequirements, Is.Empty);
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.SelectedRequirements, Is.Empty);
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+            });
         }
 
         [Test]
-        public void VerifyThatItemsCannotBeCreatedWithoutAcceptanceCriteria()
+        public async Task VerifyThatItemsCannotBeCreatedWithoutAcceptanceCriteria()
         {
             this.AddRequirement("REQ-1");
 
             var vm = new VandVBulkItemsDialogViewModel(this.activity, this.iteration, this.session.Object);
 
-            ((ICommand)vm.SelectAllCommand).Execute(null);
+            await vm.SelectAllCommand.Execute(Unit.Default);
 
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False, "a V&V item with no acceptance criteria saved cleanly and then read as incomplete");
-            Assert.That(vm.Validation, Does.Contain("acceptance criteria"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False, "a V&V item with no acceptance criteria saved cleanly and then read as incomplete");
+                Assert.That(vm.Validation, Does.Contain("acceptance criteria"));
+            });
 
             vm.AcceptanceCriteria = "as per the mass budget";
 
-            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
-            Assert.That(vm.Validation, Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+                Assert.That(vm.Validation, Is.Empty);
+            });
         }
 
         [Test]
-        public void VerifyThatARequirementOverridesTheDefaultAcceptanceCriteria()
+        public async Task VerifyThatARequirementOverridesTheDefaultAcceptanceCriteria()
         {
             var first = this.AddRequirement("REQ-1");
             this.AddRequirement("REQ-2");
@@ -172,16 +193,19 @@ namespace CDP4Requirements.Tests.ViewModels
             var vm = new VandVBulkItemsDialogViewModel(this.activity, this.iteration, this.session.Object);
             vm.AcceptanceCriteria = "the default";
 
-            ((ICommand)vm.SelectAllCommand).Execute(null);
+            await vm.SelectAllCommand.Execute(Unit.Default);
 
             vm.PossibleRequirements.Single(row => row.Requirement == first).AcceptanceCriteria = "its own";
 
-            Assert.That(vm.AcceptanceCriteriaByRequirement[first.Iid], Is.EqualTo("its own"));
-            Assert.That(vm.AcceptanceCriteriaByRequirement.Values, Does.Contain("the default"), "a requirement stating nothing of its own falls back to the default");
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.AcceptanceCriteriaByRequirement[first.Iid], Is.EqualTo("its own"));
+                Assert.That(vm.AcceptanceCriteriaByRequirement.Values, Does.Contain("the default"), "a requirement stating nothing of its own falls back to the default");
+            });
         }
 
         [Test]
-        public void VerifyThatAParametricConstraintIsOfferedButNotAppliedUntilAsked()
+        public async Task VerifyThatAParametricConstraintIsOfferedButNotAppliedUntilAsked()
         {
             var requirement = this.AddRequirement("REQ-1");
 
@@ -195,10 +219,13 @@ namespace CDP4Requirements.Tests.ViewModels
             var vm = new VandVBulkItemsDialogViewModel(this.activity, this.iteration, this.session.Object);
             var row = vm.PossibleRequirements.Single();
 
-            Assert.That(row.HasParametricConstraints, Is.True);
-            Assert.That(row.AcceptanceCriteria, Is.Null, "the constraint is offered, never written on the user's behalf");
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.HasParametricConstraints, Is.True);
+                Assert.That(row.AcceptanceCriteria, Is.Null, "the constraint is offered, never written on the user's behalf");
+            });
 
-            ((ICommand)row.UseParametricConstraintCommand).Execute(null);
+            await row.UseParametricConstraintCommand.Execute(Unit.Default);
 
             Assert.That(row.AcceptanceCriteria, Is.Not.Null.And.Not.Empty);
         }
@@ -214,7 +241,7 @@ namespace CDP4Requirements.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatFillBlanksWithDefaultLeavesOwnCriteriaAlone()
+        public async Task VerifyThatFillBlanksWithDefaultLeavesOwnCriteriaAlone()
         {
             var first = this.AddRequirement("REQ-1");
             this.AddRequirement("REQ-2");
@@ -222,14 +249,17 @@ namespace CDP4Requirements.Tests.ViewModels
             var vm = new VandVBulkItemsDialogViewModel(this.activity, this.iteration, this.session.Object);
             vm.AcceptanceCriteria = "the default";
 
-            ((ICommand)vm.SelectAllCommand).Execute(null);
+            await vm.SelectAllCommand.Execute(Unit.Default);
 
             vm.PossibleRequirements.Single(row => row.Requirement == first).AcceptanceCriteria = "its own";
 
-            ((ICommand)vm.ApplyDefaultCommand).Execute(null);
+            await vm.ApplyDefaultCommand.Execute(Unit.Default);
 
-            Assert.That(vm.PossibleRequirements.Single(row => row.Requirement == first).AcceptanceCriteria, Is.EqualTo("its own"));
-            Assert.That(vm.PossibleRequirements.Select(row => row.AcceptanceCriteria), Does.Contain("the default"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.PossibleRequirements.Single(row => row.Requirement == first).AcceptanceCriteria, Is.EqualTo("its own"));
+                Assert.That(vm.PossibleRequirements.Select(row => row.AcceptanceCriteria), Does.Contain("the default"));
+            });
         }
 
         private Requirement AddRequirement(string shortName)

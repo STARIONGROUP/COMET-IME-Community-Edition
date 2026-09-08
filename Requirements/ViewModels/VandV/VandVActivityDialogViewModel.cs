@@ -285,19 +285,29 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string OkButtonCaption => this.IsEditMode ? "OK" : "Create";
 
-        /// <summary>Gets the possible <c>vnv_method</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_method</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleMethods { get; }
 
-        /// <summary>Gets the possible <c>vnv_stage</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_stage</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleStages { get; }
 
-        /// <summary>Gets the possible <c>vnv_level</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_level</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleLevels { get; }
 
-        /// <summary>Gets the possible <c>vnv_status</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_status</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleStatuses { get; }
 
-        /// <summary>Gets the possible owning <see cref="DomainOfExpertise"/>s.</summary>
+        /// <summary>
+        /// Gets the possible owning <see cref="DomainOfExpertise"/>s.
+        /// </summary>
         public IReadOnlyList<DomainOfExpertise> PossibleOwners { get; }
 
         /// <summary>
@@ -343,21 +353,27 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public ReactiveList<VandVProcedureStep> ProcedureSteps { get; } = new ReactiveList<VandVProcedureStep>();
 
-        /// <summary>Gets or sets the activity number, the activity's short-name. Required.</summary>
+        /// <summary>
+        /// Gets or sets the activity number, the activity's short-name. Required.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;
             set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
-        /// <summary>Gets or sets the name of the activity, e.g. "Produce mass budget". Required.</summary>
+        /// <summary>
+        /// Gets or sets the name of the activity, e.g. "Produce mass budget". Required.
+        /// </summary>
         public string Name
         {
             get => this.name;
             set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets or sets the owning <see cref="DomainOfExpertise"/>. Required.</summary>
+        /// <summary>
+        /// Gets or sets the owning <see cref="DomainOfExpertise"/>. Required.
+        /// </summary>
         public DomainOfExpertise Owner
         {
             get => this.owner;
@@ -375,77 +391,99 @@ namespace CDP4Requirements.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.report, value);
         }
 
-        /// <summary>Gets or sets the verification method.</summary>
+        /// <summary>
+        /// Gets or sets the verification method.
+        /// </summary>
         public string Method
         {
             get => this.method;
             set => this.RaiseAndSetIfChanged(ref this.method, value);
         }
 
-        /// <summary>Gets or sets the stage gate.</summary>
+        /// <summary>
+        /// Gets or sets the stage gate.
+        /// </summary>
         public string Stage
         {
             get => this.stage;
             set => this.RaiseAndSetIfChanged(ref this.stage, value);
         }
 
-        /// <summary>Gets or sets the integration level.</summary>
+        /// <summary>
+        /// Gets or sets the integration level.
+        /// </summary>
         public string Level
         {
             get => this.level;
             set => this.RaiseAndSetIfChanged(ref this.level, value);
         }
 
-        /// <summary>Gets or sets the activity description, written once here instead of per item.</summary>
+        /// <summary>
+        /// Gets or sets the activity description, written once here instead of per item.
+        /// </summary>
         public string Description
         {
             get => this.description;
             set => this.RaiseAndSetIfChanged(ref this.description, value);
         }
 
-        /// <summary>Gets or sets the facility.</summary>
+        /// <summary>
+        /// Gets or sets the facility.
+        /// </summary>
         public string Facility
         {
             get => this.facility;
             set => this.RaiseAndSetIfChanged(ref this.facility, value);
         }
 
-        /// <summary>Gets or sets the external responsible party.</summary>
+        /// <summary>
+        /// Gets or sets the external responsible party.
+        /// </summary>
         public string ResponsibleExternal
         {
             get => this.responsibleExternal;
             set => this.RaiseAndSetIfChanged(ref this.responsibleExternal, value);
         }
 
-        /// <summary>Gets or sets the planned execution date.</summary>
+        /// <summary>
+        /// Gets or sets the planned execution date.
+        /// </summary>
         public DateTime? PlannedDate
         {
             get => this.plannedDate;
             set => this.RaiseAndSetIfChanged(ref this.plannedDate, value);
         }
 
-        /// <summary>Gets or sets the section of the verification plan this activity is described in.</summary>
+        /// <summary>
+        /// Gets or sets the section of the verification plan this activity is described in.
+        /// </summary>
         public string PlanReference
         {
             get => this.planReference;
             set => this.RaiseAndSetIfChanged(ref this.planReference, value);
         }
 
-        /// <summary>Gets or sets the identifier of the procedure document this activity follows.</summary>
+        /// <summary>
+        /// Gets or sets the identifier of the procedure document this activity follows.
+        /// </summary>
         public string ProcedureReference
         {
             get => this.procedureReference;
             set => this.RaiseAndSetIfChanged(ref this.procedureReference, value);
         }
 
-        /// <summary>Gets or sets the entry conditions.</summary>
+        /// <summary>
+        /// Gets or sets the entry conditions.
+        /// </summary>
         public string Preconditions
         {
             get => this.preconditions;
             set => this.RaiseAndSetIfChanged(ref this.preconditions, value);
         }
 
-        /// <summary>Gets or sets the environmental and operational conditions.</summary>
+        /// <summary>
+        /// Gets or sets the environmental and operational conditions.
+        /// </summary>
         public string Conditions
         {
             get => this.conditions;
@@ -461,28 +499,36 @@ namespace CDP4Requirements.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.selectedStep, value);
         }
 
-        /// <summary>Gets or sets the execution status, inherited by every item this activity performs.</summary>
+        /// <summary>
+        /// Gets or sets the execution status, inherited by every item this activity performs.
+        /// </summary>
         public string Status
         {
             get => this.status;
             set => this.RaiseAndSetIfChanged(ref this.status, value);
         }
 
-        /// <summary>Gets or sets the actual execution date.</summary>
+        /// <summary>
+        /// Gets or sets the actual execution date.
+        /// </summary>
         public DateTime? ActualDate
         {
             get => this.actualDate;
             set => this.RaiseAndSetIfChanged(ref this.actualDate, value);
         }
 
-        /// <summary>Gets or sets the recorded result.</summary>
+        /// <summary>
+        /// Gets or sets the recorded result.
+        /// </summary>
         public string Result
         {
             get => this.result;
             set => this.RaiseAndSetIfChanged(ref this.result, value);
         }
 
-        /// <summary>Gets or sets the evidence reference, typically the report the activity produced.</summary>
+        /// <summary>
+        /// Gets or sets the evidence reference, typically the report the activity produced.
+        /// </summary>
         public string EvidenceReference
         {
             get => this.evidenceReference;

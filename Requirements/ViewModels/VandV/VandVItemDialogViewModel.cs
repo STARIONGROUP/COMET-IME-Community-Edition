@@ -472,22 +472,34 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string RequirementCaption => $"{this.Requirement.ShortName}: {this.Requirement.Name}";
 
-        /// <summary>Gets the possible link types (<c>verifies</c> / <c>validates</c>).</summary>
+        /// <summary>
+        /// Gets the possible link types (<c>verifies</c> / <c>validates</c>).
+        /// </summary>
         public IReadOnlyList<string> PossibleLinkTypes { get; }
 
-        /// <summary>Gets the possible <c>vnv_method</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_method</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleMethods { get; }
 
-        /// <summary>Gets the possible <c>vnv_stage</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_stage</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleStages { get; }
 
-        /// <summary>Gets the possible <c>vnv_level</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_level</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleLevels { get; }
 
-        /// <summary>Gets the possible <c>vnv_criticality</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_criticality</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleCriticalities { get; }
 
-        /// <summary>Gets the possible <c>vnv_status</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_status</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleStatuses { get; }
 
         /// <summary>
@@ -627,7 +639,9 @@ namespace CDP4Requirements.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.planReference, value);
         }
 
-        /// <summary>Gets the possible owning <see cref="DomainOfExpertise"/>s.</summary>
+        /// <summary>
+        /// Gets the possible owning <see cref="DomainOfExpertise"/>s.
+        /// </summary>
         public IReadOnlyList<DomainOfExpertise> PossibleOwners { get; }
 
         /// <summary>
@@ -665,12 +679,12 @@ namespace CDP4Requirements.ViewModels
         /// Gets the sentence under the method picker: what the activity supplies, and whether this item is currently
         /// overriding it. Blank when no activity performs the item, so a standalone item shows nothing extra.
         /// </summary>
-        public string MethodInheritanceNote => this.BuildInheritanceNote("method", this.Method, VandVParameter.Method);
+        public string MethodInheritanceNote => VandVInheritanceNote.Describe(this.SelectedActivity, "method", this.Method, VandVParameter.Method);
 
         /// <summary>
         /// Gets the sentence under the stage gate picker, see <see cref="MethodInheritanceNote"/>.
         /// </summary>
-        public string StageInheritanceNote => this.BuildInheritanceNote("stage gate", this.Stage, VandVParameter.Stage);
+        public string StageInheritanceNote => VandVInheritanceNote.Describe(this.SelectedActivity, "stage gate", this.Stage, VandVParameter.Stage);
 
         /// <summary>
         /// Gets the plan references already in use.
@@ -777,140 +791,180 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public bool IsParameterStateDependent => this.SelectedParameter?.StateDependence != null;
 
-        /// <summary>Gets or sets the short-name of the V&amp;V item. Required.</summary>
+        /// <summary>
+        /// Gets or sets the short-name of the V&amp;V item. Required.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;
             set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
-        /// <summary>Gets or sets the name of the V&amp;V item. Required.</summary>
+        /// <summary>
+        /// Gets or sets the name of the V&amp;V item. Required.
+        /// </summary>
         public string Name
         {
             get => this.name;
             set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets or sets whether this item verifies or validates the requirement. Required.</summary>
+        /// <summary>
+        /// Gets or sets whether this item verifies or validates the requirement. Required.
+        /// </summary>
         public string LinkType
         {
             get => this.linkType;
             set => this.RaiseAndSetIfChanged(ref this.linkType, value);
         }
 
-        /// <summary>Gets or sets the verification method. Required.</summary>
+        /// <summary>
+        /// Gets or sets the verification method. Required.
+        /// </summary>
         public string Method
         {
             get => this.method;
             set => this.RaiseAndSetIfChanged(ref this.method, value);
         }
 
-        /// <summary>Gets or sets the stage gate. Required.</summary>
+        /// <summary>
+        /// Gets or sets the stage gate. Required.
+        /// </summary>
         public string Stage
         {
             get => this.stage;
             set => this.RaiseAndSetIfChanged(ref this.stage, value);
         }
 
-        /// <summary>Gets or sets the integration level.</summary>
+        /// <summary>
+        /// Gets or sets the integration level.
+        /// </summary>
         public string Level
         {
             get => this.level;
             set => this.RaiseAndSetIfChanged(ref this.level, value);
         }
 
-        /// <summary>Gets or sets the criticality.</summary>
+        /// <summary>
+        /// Gets or sets the criticality.
+        /// </summary>
         public string Criticality
         {
             get => this.criticality;
             set => this.RaiseAndSetIfChanged(ref this.criticality, value);
         }
 
-        /// <summary>Gets or sets the status.</summary>
+        /// <summary>
+        /// Gets or sets the status.
+        /// </summary>
         public string Status
         {
             get => this.status;
             set => this.RaiseAndSetIfChanged(ref this.status, value);
         }
 
-        /// <summary>Gets or sets the acceptance criteria. Required.</summary>
+        /// <summary>
+        /// Gets or sets the acceptance criteria. Required.
+        /// </summary>
         public string Acceptance
         {
             get => this.acceptance;
             set => this.RaiseAndSetIfChanged(ref this.acceptance, value);
         }
 
-        /// <summary>Gets or sets the activity description.</summary>
+        /// <summary>
+        /// Gets or sets the activity description.
+        /// </summary>
         public string Description
         {
             get => this.description;
             set => this.RaiseAndSetIfChanged(ref this.description, value);
         }
 
-        /// <summary>Gets or sets the entry conditions.</summary>
+        /// <summary>
+        /// Gets or sets the entry conditions.
+        /// </summary>
         public string Preconditions
         {
             get => this.preconditions;
             set => this.RaiseAndSetIfChanged(ref this.preconditions, value);
         }
 
-        /// <summary>Gets or sets the environmental and operational conditions.</summary>
+        /// <summary>
+        /// Gets or sets the environmental and operational conditions.
+        /// </summary>
         public string Conditions
         {
             get => this.conditions;
             set => this.RaiseAndSetIfChanged(ref this.conditions, value);
         }
 
-        /// <summary>Gets or sets the facility.</summary>
+        /// <summary>
+        /// Gets or sets the facility.
+        /// </summary>
         public string Facility
         {
             get => this.facility;
             set => this.RaiseAndSetIfChanged(ref this.facility, value);
         }
 
-        /// <summary>Gets or sets the external responsible party.</summary>
+        /// <summary>
+        /// Gets or sets the external responsible party.
+        /// </summary>
         public string ResponsibleExternal
         {
             get => this.responsibleExternal;
             set => this.RaiseAndSetIfChanged(ref this.responsibleExternal, value);
         }
 
-        /// <summary>Gets or sets the coverage note.</summary>
+        /// <summary>
+        /// Gets or sets the coverage note.
+        /// </summary>
         public string CoverageNote
         {
             get => this.coverageNote;
             set => this.RaiseAndSetIfChanged(ref this.coverageNote, value);
         }
 
-        /// <summary>Gets or sets the evidence reference.</summary>
+        /// <summary>
+        /// Gets or sets the evidence reference.
+        /// </summary>
         public string EvidenceReference
         {
             get => this.evidenceReference;
             set => this.RaiseAndSetIfChanged(ref this.evidenceReference, value);
         }
 
-        /// <summary>Gets or sets the recorded result.</summary>
+        /// <summary>
+        /// Gets or sets the recorded result.
+        /// </summary>
         public string Result
         {
             get => this.result;
             set => this.RaiseAndSetIfChanged(ref this.result, value);
         }
 
-        /// <summary>Gets or sets the planned execution date.</summary>
+        /// <summary>
+        /// Gets or sets the planned execution date.
+        /// </summary>
         public DateTime? PlannedDate
         {
             get => this.plannedDate;
             set => this.RaiseAndSetIfChanged(ref this.plannedDate, value);
         }
 
-        /// <summary>Gets or sets the actual execution date.</summary>
+        /// <summary>
+        /// Gets or sets the actual execution date.
+        /// </summary>
         public DateTime? ActualDate
         {
             get => this.actualDate;
             set => this.RaiseAndSetIfChanged(ref this.actualDate, value);
         }
 
-        /// <summary>Gets or sets the owning <see cref="DomainOfExpertise"/>. Required.</summary>
+        /// <summary>
+        /// Gets or sets the owning <see cref="DomainOfExpertise"/>. Required.
+        /// </summary>
         public DomainOfExpertise Owner
         {
             get => this.owner;
@@ -973,12 +1027,12 @@ namespace CDP4Requirements.ViewModels
                         return string.IsNullOrWhiteSpace(this.LinkType) ? "Choose whether this item verifies or validates the requirement." : string.Empty;
 
                     case nameof(this.Method):
-                        return this.IsSuppliedByItemOrActivity(this.Method, VandVParameter.Method)
+                        return VandVInheritanceNote.IsSuppliedByItemOrActivity(this.SelectedActivity, this.Method, VandVParameter.Method)
                             ? string.Empty
                             : "The verification method is mandatory, unless the activity performing this item states one.";
 
                     case nameof(this.Stage):
-                        return this.IsSuppliedByItemOrActivity(this.Stage, VandVParameter.Stage)
+                        return VandVInheritanceNote.IsSuppliedByItemOrActivity(this.SelectedActivity, this.Stage, VandVParameter.Stage)
                             ? string.Empty
                             : "The stage gate is mandatory, unless the activity performing this item states one.";
 
@@ -1029,59 +1083,6 @@ namespace CDP4Requirements.ViewModels
             return this.IsEditMode
                 ? attributes
                 : attributes.Where(x => !string.IsNullOrWhiteSpace(x.Value)).ToDictionary(x => x.Key, x => x.Value);
-        }
-
-        /// <summary>
-        /// Builds the line shown under a picker that a shared activity can supply: what the activity states, and
-        /// whether the value typed here is overriding it. Saying so matters, because the item silently winning over
-        /// its activity is exactly the sort of thing that is discovered far too late.
-        /// </summary>
-        /// <param name="label">The human name of the attribute, e.g. "stage gate".</param>
-        /// <param name="ownValue">The value currently entered on this dialog.</param>
-        /// <param name="parameterTypeShortName">The parameter type short-name to read off the activity.</param>
-        /// <returns>The note, or an empty string when no activity performs this item.</returns>
-        private string BuildInheritanceNote(string label, string ownValue, string parameterTypeShortName)
-        {
-            var activity = this.SelectedActivity;
-
-            if (activity == null)
-            {
-                return string.Empty;
-            }
-
-            var activityValue = VandVCoverageQuery.Attribute(activity, parameterTypeShortName);
-
-            if (string.IsNullOrWhiteSpace(activityValue))
-            {
-                return $"{activity.ShortName} states no {label}, so this item has to.";
-            }
-
-            if (string.IsNullOrWhiteSpace(ownValue))
-            {
-                return $"Inherited from {activity.ShortName}: {activityValue}. Leave empty to follow the activity.";
-            }
-
-            return VandVCoverageQuery.AreSameEnumValue(ownValue, activityValue)
-                ? $"Same as {activity.ShortName}. Clear it to simply follow the activity."
-                : $"Overrides {activity.ShortName}, which states {activityValue}. This item keeps '{ownValue}'.";
-        }
-
-        /// <summary>
-        /// Asserts whether an attribute is stated either on this item or on the activity performing it.
-        /// </summary>
-        /// <param name="ownValue">The value typed on this dialog.</param>
-        /// <param name="parameterTypeShortName">The parameter type short-name to read off the activity.</param>
-        /// <returns>true when either the item or its activity supplies the attribute.</returns>
-        private bool IsSuppliedByItemOrActivity(string ownValue, string parameterTypeShortName)
-        {
-            if (!string.IsNullOrWhiteSpace(ownValue))
-            {
-                return true;
-            }
-
-            var activity = this.SelectedActivity;
-
-            return activity != null && !string.IsNullOrWhiteSpace(VandVCoverageQuery.Attribute(activity, parameterTypeShortName));
         }
 
         /// <summary>
@@ -1432,7 +1433,7 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            var expression = choice.ExpressionText;
+            var expression = choice.QueryExpressionText();
 
             if (!string.IsNullOrWhiteSpace(expression))
             {

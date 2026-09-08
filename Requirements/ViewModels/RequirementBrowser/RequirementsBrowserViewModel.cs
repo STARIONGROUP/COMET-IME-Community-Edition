@@ -344,14 +344,7 @@ namespace CDP4Requirements.ViewModels
         public bool IsVandVDisplayed
         {
             get => this.isVandVDisplayed;
-            set
-            {
-                this.HasUpdateStarted = true;
-                this.RaiseAndSetIfChanged(ref this.isVandVDisplayed, value);
-                this.HasUpdateStarted = false;
-
-                this.UpdateRequirementSpecificationsRows();
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isVandVDisplayed, value);
         }
 
         /// <summary>
@@ -579,6 +572,16 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
+            this.Disposables.Add(
+                this.WhenAnyValue(x => x.IsVandVDisplayed)
+                    .Skip(1)
+                    .Subscribe(_ =>
+                    {
+                        this.HasUpdateStarted = true;
+                        this.UpdateRequirementSpecificationsRows();
+                        this.HasUpdateStarted = false;
+                    }));
+
             var engineeringModelSetupSubscription = this.CDPMessageBus
                 .Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                 .Where(

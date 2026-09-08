@@ -106,11 +106,14 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVApplyActivityDialogViewModel(this.activity, this.iteration, this.session.Object);
 
-            Assert.That(vm.Status, Is.EqualTo("Passed"));
-            Assert.That(vm.Result, Is.EqualTo("mass budget issue 3"));
-            Assert.That(vm.EvidenceReference, Is.EqualTo("TR-101"));
-            Assert.That(vm.Compliance, Is.EqualTo("Compliant"), "closing out defaults to compliant, subject to the human confirming");
-            Assert.That(vm.CloseOutReason, Does.Contain("ACT_1"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.Status, Is.EqualTo("Passed"));
+                Assert.That(vm.Result, Is.EqualTo("mass budget issue 3"));
+                Assert.That(vm.EvidenceReference, Is.EqualTo("TR-101"));
+                Assert.That(vm.Compliance, Is.EqualTo("Compliant"), "closing out defaults to compliant, subject to the human confirming");
+                Assert.That(vm.CloseOutReason, Does.Contain("ACT_1"));
+            });
         }
 
         [Test]
@@ -122,14 +125,19 @@ namespace CDP4Requirements.Tests.ViewModels
 
             var vm = new VandVApplyActivityDialogViewModel(this.activity, this.iteration, this.session.Object);
 
-            Assert.That(vm.Items, Has.Count.EqualTo(2));
-            Assert.That(vm.Items.Single(x => x.Thing == clean).IsSelected, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.Items, Has.Count.EqualTo(2));
+                Assert.That(vm.Items.Single(x => x.Thing == clean).IsSelected, Is.True);
+            });
 
             var closedRow = vm.Items.Single(x => x.Thing == closed);
-            Assert.That(closedRow.IsSelected, Is.False, "a closed item needs a human look, not a bulk gesture");
-            Assert.That(closedRow.Display, Does.Contain("already closed"));
-
-            Assert.That(vm.SelectedItems, Is.EqualTo(new[] { clean }));
+            Assert.Multiple(() =>
+            {
+                Assert.That(closedRow.IsSelected, Is.False, "a closed item needs a human look, not a bulk gesture");
+                Assert.That(closedRow.Display, Does.Contain("already closed"));
+                Assert.That(vm.SelectedItems, Is.EqualTo(new[] { clean }));
+            });
         }
 
         [Test]
@@ -144,9 +152,12 @@ namespace CDP4Requirements.Tests.ViewModels
             vm.AlsoCloseOut = true;
 
             var attributes = vm.BuildAttributes();
-            Assert.That(attributes[VandVParameter.Closed], Is.EqualTo("true"));
-            Assert.That(attributes[VandVParameter.Compliance], Is.EqualTo("Compliant"));
-            Assert.That(attributes[VandVParameter.CloseOutReason], Is.Not.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(attributes[VandVParameter.Closed], Is.EqualTo("true"));
+                Assert.That(attributes[VandVParameter.Compliance], Is.EqualTo("Compliant"));
+                Assert.That(attributes[VandVParameter.CloseOutReason], Is.Not.Empty);
+            });
         }
 
         [Test]
@@ -183,13 +194,7 @@ namespace CDP4Requirements.Tests.ViewModels
 
         private void SetAttribute(Requirement requirement, string parameterTypeShortName, string value)
         {
-            var simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            {
-                ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = parameterTypeShortName },
-                Value = new ValueArray<string>(new[] { value })
-            };
-
-            requirement.ParameterValue.Add(simpleParameterValue);
+            requirement.SetVandVAttribute(parameterTypeShortName, value, this.assembler.Cache, this.uri);
         }
     }
 }
