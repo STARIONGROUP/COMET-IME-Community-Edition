@@ -125,7 +125,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateCreationDate()
         {
-            this.CreationDate = this.Thing.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture);
+            this.CreationDate = this.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture);
         }
 
         /// <summary>

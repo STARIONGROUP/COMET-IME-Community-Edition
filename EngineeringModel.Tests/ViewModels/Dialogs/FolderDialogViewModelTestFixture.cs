@@ -244,8 +244,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
                 new FolderDialogViewModel(newFolder, transaction, this.session.Object, true, ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object, commonFileStoreClone);
 
-            Assert.That(folderDialogViewModel.PossibleOwner, Is.Not.Empty);
-            Assert.That(folderDialogViewModel.SelectedOwner, Is.EqualTo(this.domainOfExpertise));
+            Assert.Multiple(() =>
+            {
+                Assert.That(folderDialogViewModel.PossibleOwner, Is.Not.Empty);
+                Assert.That(folderDialogViewModel.SelectedOwner, Is.EqualTo(this.domainOfExpertise));
+            });
         }
     }
 }

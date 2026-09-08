@@ -207,10 +207,14 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             vm.SourceXConfiguration.SelectedOwners.Add(this.domain);
 
             // The File shows up as a row (it would be silently dropped before File support was added)
-            Assert.That(vm.Matrix.Records, Is.Not.Empty);
+            var fileRow = vm.Matrix.Records.FirstOrDefault(row => row.Values.First().SourceY == file);
 
-            var fileRow = vm.Matrix.Records.Single(row => row.Values.First().SourceY == file);
-            Assert.That(fileRow.Values.First().SourceY.QueryDisplayShortName(), Is.EqualTo("geometry.stp"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.Matrix.Records, Is.Not.Empty);
+                Assert.That(fileRow, Is.Not.Null);
+                Assert.That(fileRow?.Values.First().SourceY.QueryDisplayShortName(), Is.EqualTo("geometry.stp"));
+            });
 
             vm.Dispose();
         }

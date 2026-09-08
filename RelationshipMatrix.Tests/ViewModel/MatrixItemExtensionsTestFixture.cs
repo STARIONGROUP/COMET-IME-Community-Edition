@@ -47,8 +47,11 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         {
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Name = "battery", ShortName = "bat" };
 
-            Assert.That(elementDefinition.QueryDisplayName(), Is.EqualTo("battery"));
-            Assert.That(elementDefinition.QueryDisplayShortName(), Is.EqualTo("bat"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(elementDefinition.QueryDisplayName(), Is.EqualTo("battery"));
+                Assert.That(elementDefinition.QueryDisplayShortName(), Is.EqualTo("bat"));
+            });
         }
 
         [Test]
@@ -60,8 +63,11 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             file.FileRevision.Add(firstRevision);
             file.FileRevision.Add(lastRevision);
 
-            Assert.That(file.QueryDisplayName(), Is.EqualTo("geometry.stp"));
-            Assert.That(file.QueryDisplayShortName(), Is.EqualTo("geometry.stp"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(file.QueryDisplayName(), Is.EqualTo("geometry.stp"));
+                Assert.That(file.QueryDisplayShortName(), Is.EqualTo("geometry.stp"));
+            });
         }
     }
 }

@@ -289,8 +289,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             Assert.DoesNotThrow(() =>
                 vm = new FileDialogViewModel(newFile, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, commonFileStoreClone));
 
-            Assert.That(vm.PossibleOwner, Is.Not.Empty);
-            Assert.That(vm.SelectedOwner, Is.EqualTo(this.domain));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.PossibleOwner, Is.Not.Empty);
+                Assert.That(vm.SelectedOwner, Is.EqualTo(this.domain));
+            });
         }
     }
 }

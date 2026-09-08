@@ -70,8 +70,11 @@ namespace CDP4Composition.Tests.Diagram
 
             var namedThingDiagramContentItem = new NamedThingDiagramContentItem(file, new CDPMessageBus());
 
-            Assert.AreEqual("geometry.stp", namedThingDiagramContentItem.FullName);
-            Assert.AreEqual("geometry.stp", namedThingDiagramContentItem.ShortName);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("geometry.stp", namedThingDiagramContentItem.FullName);
+                Assert.AreEqual("geometry.stp", namedThingDiagramContentItem.ShortName);
+            });
         }
     }
 }

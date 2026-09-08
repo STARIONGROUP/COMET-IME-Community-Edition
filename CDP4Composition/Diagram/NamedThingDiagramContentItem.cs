@@ -91,7 +91,6 @@ namespace CDP4Composition.Diagram
                 this.ShortName = parameterBaseThing.UserFriendlyShortName;
             }
 
-            // a File is not a (Short)NamedThing; its name lives on the current FileRevision (see GitHub issue #1490)
             if (this.Thing is File file)
             {
                 this.FullName = file.CurrentFileRevision?.Name;
