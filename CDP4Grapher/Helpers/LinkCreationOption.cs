@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Grapher.ViewModels
+namespace CDP4Grapher.Helpers
 {
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -31,7 +31,7 @@ namespace CDP4Grapher.ViewModels
 
     /// <summary>
     /// A single choice offered in the "start link" menu of the traceability diagram: it fully describes the
-    /// <see cref="BinaryRelationship"/> that would be created, so the create command needs no further direction logic.
+    /// <see cref="BinaryRelationship"/> that would be created, so the create logic needs no further direction logic.
     /// </summary>
     public class LinkCreationOption
     {

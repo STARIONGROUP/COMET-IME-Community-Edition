@@ -567,11 +567,7 @@ namespace CDP4Grapher.ViewModels
         public bool ShowClassKind
         {
             get => this.showClassKind;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.showClassKind, value);
-                this.ComputeGraph();
-            }
+            set => this.RaiseAndSetIfChanged(ref this.showClassKind, value);
         }
 
         /// <summary>
@@ -580,11 +576,7 @@ namespace CDP4Grapher.ViewModels
         public bool ShowShortName
         {
             get => this.showShortName;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.showShortName, value);
-                this.ComputeGraph();
-            }
+            set => this.RaiseAndSetIfChanged(ref this.showShortName, value);
         }
 
         /// <summary>
@@ -593,11 +585,7 @@ namespace CDP4Grapher.ViewModels
         public bool ShowName
         {
             get => this.showName;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.showName, value);
-                this.ComputeGraph();
-            }
+            set => this.RaiseAndSetIfChanged(ref this.showName, value);
         }
 
         /// <summary>
@@ -606,11 +594,7 @@ namespace CDP4Grapher.ViewModels
         public bool ShowDefinition
         {
             get => this.showDefinition;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.showDefinition, value);
-                this.ComputeGraph();
-            }
+            set => this.RaiseAndSetIfChanged(ref this.showDefinition, value);
         }
 
         /// <summary>
@@ -619,16 +603,7 @@ namespace CDP4Grapher.ViewModels
         public int DefinitionMaxLength
         {
             get => this.definitionMaxLength;
-            set
-            {
-                if (value == this.definitionMaxLength)
-                {
-                    return;
-                }
-
-                this.RaiseAndSetIfChanged(ref this.definitionMaxLength, value);
-                this.ComputeGraph();
-            }
+            set => this.RaiseAndSetIfChanged(ref this.definitionMaxLength, value);
         }
 
         /// <summary>
@@ -1181,34 +1156,20 @@ namespace CDP4Grapher.ViewModels
         }
 
         /// <summary>
-        /// Builds the applicable link kinds when drawing a relationship from <paramref name="source"/> to
-        /// <paramref name="target"/>: the <see cref="BinaryRelationshipRule"/>s of the open reference data libraries
-        /// whose source and target categories both fit the two <see cref="Thing"/>s. Only rules are offered, so a link
-        /// can only be created where a rule allows it.
+        /// Gets the applicable link kinds when drawing a relationship from <paramref name="source"/> to
+        /// <paramref name="target"/>; see <see cref="RelationshipLinkHelper.GetLinkOptions"/>
         /// </summary>
         /// <param name="source">The <see cref="Thing"/> the relationship would run from</param>
         /// <param name="target">The <see cref="Thing"/> the relationship would run to</param>
         /// <returns>The applicable <see cref="LinkCreationOption"/>s</returns>
         public IReadOnlyList<LinkCreationOption> GetLinkOptions(Thing source, Thing target)
         {
-            if (source == null || target == null || source.Iid == target.Iid
-                || !(source is ICategorizableThing categorizableSource) || !(target is ICategorizableThing categorizableTarget))
-            {
-                return new List<LinkCreationOption>();
-            }
-
-            return this.Session.OpenReferenceDataLibraries
-                .SelectMany(x => x.Rule)
-                .OfType<BinaryRelationshipRule>()
-                .Where(rule => categorizableSource.IsMemberOfCategory(rule.SourceCategory) && categorizableTarget.IsMemberOfCategory(rule.TargetCategory))
-                .OrderBy(rule => rule.Name)
-                .Select(rule => new LinkCreationOption(rule.Name, source, target, rule.RelationshipCategory))
-                .ToList();
+            return RelationshipLinkHelper.GetLinkOptions(this.Session, source, target);
         }
 
         /// <summary>
         /// Creates the <see cref="BinaryRelationship"/> described by a <see cref="LinkCreationOption"/> and writes it to
-        /// the model, mirroring the way the Relationship Editor creates a relationship
+        /// the model, then ends the link
         /// </summary>
         /// <param name="option">The chosen <see cref="LinkCreationOption"/></param>
         private async void ExecuteCreateLink(LinkCreationOption option)
@@ -1218,28 +1179,9 @@ namespace CDP4Grapher.ViewModels
                 return;
             }
 
-            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
-
-            var relationship = new BinaryRelationship(Guid.NewGuid(), null, null) { Owner = tuple?.Item1 };
-
-            if (option.RelationshipCategory != null)
-            {
-                relationship.Category.Add(option.RelationshipCategory);
-            }
-
-            var iterationClone = this.Thing.Clone(false);
-            iterationClone.Relationship.Add(relationship);
-            relationship.Container = iterationClone;
-            relationship.Source = option.Source;
-            relationship.Target = option.Target;
-
-            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
-            var transaction = new ThingTransaction(transactionContext, iterationClone);
-            transaction.CreateOrUpdate(relationship);
-
             try
             {
-                await this.Session.Write(transaction.FinalizeTransaction());
+                await RelationshipLinkHelper.WriteBinaryRelationship(this.Session, this.Thing, option);
             }
             catch (Exception ex)
             {
@@ -1266,61 +1208,6 @@ namespace CDP4Grapher.ViewModels
                 ShowDefinition = this.ShowDefinition,
                 DefinitionMaxLength = this.DefinitionMaxLength
             };
-        }
-
-        /// <summary>
-        /// Builds the copy-pasteable details of a <see cref="Thing"/> shown on the Details tab
-        /// </summary>
-        /// <param name="thing">The selected <see cref="Thing"/>, or null</param>
-        /// <returns>The details text, or an empty string when nothing is selected</returns>
-        private static string BuildDetails(Thing thing)
-        {
-            if (thing == null)
-            {
-                return string.Empty;
-            }
-
-            var lines = new List<string> { $"Kind: {thing.ClassKind}" };
-
-            if (thing is INamedThing namedThing)
-            {
-                lines.Add($"Name: {namedThing.Name}");
-            }
-
-            if (thing is IShortNamedThing shortNamedThing)
-            {
-                lines.Add($"Short name: {shortNamedThing.ShortName}");
-            }
-
-            if (thing is IOwnedThing ownedThing && ownedThing.Owner != null)
-            {
-                lines.Add($"Owner: {ownedThing.Owner.ShortName}");
-            }
-
-            if (thing is ICategorizableThing categorizableThing && categorizableThing.Category.Any())
-            {
-                lines.Add($"Categories: {string.Join(", ", categorizableThing.Category.Select(x => x.Name))}");
-            }
-
-            if (thing is BinaryRelationship binaryRelationship)
-            {
-                lines.Add($"Source: {binaryRelationship.Source?.UserFriendlyName}");
-                lines.Add($"Target: {binaryRelationship.Target?.UserFriendlyName}");
-            }
-
-            if (thing is MultiRelationship multiRelationship)
-            {
-                lines.Add($"Related: {string.Join(", ", multiRelationship.RelatedThing.Select(x => x.UserFriendlyName))}");
-            }
-
-            var definition = (thing as DefinedThing)?.Definition.FirstOrDefault()?.Content;
-
-            if (!string.IsNullOrWhiteSpace(definition))
-            {
-                lines.Add($"Definition: {definition}");
-            }
-
-            return string.Join(Environment.NewLine, lines);
         }
 
         /// <summary>
@@ -1376,7 +1263,11 @@ namespace CDP4Grapher.ViewModels
             // the Details tab follows the diagram selection, whether it changed from the diagram or programmatically
             this.Disposables.Add(
                 this.WhenAnyValue(x => x.SelectedNode, x => x.SelectedEdge)
-                    .Subscribe(_ => this.SelectedThingDetails = BuildDetails(this.SelectedDiagramThing)));
+                    .Subscribe(_ => this.SelectedThingDetails = TraceabilityDetailsBuilder.Build(this.SelectedDiagramThing)));
+            
+            this.Disposables.Add(
+                this.WhenAnyValue(x => x.ShowClassKind, x => x.ShowShortName, x => x.ShowName, x => x.ShowDefinition, x => x.DefinitionMaxLength)
+                    .Subscribe(_ => this.ComputeGraph()));
         }
 
         /// <summary>
