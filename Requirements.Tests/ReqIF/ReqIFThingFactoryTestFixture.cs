@@ -163,10 +163,13 @@ namespace CDP4Requirements.Tests.ReqIF
             var factory = new ThingFactory(this.iteration, datatypeMap, spectypeMap, this.domain, this.reqIf.Lang);
             factory.ComputeRequirementThings(this.reqIf);
 
-            Assert.AreEqual(1, factory.RelationGroupMap.Count);
-            Assert.AreEqual(1, factory.SpecRelationMap.Count);
-            Assert.AreEqual(2, factory.SpecificationMap.Count);
-            Assert.IsTrue(factory.SpecificationMap.All(x => x.Value.Requirement.Count == 1));
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(1, factory.RelationGroupMap.Count);
+                Assert.AreEqual(1, factory.SpecRelationMap.Count);
+                Assert.AreEqual(2, factory.SpecificationMap.Count);
+                Assert.IsTrue(factory.SpecificationMap.All(x => x.Value.Requirement.Count == 1));
+            });
 
             var reqSpec1 = factory.SpecificationMap[this.specification1];
             var reqSpec2 = factory.SpecificationMap[this.specification2];
@@ -176,16 +179,19 @@ namespace CDP4Requirements.Tests.ReqIF
             var specificationRelationship = factory.RelationGroupMap.Single().Value;
             var reqRelatinoship = factory.SpecRelationMap.Single().Value;
 
-            Assert.AreSame(specificationRelationship.Source, reqSpec1);
-            Assert.AreSame(specificationRelationship.Target, reqSpec2);
-            Assert.AreSame(reqRelatinoship.Source, req1);
-            Assert.AreSame(reqRelatinoship.Target, req2);
+            Assert.Multiple(() =>
+            {
+                Assert.AreSame(specificationRelationship.Source, reqSpec1);
+                Assert.AreSame(specificationRelationship.Target, reqSpec2);
+                Assert.AreSame(reqRelatinoship.Source, req1);
+                Assert.AreSame(reqRelatinoship.Target, req2);
 
-            Assert.IsNotEmpty(req1.Definition);
-            Assert.IsNotEmpty(req2.Definition);
+                Assert.IsNotEmpty(req1.Definition);
+                Assert.IsNotEmpty(req2.Definition);
 
-            Assert.AreEqual(reqSpec1.Name, this.specValue1.TheValue);
-            Assert.AreEqual(reqSpec2.Name, this.specValue2.TheValue);
+                Assert.AreEqual(reqSpec1.Name, this.specValue1.TheValue);
+                Assert.AreEqual(reqSpec2.Name, this.specValue2.TheValue);
+            });
 
             var parameterValue = reqRelatinoship.ParameterValue.Single();
             Assert.AreEqual(parameterValue.Value[0], this.specrelationValue.TheValue);
@@ -203,16 +209,19 @@ namespace CDP4Requirements.Tests.ReqIF
             var doorsStyle = "<xhtml:div><xhtml:p>Line 1<xhtml:br/>Line 2</xhtml:p></xhtml:div>";
             var converted = ThingFactory.ConvertXhtmlToText(doorsStyle);
 
-            Assert.IsFalse(converted.Contains("<"), "no raw markup remains");
-            StringAssert.Contains("Line 1", converted);
-            StringAssert.Contains("Line 2", converted);
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(converted.Contains("<"), "no raw markup remains");
+                StringAssert.Contains("Line 1", converted);
+                StringAssert.Contains("Line 2", converted);
 
-            // entities are decoded and inline tags removed
-            Assert.AreEqual("a <b> bold", ThingFactory.ConvertXhtmlToText("<div xmlns=\"http://www.w3.org/1999/xhtml\">a &lt;b&gt; <b>bold</b></div>"));
+                // entities are decoded and inline tags removed
+                Assert.AreEqual("a <b> bold", ThingFactory.ConvertXhtmlToText("<div xmlns=\"http://www.w3.org/1999/xhtml\">a &lt;b&gt; <b>bold</b></div>"));
 
-            // null / empty are passed through unchanged
-            Assert.IsNull(ThingFactory.ConvertXhtmlToText(null));
-            Assert.AreEqual(string.Empty, ThingFactory.ConvertXhtmlToText(string.Empty));
+                // null / empty are passed through unchanged
+                Assert.IsNull(ThingFactory.ConvertXhtmlToText(null));
+                Assert.AreEqual(string.Empty, ThingFactory.ConvertXhtmlToText(string.Empty));
+            });
         }
 
         private void SetupThings()

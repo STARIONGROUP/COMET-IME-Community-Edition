@@ -250,12 +250,15 @@ namespace CDP4Requirements.Tests.ReqIF
             var shortNamePattern = new Regex("^[a-zA-Z0-9_]+$");
             var shortNames = capturedParameterType.ValueDefinition.Select(x => x.ShortName).ToList();
 
-            Assert.That(shortNames, Has.All.Matches<string>(x => shortNamePattern.IsMatch(x)), "all short-names must be valid");
-            Assert.That(shortNames.Distinct().Count(), Is.EqualTo(shortNames.Count), "short-names must be unique");
-            Assert.That(shortNames, Has.None.Contains("Other content"), "the ReqIF OTHER-CONTENT placeholder must not be used as short-name");
+            Assert.Multiple(() =>
+            {
+                Assert.That(shortNames, Has.All.Matches<string>(x => shortNamePattern.IsMatch(x)), "all short-names must be valid");
+                Assert.That(shortNames.Distinct().Count(), Is.EqualTo(shortNames.Count), "short-names must be unique");
+                Assert.That(shortNames, Has.None.Contains("Other content"), "the ReqIF OTHER-CONTENT placeholder must not be used as short-name");
 
-            // the human-readable name is preserved
-            Assert.That(capturedParameterType.ValueDefinition.Select(x => x.Name), Does.Contain("mandatory (>= 1)"));
+                // the human-readable name is preserved
+                Assert.That(capturedParameterType.ValueDefinition.Select(x => x.Name), Does.Contain("mandatory (>= 1)"));
+            });
         }
 
         [Test]

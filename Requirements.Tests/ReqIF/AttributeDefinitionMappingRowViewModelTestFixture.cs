@@ -56,10 +56,13 @@ namespace CDP4Requirements.Tests.ReqIF
             var foreignIdDefinition = new AttributeDefinitionString { LongName = ThingToReqIfMapper.ReqIfForeignIdAttributeDefName };
             var otherDefinition = new AttributeDefinitionString { LongName = "Something else" };
 
-            Assert.AreEqual(AttributeDefinitionMapKind.FIRST_DEFINITION, new AttributeDefinitionMappingRowViewModel(textDefinition, null, () => { }).AttributeDefinitionMapKind);
-            Assert.AreEqual(AttributeDefinitionMapKind.NAME, new AttributeDefinitionMappingRowViewModel(nameDefinition, null, () => { }).AttributeDefinitionMapKind);
-            Assert.AreEqual(AttributeDefinitionMapKind.SHORTNAME, new AttributeDefinitionMappingRowViewModel(foreignIdDefinition, null, () => { }).AttributeDefinitionMapKind);
-            Assert.AreEqual(AttributeDefinitionMapKind.NONE, new AttributeDefinitionMappingRowViewModel(otherDefinition, null, () => { }).AttributeDefinitionMapKind);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(AttributeDefinitionMapKind.FIRST_DEFINITION, new AttributeDefinitionMappingRowViewModel(textDefinition, null, () => { }).AttributeDefinitionMapKind);
+                Assert.AreEqual(AttributeDefinitionMapKind.NAME, new AttributeDefinitionMappingRowViewModel(nameDefinition, null, () => { }).AttributeDefinitionMapKind);
+                Assert.AreEqual(AttributeDefinitionMapKind.SHORTNAME, new AttributeDefinitionMappingRowViewModel(foreignIdDefinition, null, () => { }).AttributeDefinitionMapKind);
+                Assert.AreEqual(AttributeDefinitionMapKind.NONE, new AttributeDefinitionMappingRowViewModel(otherDefinition, null, () => { }).AttributeDefinitionMapKind);
+            });
         }
     }
 }

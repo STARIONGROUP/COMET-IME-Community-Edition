@@ -108,13 +108,16 @@ namespace CDP4Requirements.Tests.Controls
         public void VerifyThatConstructorWorks()
         {
             var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
-            Assert.IsNotNull(vm);
-            Assert.IsNotNull(vm.Sessions);
-            Assert.IsNotNull(vm.Iterations);
-            Assert.IsNotNull(vm.OkCommand);
-            Assert.IsNotNull(vm.CancelCommand);
-            Assert.IsNotNull(vm.BrowseCommand);
-            Assert.IsFalse(vm.IncludeDeprecated);
+            Assert.Multiple(() =>
+            {
+                Assert.IsNotNull(vm);
+                Assert.IsNotNull(vm.Sessions);
+                Assert.IsNotNull(vm.Iterations);
+                Assert.IsNotNull(vm.OkCommand);
+                Assert.IsNotNull(vm.CancelCommand);
+                Assert.IsNotNull(vm.BrowseCommand);
+                Assert.IsFalse(vm.IncludeDeprecated);
+            });
         }
 
         [Test]
@@ -155,8 +158,11 @@ namespace CDP4Requirements.Tests.Controls
 
             vm.SelectedIteration = vm.Iterations.First();
 
-            Assert.AreEqual(2, vm.RequirementsSpecifications.Count);
-            Assert.IsTrue(vm.RequirementsSpecifications.All(x => x.IsSelected));
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(2, vm.RequirementsSpecifications.Count);
+                Assert.IsTrue(vm.RequirementsSpecifications.All(x => x.IsSelected));
+            });
         }
 
         [Test]
@@ -202,8 +208,11 @@ namespace CDP4Requirements.Tests.Controls
             await vm.PreviewSpecObjectTypesCommand.Execute();
 
             var requirementType = vm.SpecObjectTypesPreview.Single(x => x.Name == "Requirement");
-            Assert.That(requirementType.NumberOfObjects, Is.EqualTo(1));
-            Assert.That(requirementType.DistinguishingAttributes, Is.EqualTo("(no extra parameters)"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(requirementType.NumberOfObjects, Is.EqualTo(1));
+                Assert.That(requirementType.DistinguishingAttributes, Is.EqualTo("(no extra parameters)"));
+            });
         }
 
         [Test]
@@ -219,14 +228,20 @@ namespace CDP4Requirements.Tests.Controls
             vm.SelectedIteration = vm.Iterations.First();
 
             // the deprecated specification is hidden by default (Include Deprecated is off)
-            Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Contain(normalSpec));
-            Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Not.Contain(deprecatedSpec));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Contain(normalSpec));
+                Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Not.Contain(deprecatedSpec));
+            });
 
             // turning on Include Deprecated reveals it, selected by default
             vm.IncludeDeprecated = true;
 
-            Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Contain(deprecatedSpec));
-            Assert.IsTrue(vm.RequirementsSpecifications.All(x => x.IsSelected));
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.RequirementsSpecifications.Select(x => x.RequirementsSpecification), Does.Contain(deprecatedSpec));
+                Assert.IsTrue(vm.RequirementsSpecifications.All(x => x.IsSelected));
+            });
         }
 
         [Test]
@@ -246,8 +261,11 @@ namespace CDP4Requirements.Tests.Controls
 
             await vm.PreviewSpecObjectTypesCommand.Execute();
 
-            Assert.IsEmpty(vm.SpecObjectTypesPreview);
-            Assert.That(vm.ErrorMessage, Is.EqualTo("Select at least one requirements specification to preview."));
+            Assert.Multiple(() =>
+            {
+                Assert.IsEmpty(vm.SpecObjectTypesPreview);
+                Assert.That(vm.ErrorMessage, Is.EqualTo("Select at least one requirements specification to preview."));
+            });
         }
 
         [Test]
@@ -263,19 +281,28 @@ namespace CDP4Requirements.Tests.Controls
                 .Returns("test");
 
             vm.SelectedIteration = vm.Iterations.First();
-            Assert.That(vm.SelectedIteration.IterationNumber, Is.Not.Null.Or.Empty);
-            Assert.That(vm.SelectedIteration.Model, Is.Not.Null.Or.Empty);
-            Assert.That(vm.SelectedIteration.DataSourceUri, Is.Not.Null.Or.Empty);
-            Assert.IsNotNull(vm.SelectedIteration.Iteration);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.SelectedIteration.IterationNumber, Is.Not.Null.Or.Empty);
+                Assert.That(vm.SelectedIteration.Model, Is.Not.Null.Or.Empty);
+                Assert.That(vm.SelectedIteration.DataSourceUri, Is.Not.Null.Or.Empty);
+                Assert.IsNotNull(vm.SelectedIteration.Iteration);
+            });
 
-            Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
-            Assert.IsTrue(((ICommand)vm.CancelCommand).CanExecute(null));
-            Assert.IsTrue(((ICommand)vm.BrowseCommand).CanExecute(null));
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
+                Assert.IsTrue(((ICommand)vm.CancelCommand).CanExecute(null));
+                Assert.IsTrue(((ICommand)vm.BrowseCommand).CanExecute(null));
+            });
 
             await vm.BrowseCommand.Execute();
-            Assert.That(vm.Path, Is.Not.Null.Or.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.Path, Is.Not.Null.Or.Empty);
 
-            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
+                Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
+            });
 
             await vm.ExecuteOk();
             Assert.IsNotNull(vm.DialogResult);
