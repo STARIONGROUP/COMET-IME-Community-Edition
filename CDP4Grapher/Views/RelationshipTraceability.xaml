@@ -221,6 +221,23 @@
                     </dxlc:LayoutItem>
                 </dxlc:LayoutGroup>
 
+                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Header="Block content"
+                                  Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                    <dxlc:LayoutItem>
+                    <StackPanel>
+                        <TextBlock Text="Show on each block:" TextWrapping="Wrap" Margin="0,0,0,3" />
+                        <dxe:CheckEdit Content="Class kind" IsChecked="{Binding ShowClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <dxe:CheckEdit Content="Short name" IsChecked="{Binding ShowShortName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <dxe:CheckEdit Content="Name" IsChecked="{Binding ShowName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <dxe:CheckEdit Content="Definition" IsChecked="{Binding ShowDefinition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Text="Definition max. length:" Margin="0,5,0,0"
+                                   ToolTip="The definition is truncated beyond this many characters so the blocks stay small." />
+                        <dxe:SpinEdit Value="{Binding DefinitionMaxLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}"
+                                      MinValue="10" MaxValue="1000" IsFloatValue="False" ValidateOnTextInput="False" />
+                    </StackPanel>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+
                 <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Header="Excluded from diagram"
                                   Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
                     <dxlc:LayoutItem>
@@ -251,11 +268,31 @@
         </dxlc:LayoutControl>
                     </dxn:NavBarGroup.Content>
                 </dxn:NavBarGroup>
+                <dxn:NavBarGroup DisplaySource="Content" Header="Details">
+                    <dxn:NavBarGroup.Content>
+                        <Grid FlowDirection="LeftToRight" Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" TextWrapping="Wrap" FontStyle="Italic" Margin="0,0,0,5"
+                                       Text="Select a node or relationship on the diagram to see its details here. The text can be copied." />
+                            <TextBox Grid.Row="1"
+                                     Text="{Binding SelectedThingDetails, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto"
+                                     FontFamily="Consolas" />
+                        </Grid>
+                    </dxn:NavBarGroup.Content>
+                </dxn:NavBarGroup>
             </dxn:NavBarControl.Groups>
         </dxn:NavBarControl>
 
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -270,9 +307,18 @@
                 <TextBlock TextWrapping="Wrap" Text="{Binding MaxNodeCountMessage}" />
             </Border>
 
-            <TextBlock Grid.Row="1" Margin="5,2" Text="{Binding StatusMessage}" />
+            <Border Grid.Row="1"
+                    Background="#D1ECF1"
+                    BorderBrush="#7FC6D6"
+                    BorderThickness="1"
+                    Padding="5"
+                    Visibility="{Binding IsLinking, Converter={dxmvvm:BooleanToVisibilityConverter}}">
+                <TextBlock TextWrapping="Wrap" Text="{Binding LinkStatusMessage}" />
+            </Border>
 
-            <views:TraceabilityDiagramControl Grid.Row="2"
+            <TextBlock Grid.Row="2" Margin="5,2" Text="{Binding StatusMessage}" />
+
+            <views:TraceabilityDiagramControl Grid.Row="3"
                                               SelectionMode="Single"
                                               IsManipulationEnabled="False"
                                               AllowRotateItems="False"
@@ -286,6 +332,7 @@
                     <behaviors:TraceabilityDiagramBehavior />
                     <dxmvvm:KeyToCommand KeyGesture="Ctrl+E" Command="{Binding EditSelectedThingCommand}" />
                     <dxmvvm:KeyToCommand KeyGesture="Ctrl+I" Command="{Binding InspectSelectedThingCommand}" />
+                    <dxmvvm:KeyToCommand KeyGesture="Escape" Command="{Binding CancelLinkCommand}" />
                     <dxmvvm:EventToCommand EventName="SelectionChanged"
                                            Command="{Binding DiagramSelectionChangedCommand}"
                                            PassEventArgsToCommand="True" />
@@ -297,15 +344,30 @@
                         <dxdiag:DiagramDataBindingBehavior.ItemTemplate>
                             <DataTemplate DataType="{x:Type viewModels:TraceabilityNodeViewModel}">
                                 <Border Background="{Binding Level, Converter={StaticResource LevelToBrushConverter}}"
-                                        BorderBrush="DimGray"
-                                        BorderThickness="1"
                                         CornerRadius="3"
                                         Padding="6,4"
                                         ToolTip="{Binding ToolTip}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush" Value="DimGray" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsLinkSource}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="#FF6F00" />
+                                                    <Setter Property="BorderThickness" Value="3" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <StackPanel Orientation="Vertical">
-                                        <TextBlock Text="{Binding ClassKindName}" FontSize="9" Foreground="DimGray" TextAlignment="Center" />
-                                        <TextBlock Text="{Binding ShortName}" FontWeight="Bold" TextAlignment="Center" />
-                                        <TextBlock Text="{Binding Name}" FontSize="10" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="160" />
+                                        <TextBlock Text="{Binding ClassKindName}" FontSize="9" Foreground="DimGray" TextAlignment="Center"
+                                                   Visibility="{Binding ShowClassKind, Converter={dxmvvm:BooleanToVisibilityConverter}}" />
+                                        <TextBlock Text="{Binding ShortName}" FontWeight="Bold" TextAlignment="Center"
+                                                   Visibility="{Binding ShowShortName, Converter={dxmvvm:BooleanToVisibilityConverter}}" />
+                                        <TextBlock Text="{Binding Name}" FontSize="10" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="160"
+                                                   Visibility="{Binding ShowName, Converter={dxmvvm:BooleanToVisibilityConverter}}" />
+                                        <TextBlock Text="{Binding Definition}" FontSize="9" Foreground="#333333" FontStyle="Italic" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="160"
+                                                   Visibility="{Binding ShowDefinition, Converter={dxmvvm:BooleanToVisibilityConverter}}" />
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>

@@ -34,25 +34,45 @@ namespace CDP4Grapher.ViewModels
 
     using CDP4Grapher.Helpers;
 
+    using ReactiveUI;
+
     /// <summary>
     /// Represents a <see cref="RelationshipGraphNode"/> as an item on the traceability diagram
     /// </summary>
-    public class TraceabilityNodeViewModel
+    public class TraceabilityNodeViewModel : ReactiveObject
     {
+        /// <summary>
+        /// Backing field for <see cref="IsLinkSource"/>
+        /// </summary>
+        private bool isLinkSource;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TraceabilityNodeViewModel"/> class
         /// </summary>
         /// <param name="node">
         /// The <see cref="RelationshipGraphNode"/> that is represented
         /// </param>
-        public TraceabilityNodeViewModel(RelationshipGraphNode node)
+        /// <param name="displayOptions">
+        /// The <see cref="NodeDisplayOptions"/> that select which lines the box shows, or null for the defaults
+        /// </param>
+        public TraceabilityNodeViewModel(RelationshipGraphNode node, NodeDisplayOptions displayOptions = null)
         {
+            var options = displayOptions ?? new NodeDisplayOptions();
+
             this.Thing = node.Thing;
             this.Id = node.Thing.Iid;
             this.Level = node.Level;
             this.Name = node.Thing.UserFriendlyName;
             this.ShortName = node.Thing.UserFriendlyShortName;
             this.ClassKindName = node.Thing.ClassKind.ToString();
+
+            var fullDefinition = (node.Thing as DefinedThing)?.Definition.FirstOrDefault()?.Content;
+            this.Definition = Truncate(fullDefinition, options.DefinitionMaxLength);
+
+            this.ShowClassKind = options.ShowClassKind;
+            this.ShowShortName = options.ShowShortName;
+            this.ShowName = options.ShowName;
+            this.ShowDefinition = options.ShowDefinition && !string.IsNullOrWhiteSpace(this.Definition);
 
             var lines = new List<string> { $"{this.ClassKindName}: {this.Name}" };
 
@@ -61,14 +81,28 @@ namespace CDP4Grapher.ViewModels
                 lines.Add($"Categories: {string.Join(", ", categorizableThing.Category.Select(x => x.Name))}");
             }
 
-            var definition = (node.Thing as DefinedThing)?.Definition.FirstOrDefault()?.Content;
-
-            if (!string.IsNullOrWhiteSpace(definition))
+            if (!string.IsNullOrWhiteSpace(fullDefinition))
             {
-                lines.Add(definition);
+                lines.Add(fullDefinition);
             }
 
             this.ToolTip = string.Join("\n", lines);
+        }
+
+        /// <summary>
+        /// Truncates a definition to a maximum length, appending an ellipsis when it is cut
+        /// </summary>
+        /// <param name="definition">The full definition content, or null</param>
+        /// <param name="maxLength">The maximum number of characters to keep</param>
+        /// <returns>The capped definition, or null when there was none</returns>
+        private static string Truncate(string definition, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(definition) || maxLength <= 0 || definition.Length <= maxLength)
+            {
+                return definition;
+            }
+
+            return definition.Substring(0, maxLength) + "…";
         }
 
         /// <summary>
@@ -94,6 +128,16 @@ namespace CDP4Grapher.ViewModels
         public bool IsRoot => this.Level == 0;
 
         /// <summary>
+        /// Gets or sets a value indicating whether this node is the source a link is currently being drawn from, so the
+        /// view can outline it
+        /// </summary>
+        public bool IsLinkSource
+        {
+            get => this.isLinkSource;
+            set => this.RaiseAndSetIfChanged(ref this.isLinkSource, value);
+        }
+
+        /// <summary>
         /// Gets the name of the <see cref="Thing"/>
         /// </summary>
         public string Name { get; }
@@ -107,6 +151,33 @@ namespace CDP4Grapher.ViewModels
         /// Gets the name of the <see cref="ClassKind"/> of the <see cref="Thing"/>
         /// </summary>
         public string ClassKindName { get; }
+
+        /// <summary>
+        /// Gets the content of the first <see cref="Definition"/> of the <see cref="Thing"/>, capped by
+        /// <see cref="NodeDisplayOptions.DefinitionMaxLength"/>, or null when it has none
+        /// </summary>
+        public string Definition { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="ClassKindName"/> line is shown on the box
+        /// </summary>
+        public bool ShowClassKind { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="ShortName"/> line is shown on the box
+        /// </summary>
+        public bool ShowShortName { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Name"/> line is shown on the box
+        /// </summary>
+        public bool ShowName { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Definition"/> line is shown on the box; only ever true when
+        /// there is a definition to show
+        /// </summary>
+        public bool ShowDefinition { get; }
 
         /// <summary>
         /// Gets the tool tip of the node: the kind and name of the <see cref="Thing"/>, the names of its

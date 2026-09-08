@@ -53,6 +53,7 @@ namespace CDP4Grapher.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Helpers;
@@ -189,6 +190,41 @@ namespace CDP4Grapher.ViewModels
         /// Backing field for <see cref="SelectedConfiguration"/>
         /// </summary>
         private TraceabilityConfiguration selectedConfiguration;
+
+        /// <summary>
+        /// Backing field for <see cref="ShowClassKind"/>
+        /// </summary>
+        private bool showClassKind = true;
+
+        /// <summary>
+        /// Backing field for <see cref="ShowShortName"/>
+        /// </summary>
+        private bool showShortName = true;
+
+        /// <summary>
+        /// Backing field for <see cref="ShowName"/>
+        /// </summary>
+        private bool showName = true;
+
+        /// <summary>
+        /// Backing field for <see cref="ShowDefinition"/>
+        /// </summary>
+        private bool showDefinition;
+
+        /// <summary>
+        /// Backing field for <see cref="DefinitionMaxLength"/>
+        /// </summary>
+        private int definitionMaxLength = 100;
+
+        /// <summary>
+        /// Backing field for <see cref="LinkSourceThing"/>
+        /// </summary>
+        private Thing linkSourceThing;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedThingDetails"/>
+        /// </summary>
+        private string selectedThingDetails;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipTraceabilityViewModel"/> class
@@ -526,6 +562,88 @@ namespace CDP4Grapher.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the node boxes show the class kind line
+        /// </summary>
+        public bool ShowClassKind
+        {
+            get => this.showClassKind;
+            set => this.RaiseAndSetIfChanged(ref this.showClassKind, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the node boxes show the short name line
+        /// </summary>
+        public bool ShowShortName
+        {
+            get => this.showShortName;
+            set => this.RaiseAndSetIfChanged(ref this.showShortName, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the node boxes show the name line
+        /// </summary>
+        public bool ShowName
+        {
+            get => this.showName;
+            set => this.RaiseAndSetIfChanged(ref this.showName, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the node boxes show the definition line
+        /// </summary>
+        public bool ShowDefinition
+        {
+            get => this.showDefinition;
+            set => this.RaiseAndSetIfChanged(ref this.showDefinition, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the maximum number of characters of the definition shown on the node boxes
+        /// </summary>
+        public int DefinitionMaxLength
+        {
+            get => this.definitionMaxLength;
+            set => this.RaiseAndSetIfChanged(ref this.definitionMaxLength, value);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Thing"/> a link is being drawn from, set by "start link" and cleared once the link is
+        /// created or cancelled, or null when no link is in progress
+        /// </summary>
+        public Thing LinkSourceThing
+        {
+            get => this.linkSourceThing;
+            private set
+            {
+                this.RaiseAndSetIfChanged(ref this.linkSourceThing, value);
+                this.RaisePropertyChanged(nameof(this.IsLinking));
+                this.RaisePropertyChanged(nameof(this.LinkStatusMessage));
+                this.UpdateLinkSourceHighlight();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether a link is currently being drawn
+        /// </summary>
+        public bool IsLinking => this.LinkSourceThing != null;
+
+        /// <summary>
+        /// Gets the banner shown while a link is being drawn, naming the source and how to proceed
+        /// </summary>
+        public string LinkStatusMessage => this.IsLinking
+            ? $"Linking from '{this.LinkSourceThing.UserFriendlyName}'. Right-click a target node to create the link, or press Escape to cancel."
+            : string.Empty;
+
+        /// <summary>
+        /// Gets the copy-pasteable details of the <see cref="SelectedDiagramThing"/>, shown on the Details tab
+        /// </summary>
+        public string SelectedThingDetails
+        {
+            get => this.selectedThingDetails;
+            private set => this.RaiseAndSetIfChanged(ref this.selectedThingDetails, value);
+        }
+
+        /// <summary>
         /// Gets the command that recomputes the graph
         /// </summary>
         public ReactiveCommand<Unit, Unit> RefreshCommand { get; private set; }
@@ -611,6 +729,27 @@ namespace CDP4Grapher.ViewModels
         public ReactiveCommand<string, Unit> ExportCommand { get; private set; }
 
         /// <summary>
+        /// Gets the command that starts drawing a link from <see cref="SelectedNode"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> StartLinkCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that abandons the link currently being drawn
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CancelLinkCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that creates the <see cref="BinaryRelationship"/> described by its
+        /// <see cref="LinkCreationOption"/> parameter
+        /// </summary>
+        public ReactiveCommand<LinkCreationOption, Unit> CreateLinkCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that deletes the <see cref="Relationship"/> of the <see cref="SelectedEdge"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> DeleteRelationshipCommand { get; private set; }
+
+        /// <summary>
         /// Updates the current drag state
         /// </summary>
         /// <param name="dropInfo">Information about the drag operation</param>
@@ -686,8 +825,10 @@ namespace CDP4Grapher.ViewModels
             this.builder = this.builder ?? new RelationshipGraphBuilder(this.Thing);
             var graph = this.builder.Build(roots, this.BuildConfiguration());
 
+            var displayOptions = this.BuildDisplayOptions();
+
             this.Nodes.Clear();
-            this.Nodes.AddRange(graph.Nodes.Select(x => new TraceabilityNodeViewModel(x)));
+            this.Nodes.AddRange(graph.Nodes.Select(x => new TraceabilityNodeViewModel(x, displayOptions)));
 
             var nodeLevels = graph.Nodes.ToDictionary(x => x.Thing.Iid, x => x.Level);
 
@@ -702,6 +843,20 @@ namespace CDP4Grapher.ViewModels
 
             var exclusionSuffix = this.ExcludedThings.Any() ? $", {this.ExcludedThings.Count} excluded" : string.Empty;
             this.StatusMessage = $"{graph.Nodes.Count} nodes, {graph.Edges.Count} relationships{exclusionSuffix}";
+
+            // the nodes were just recreated, so a link in progress must be re-highlighted on the new node
+            this.UpdateLinkSourceHighlight();
+        }
+
+        /// <summary>
+        /// Flags the node that a link is being drawn from, so the view outlines it, and clears the flag on the others
+        /// </summary>
+        private void UpdateLinkSourceHighlight()
+        {
+            foreach (var node in this.Nodes)
+            {
+                node.IsLinkSource = this.linkSourceThing != null && node.Thing.Iid == this.linkSourceThing.Iid;
+            }
         }
 
         /// <summary>
@@ -949,6 +1104,110 @@ namespace CDP4Grapher.ViewModels
                         this.Behavior?.Export(format);
                     }
                 });
+
+            this.StartLinkCommand = ReactiveCommandCreator.Create(
+                () => this.LinkSourceThing = this.SelectedNode.Thing,
+                this.WhenAnyValue(x => x.SelectedNode).Select(x => x != null));
+
+            this.CancelLinkCommand = ReactiveCommandCreator.Create(
+                () => this.LinkSourceThing = null,
+                this.WhenAnyValue(x => x.LinkSourceThing).Select(x => x != null));
+
+            this.CreateLinkCommand = ReactiveCommandCreator.Create<LinkCreationOption>(this.ExecuteCreateLink);
+
+            this.DeleteRelationshipCommand = ReactiveCommandCreator.Create(
+                this.ExecuteDeleteRelationship,
+                this.WhenAnyValue(x => x.SelectedEdge).Select(x => x != null));
+        }
+
+        /// <summary>
+        /// Deletes the <see cref="Relationship"/> of the <see cref="SelectedEdge"/> after the user confirms it. The
+        /// graph is recomputed by the write echo through the relationship subscription.
+        /// </summary>
+        private async void ExecuteDeleteRelationship()
+        {
+            var relationship = this.SelectedEdge?.Relationship;
+
+            if (relationship == null)
+            {
+                return;
+            }
+
+            var confirmation = new ConfirmationDialogViewModel(relationship);
+
+            if (!((this.DialogNavigationService.NavigateModal(confirmation)?.Result) ?? false))
+            {
+                return;
+            }
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+            var iterationClone = this.Thing.Clone(false);
+            var transaction = new ThingTransaction(transactionContext, iterationClone);
+            transaction.Delete(relationship.Clone(false), iterationClone);
+
+            try
+            {
+                await this.Session.Write(transaction.FinalizeTransaction());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Deletion of the relationship failed: {ex.Message}", "Deleting relationship failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Gets the applicable link kinds when drawing a relationship from <paramref name="source"/> to
+        /// <paramref name="target"/>; see <see cref="RelationshipLinkHelper.GetLinkOptions"/>
+        /// </summary>
+        /// <param name="source">The <see cref="Thing"/> the relationship would run from</param>
+        /// <param name="target">The <see cref="Thing"/> the relationship would run to</param>
+        /// <returns>The applicable <see cref="LinkCreationOption"/>s</returns>
+        public IReadOnlyList<LinkCreationOption> GetLinkOptions(Thing source, Thing target)
+        {
+            return RelationshipLinkHelper.GetLinkOptions(this.Session, source, target);
+        }
+
+        /// <summary>
+        /// Creates the <see cref="BinaryRelationship"/> described by a <see cref="LinkCreationOption"/> and writes it to
+        /// the model, then ends the link
+        /// </summary>
+        /// <param name="option">The chosen <see cref="LinkCreationOption"/></param>
+        private async void ExecuteCreateLink(LinkCreationOption option)
+        {
+            if (option?.Source == null || option.Target == null)
+            {
+                return;
+            }
+
+            try
+            {
+                await RelationshipLinkHelper.WriteBinaryRelationship(this.Session, this.Thing, option);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Creation of the relationship failed: {ex.Message}", "Creating relationship failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                // the write echo recomputes the graph through the relationship subscription; the link is finished
+                this.LinkSourceThing = null;
+            }
+        }
+
+        /// <summary>
+        /// Builds the <see cref="NodeDisplayOptions"/> from the current state of the block-content configuration
+        /// </summary>
+        /// <returns>The <see cref="NodeDisplayOptions"/></returns>
+        private NodeDisplayOptions BuildDisplayOptions()
+        {
+            return new NodeDisplayOptions
+            {
+                ShowClassKind = this.ShowClassKind,
+                ShowShortName = this.ShowShortName,
+                ShowName = this.ShowName,
+                ShowDefinition = this.ShowDefinition,
+                DefinitionMaxLength = this.DefinitionMaxLength
+            };
         }
 
         /// <summary>
@@ -1000,6 +1259,15 @@ namespace CDP4Grapher.ViewModels
                         this.PopulatePossibleValues();
                         this.ComputeGraph();
                     }));
+
+            // the Details tab follows the diagram selection, whether it changed from the diagram or programmatically
+            this.Disposables.Add(
+                this.WhenAnyValue(x => x.SelectedNode, x => x.SelectedEdge)
+                    .Subscribe(_ => this.SelectedThingDetails = TraceabilityDetailsBuilder.Build(this.SelectedDiagramThing)));
+            
+            this.Disposables.Add(
+                this.WhenAnyValue(x => x.ShowClassKind, x => x.ShowShortName, x => x.ShowName, x => x.ShowDefinition, x => x.DefinitionMaxLength)
+                    .Subscribe(_ => this.ComputeGraph()));
         }
 
         /// <summary>
@@ -1126,7 +1394,12 @@ namespace CDP4Grapher.ViewModels
                 LevelOverrides = this.LevelFilterRows
                     .Where(x => x.IsActive)
                     .Select(x => new TraceabilityLevelOverride { Level = x.Level, Direction = x.Direction, Categories = x.SelectedCategories.Select(c => c.Iid).ToList() })
-                    .ToList()
+                    .ToList(),
+                ShowClassKind = this.ShowClassKind,
+                ShowShortName = this.ShowShortName,
+                ShowName = this.ShowName,
+                ShowDefinition = this.ShowDefinition,
+                DefinitionMaxLength = this.DefinitionMaxLength
             };
         }
 
@@ -1153,6 +1426,11 @@ namespace CDP4Grapher.ViewModels
                 this.LayoutDirection = configuration.LayoutDirection;
                 this.SelectedDefaultLevelCategories = this.ResolveCategories(configuration.DefaultLevelCategories);
                 this.SelectedDefaultDirection = ResolveDirectionOption(configuration.DefaultDirection);
+                this.ShowClassKind = configuration.ShowClassKind;
+                this.ShowShortName = configuration.ShowShortName;
+                this.ShowName = configuration.ShowName;
+                this.ShowDefinition = configuration.ShowDefinition;
+                this.DefinitionMaxLength = configuration.DefinitionMaxLength;
 
                 // ad-hoc exclusions would silently distort the applied preset
                 this.ExcludedThings.Clear();

@@ -112,5 +112,30 @@ namespace CDP4Grapher.Settings
         /// Gets or sets the per-level overrides of <see cref="DefaultLevelCategories"/>
         /// </summary>
         public List<TraceabilityLevelOverride> LevelOverrides { get; set; } = new List<TraceabilityLevelOverride>();
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the class kind line is shown on the node boxes
+        /// </summary>
+        public bool ShowClassKind { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the short name line is shown on the node boxes
+        /// </summary>
+        public bool ShowShortName { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the name line is shown on the node boxes
+        /// </summary>
+        public bool ShowName { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the definition line is shown on the node boxes
+        /// </summary>
+        public bool ShowDefinition { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of characters of the definition shown on the node boxes
+        /// </summary>
+        public int DefinitionMaxLength { get; set; } = 100;
     }
 }
