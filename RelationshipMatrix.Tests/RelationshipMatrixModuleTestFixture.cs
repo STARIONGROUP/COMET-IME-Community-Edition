@@ -25,11 +25,15 @@
 
 namespace CDP4RelationshipMatrix.Tests
 {
+    using CDP4Common.CommonData;
+
     using CDP4Composition;
     using CDP4Composition.Exceptions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
+    using CDP4RelationshipMatrix.Settings;
 
     using CommonServiceLocator;
 
@@ -85,6 +89,22 @@ namespace CDP4RelationshipMatrix.Tests
             Assert.DoesNotThrow(() => this.relationshipMatrixModule.ReadPluginSettings());
 
             this.pluginSettingsService.Verify(x => x.Write(It.IsAny<RelationshipMatrixPluginSettings>()));
+        }
+
+        [Test]
+        public void Verify_that_class_kinds_added_to_the_defaults_are_merged_into_an_existing_settings_file()
+        {
+            // A settings file written before File was a possible source/target must still gain it (see GitHub issue #1490)
+            var existingSettings = new RelationshipMatrixPluginSettings();
+            existingSettings.PossibleClassKinds.Add(ClassKind.ElementDefinition);
+            existingSettings.PossibleDisplayKinds.Add(DisplayKind.Name);
+
+            this.pluginSettingsService.Setup(x => x.Read<RelationshipMatrixPluginSettings>(false)).Returns(existingSettings);
+
+            this.relationshipMatrixModule.ReadPluginSettings();
+
+            Assert.That(existingSettings.PossibleClassKinds, Does.Contain(ClassKind.File));
+            this.pluginSettingsService.Verify(x => x.Write(existingSettings));
         }
     }
 }

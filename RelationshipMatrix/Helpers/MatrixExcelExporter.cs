@@ -162,7 +162,7 @@ namespace CDP4RelationshipMatrix.Helpers
             // construct rows
             for (var i = 1; i <= this.Matrix.Records.Count; i++)
             {
-                worksheetMatrix.Cell(i + 1, 1).Value = this.Matrix.Records[i - 1].First().Value.DisplayKind == DisplayKind.Name ? this.Matrix.Records[i - 1].First().Value.SourceY.UserFriendlyName : this.Matrix.Records[i - 1].First().Value.SourceY.UserFriendlyShortName;
+                worksheetMatrix.Cell(i + 1, 1).Value = this.Matrix.Records[i - 1].First().Value.DisplayKind == DisplayKind.Name ? this.Matrix.Records[i - 1].First().Value.SourceY.QueryDisplayName() : this.Matrix.Records[i - 1].First().Value.SourceY.QueryDisplayShortName();
                 var relation = this.Matrix.Records[i - 1].Values.ToList();
 
                 var traceCount = 0;

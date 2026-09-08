@@ -25,13 +25,16 @@
 
 namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     using CDP4Dal.Events;
 
@@ -148,6 +151,70 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             Assert.AreEqual(2, vm.Matrix.Records.Count);
             Assert.AreEqual(2, vm.Matrix.Columns.Count);
+
+            vm.Dispose();
+        }
+
+        [Test]
+        public void AssertFileCanBeUsedAsMatrixSource()
+        {
+            // #1490: a File is not a DefinedThing; it must still flow through the matrix, using its current revision name as name and short-name.
+            var fileCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "geometry", ShortName = "geometry" };
+            fileCategory.PermissibleClass.Add(ClassKind.File);
+            this.srdl.DefinedCategory.Add(fileCategory);
+            this.assembler.Cache.TryAdd(new CacheKey(fileCategory.Iid, null), new Lazy<Thing>(() => fileCategory));
+
+            var fileRule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                SourceCategory = fileCategory,
+                TargetCategory = this.catEd1,
+                RelationshipCategory = this.catRel,
+                Name = "file-to-element",
+                ShortName = "file-to-element"
+            };
+
+            this.srdl.Rule.Add(fileRule);
+            this.assembler.Cache.TryAdd(new CacheKey(fileRule.Iid, null), new Lazy<Thing>(() => fileRule));
+
+            var fileStore = new DomainFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain, Container = this.iteration };
+            var file = new File(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain };
+            file.Category.Add(fileCategory);
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "geometry.stp", CreatedOn = DateTime.UtcNow, Creator = this.participant };
+            file.FileRevision.Add(fileRevision);
+            fileStore.File.Add(file);
+            this.iteration.DomainFileStore.Add(fileStore);
+            this.assembler.Cache.TryAdd(new CacheKey(file.Iid, this.iteration.Iid), new Lazy<Thing>(() => file));
+
+            this.settings.PossibleClassKinds.Add(ClassKind.File);
+
+            var vm = new RelationshipMatrixViewModel(
+                this.iteration,
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.panelNavigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginService.Object);
+
+            vm.SourceYConfiguration.SelectedClassKind = vm.SourceYConfiguration.PossibleClassKinds.First(x => x == ClassKind.File);
+            vm.SourceXConfiguration.SelectedClassKind = vm.SourceXConfiguration.PossibleClassKinds.First(x => x == ClassKind.ElementDefinition);
+
+            vm.SourceYConfiguration.SelectedCategories = new List<Category>(vm.SourceYConfiguration.PossibleCategories.Where(x => x.Iid == fileCategory.Iid));
+            vm.SourceXConfiguration.SelectedCategories = new List<Category>(vm.SourceXConfiguration.PossibleCategories.Where(x => x.Iid == this.catEd1.Iid));
+
+            vm.RelationshipConfiguration.SelectedRule = vm.RelationshipConfiguration.PossibleRules.Single(x => x.Iid == fileRule.Iid);
+
+            vm.SourceYConfiguration.SelectedOwners.Add(this.domain);
+            vm.SourceXConfiguration.SelectedOwners.Add(this.domain);
+
+            // The File shows up as a row (it would be silently dropped before File support was added)
+            var fileRow = vm.Matrix.Records.FirstOrDefault(row => row.Values.First().SourceY == file);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.Matrix.Records, Is.Not.Empty);
+                Assert.That(fileRow, Is.Not.Null);
+                Assert.That(fileRow?.Values.First().SourceY.QueryDisplayShortName(), Is.EqualTo("geometry.stp"));
+            });
 
             vm.Dispose();
         }

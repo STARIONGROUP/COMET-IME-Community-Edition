@@ -49,7 +49,8 @@ namespace CDP4Composition
             ClassKind.ParametricConstraint,
             ClassKind.RequirementsSpecification,
             ClassKind.RequirementsGroup,
-            ClassKind.Requirement
+            ClassKind.Requirement,
+            ClassKind.File
         };
     }
 }

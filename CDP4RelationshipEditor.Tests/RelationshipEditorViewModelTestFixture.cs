@@ -28,6 +28,7 @@ namespace CDP4RelationshipEditor.Tests
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Windows;
 
     using CDP4Common.CommonData;
@@ -35,15 +36,23 @@ namespace CDP4RelationshipEditor.Tests
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4RelationshipEditor.ViewModels;
+
+    using CommonServiceLocator;
+
+    using DevExpress.Xpf.Diagram;
 
     using Moq;
 
@@ -56,6 +65,8 @@ namespace CDP4RelationshipEditor.Tests
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IMessageBoxService> messageBoxService;
         private Mock<IDropInfo> dropinfo;
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
@@ -79,6 +90,11 @@ namespace CDP4RelationshipEditor.Tests
             this.assembler = new Assembler(this.uri, this.messageBus);
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+
+            this.messageBoxService = new Mock<IMessageBoxService>();
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dropinfo = new Mock<IDropInfo>();
@@ -123,6 +139,27 @@ namespace CDP4RelationshipEditor.Tests
         public void TearDown()
         {
             this.messageBus.ClearSubscriptions();
+        }
+
+        [Test]
+        [Apartment(ApartmentState.STA)]
+        public void VerifyThatRelationshipToCommonFileStoreFileIsBlocked()
+        {
+            // A CommonFileStore file lives in the EngineeringModel partition, so it cannot be a relationship endpoint (see GitHub issue #1490)
+            var commonFileStore = new CommonFileStore(Guid.NewGuid(), this.cache, this.uri) { Container = this.model };
+            this.model.CommonFileStore.Add(commonFileStore);
+            var file = new File(Guid.NewGuid(), this.cache, this.uri) { Container = commonFileStore };
+            commonFileStore.File.Add(file);
+
+            var viewModel = new RelationshipEditorViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null)
+            {
+                SelectedItems = new ReactiveList<DiagramItem> { new NamedThingDiagramContentItem(file, this.messageBus) }
+            };
+
+            viewModel.CreateMultiRelationshipCommandExecute();
+
+            this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), "Cannot create relationship", MessageBoxButton.OK, MessageBoxImage.Warning), Times.Once);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
         }
 
         [Test]

@@ -26,6 +26,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -43,6 +44,8 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CommonServiceLocator;
 
+    using ReactiveUI;
+
     /// <summary>
     /// The folder row view model.
     /// </summary>
@@ -59,7 +62,12 @@ namespace CDP4EngineeringModel.ViewModels
         private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FolderRowViewModel"/> class. 
+        /// Backing field for the <see cref="CreationDate"/> property
+        /// </summary>
+        private string creationDate;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FolderRowViewModel"/> class.
         /// </summary>
         /// <param name="folder">
         /// The <see cref="Folder"/> associated with this row
@@ -77,6 +85,16 @@ namespace CDP4EngineeringModel.ViewModels
             : base(folder, session, containerViewModel)
         {
             this.parentFileStoreFileAndFolderHandler = parentFileStoreFileAndFolderHandler;
+            this.UpdateCreationDate();
+        }
+
+        /// <summary>
+        /// Gets the date of creation of the <see cref="Folder"/>, formatted consistently with the other file-store rows
+        /// </summary>
+        public string CreationDate
+        {
+            get => this.creationDate;
+            private set => this.RaiseAndSetIfChanged(ref this.creationDate, value);
         }
 
         /// <summary>
@@ -98,7 +116,16 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+            this.UpdateCreationDate();
             this.parentFileStoreFileAndFolderHandler?.UpdateFolderRowPosition(this.Thing);
+        }
+
+        /// <summary>
+        /// Updates the <see cref="CreationDate"/> property from the <see cref="Folder"/>'s creation date
+        /// </summary>
+        private void UpdateCreationDate()
+        {
+            this.CreationDate = this.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture);
         }
 
         /// <summary>

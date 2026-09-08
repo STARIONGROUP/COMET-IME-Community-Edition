@@ -13,6 +13,7 @@ namespace CDP4RelationshipMatrix.Converters
     using System.Windows.Data;
     using CDP4Common.CommonData;
     using DevExpress.Xpf.Grid;
+    using Settings;
     using ViewModels;
 
     /// <summary>
@@ -72,7 +73,14 @@ namespace CDP4RelationshipMatrix.Converters
         {
             var matrixCellViewModel = row[fieldName];
 
-            return matrixCellViewModel?.SourceY is DefinedThing definedThing ? typeof(DefinedThing).GetProperty(matrixCellViewModel.DisplayKind.ToString()).GetValue(matrixCellViewModel.SourceY) : "-";
+            if (matrixCellViewModel?.SourceY == null)
+            {
+                return "-";
+            }
+
+            return matrixCellViewModel.DisplayKind == DisplayKind.Name
+                ? matrixCellViewModel.SourceY.QueryDisplayName()
+                : matrixCellViewModel.SourceY.QueryDisplayShortName();
         }
 
         /// <summary>

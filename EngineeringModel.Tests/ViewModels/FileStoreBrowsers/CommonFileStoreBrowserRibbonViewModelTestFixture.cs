@@ -40,6 +40,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.ViewModels;
@@ -160,6 +161,22 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
                 this.pluginSettingsService.Object);
 
             Assert.IsInstanceOf<CommonFileStoreBrowserViewModel>(viewmodel);
+        }
+
+        [Test]
+        public void VerifyThatModelMenuGroupIsRemovedWhenModelIsClosed()
+        {
+            var viewmodel = new CommonFileStoreBrowserRibbonViewModel(this.messageBus);
+
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendObjectChangeEvent(this.model, EventKind.Added);
+
+            Assert.That(viewmodel.EngineeringModels, Has.Count.EqualTo(1));
+
+            // Closing the model removes the EngineeringModel; the ribbon must then close its panels and drop the menu group (see GitHub issue #1381)
+            this.messageBus.SendObjectChangeEvent(this.model, EventKind.Removed);
+
+            Assert.That(viewmodel.EngineeringModels, Is.Empty);
         }
     }
 }

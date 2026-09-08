@@ -266,5 +266,34 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             vm.SelectedLockedBy = otherPerson;
             Assert.IsFalse(vm.OkCanExecute);
         }
+
+        [Test]
+        public void VerifyThatOwnerIsPopulatedForFileInCommonFileStore()
+        {
+            // A CommonFileStore hangs off the EngineeringModel, so its File has no Iteration container.
+            // Session.QueryDomainOfExpertise dereferences a null Iteration - simulate that here (see GitHub issue #1490).
+            this.session.Setup(x => x.QueryDomainOfExpertise(null)).Throws<NullReferenceException>();
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.Is<Iteration>(i => i != null))).Returns(new[] { this.domain });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.Is<Iteration>(i => i != null))).Returns(this.domain);
+
+            var commonFileStore = new CommonFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.model };
+            this.model.CommonFileStore.Add(commonFileStore);
+            var commonFileStoreClone = commonFileStore.Clone(false);
+            var newFile = new File(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(commonFileStore);
+            var transaction = new ThingTransaction(transactionContext, commonFileStoreClone);
+
+            FileDialogViewModel vm = null;
+
+            Assert.DoesNotThrow(() =>
+                vm = new FileDialogViewModel(newFile, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, commonFileStoreClone));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.PossibleOwner, Is.Not.Empty);
+                Assert.That(vm.SelectedOwner, Is.EqualTo(this.domain));
+            });
+        }
     }
 }

@@ -28,6 +28,7 @@ namespace CDP4Composition.Extensions
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -73,6 +74,33 @@ namespace CDP4Composition.Extensions
             }
 
             return allowedOwners.OrderBy(domain => domain.Name).ToList();
+        }
+
+        /// <summary>
+        /// Resolves the <see cref="Iteration"/> to use when querying the allowed owner <see cref="DomainOfExpertise"/>s
+        /// of an <see cref="IOwnedThing"/> whose <paramref name="container"/> is a <see cref="FileStore"/> or a
+        /// <see cref="Folder"/> nested in one.
+        /// </summary>
+        /// <param name="session">
+        /// The <see cref="ISession"/> whose open <see cref="Iteration"/>s are inspected for the <see cref="CommonFileStore"/> case.
+        /// </param>
+        /// <param name="container">
+        /// The container <see cref="Thing"/> of the edited <see cref="IOwnedThing"/>.
+        /// </param>
+        /// <returns>
+        /// The owning <see cref="Iteration"/>, or an open <see cref="Iteration"/> of the containing
+        /// <see cref="EngineeringModel"/> when the thing lives in a <see cref="CommonFileStore"/>; null if none can be resolved.
+        /// </returns>
+        /// <remarks>
+        /// Things in a <see cref="DomainFileStore"/> are contained (indirectly) by an <see cref="Iteration"/>, but things in a
+        /// <see cref="CommonFileStore"/> are contained by the <see cref="EngineeringModel"/> directly, so no <see cref="Iteration"/>
+        /// is found by walking the containers. In that case an open <see cref="Iteration"/> of the model is used, since the allowed
+        /// owners of a <see cref="Participant"/> are the same for every <see cref="Iteration"/> of the model. See GitHub issue #1490.
+        /// </remarks>
+        public static Iteration QueryOwnedThingIteration(this ISession session, Thing container)
+        {
+            return container.GetContainerOfType<Iteration>()
+                   ?? container.GetContainerOfType<EngineeringModel>()?.Iteration.FirstOrDefault(session.OpenIterations.ContainsKey);
         }
     }
 }

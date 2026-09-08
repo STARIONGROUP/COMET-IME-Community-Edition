@@ -48,6 +48,7 @@ namespace CDP4RelationshipEditor.ViewModels
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -55,6 +56,8 @@ namespace CDP4RelationshipEditor.ViewModels
 
     using CDP4RelationshipEditor.Controls;
     using CDP4RelationshipEditor.Helpers;
+
+    using CommonServiceLocator;
 
     using DevExpress.Xpf.Diagram;
 
@@ -69,6 +72,11 @@ namespace CDP4RelationshipEditor.ViewModels
         /// Backing field for <see cref="ThingDiagramItems"/>
         /// </summary>
         private ReactiveList<object> thingDiagramItems;
+
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to warn about invalid relationship endpoints
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService;
 
         /// <summary>
         /// Backing field for <see cref="SelectedItems"/>
@@ -122,6 +130,8 @@ namespace CDP4RelationshipEditor.ViewModels
         {
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+
+            this.messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
             this.AddSubscriptions();
             this.UpdateProperties();
@@ -381,6 +391,37 @@ namespace CDP4RelationshipEditor.ViewModels
         }
 
         /// <summary>
+        /// Asserts whether all <paramref name="things"/> can be used as endpoints of a relationship created in this editor's <see cref="Iteration"/>,
+        /// showing a friendly message and returning false when one of them cannot.
+        /// </summary>
+        /// <param name="things">The <see cref="Thing"/>s that would become the source/target/related things of the relationship.</param>
+        /// <returns>true when every <see cref="Thing"/> is a valid endpoint; otherwise false.</returns>
+        /// <remarks>
+        /// A <see cref="BinaryRelationship"/>/<see cref="MultiRelationship"/> is contained by the <see cref="Iteration"/> and the data-source
+        /// requires its endpoints to live in the same iteration partition. A <see cref="File"/> of a <see cref="CommonFileStore"/> lives in the
+        /// EngineeringModel partition instead, so relating it fails server-side with a foreign-key error; catch that here (see GitHub issue #1490).
+        /// </remarks>
+        private bool AreValidRelationshipEndpoints(IReadOnlyList<Thing> things)
+        {
+            var invalidThing = things.FirstOrDefault(thing => thing.GetContainerOfType<Iteration>() == null);
+
+            if (invalidThing == null)
+            {
+                return true;
+            }
+
+            var invalidThingName = invalidThing is File file ? file.CurrentFileRevision?.Name : invalidThing.UserFriendlyName;
+
+            this.messageBoxService.Show(
+                $"'{invalidThingName}' cannot be linked in a relationship because it is not part of the iteration. Files in a Common File Store are stored at the model level; move the file to a Domain File Store to relate it.",
+                "Cannot create relationship",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            return false;
+        }
+
+        /// <summary>
         /// Creates a <see cref="MultiRelationship"/>
         /// </summary>
         /// <param name="rule">
@@ -399,6 +440,13 @@ namespace CDP4RelationshipEditor.ViewModels
         /// <param name="rule">The <see cref="MultiRelationshipRule"/> that defines this relationship.</param>
         private async void CreateMultiRelationship(IEnumerable<Thing> relatableThings, MultiRelationshipRule rule)
         {
+            var relatableThingList = relatableThings.ToList();
+
+            if (!this.AreValidRelationshipEndpoints(relatableThingList))
+            {
+                return;
+            }
+
             // send off the relationship
             Tuple<DomainOfExpertise, Participant> tuple;
             this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
@@ -415,7 +463,7 @@ namespace CDP4RelationshipEditor.ViewModels
 
             multiRelationship.Container = iteration;
 
-            multiRelationship.RelatedThing = relatableThings.ToList();
+            multiRelationship.RelatedThing = relatableThingList;
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
 
@@ -461,6 +509,13 @@ namespace CDP4RelationshipEditor.ViewModels
             }
 
             if (beginItemContent.Thing == endItemContent.Thing)
+            {
+                this.Behavior.RemoveItem(connector);
+                this.Behavior.ResetTool();
+                return;
+            }
+
+            if (!this.AreValidRelationshipEndpoints(new[] { beginItemContent.Thing, endItemContent.Thing }))
             {
                 this.Behavior.RemoveItem(connector);
                 this.Behavior.ResetTool();
