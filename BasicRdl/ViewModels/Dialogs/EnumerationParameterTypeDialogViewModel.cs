@@ -111,6 +111,18 @@ namespace BasicRdl.ViewModels
         }
 
         /// <summary>
+        /// Update the transaction with the <see cref="EnumerationParameterType"/> represented by this dialog
+        /// </summary>
+        protected override void UpdateTransaction()
+        {
+            var orderedItems = this.Thing.ValueDefinition.SortedItems.Values.ToList();
+
+            base.UpdateTransaction();
+
+            this.RestoreSortKeysOfDeletedItems(this.Thing.ValueDefinition, orderedItems);
+        }
+
+        /// <summary>
         /// Updates the <see cref="DialogViewModelBase{T}.OkCanExecute"/> property using validation rules
         /// </summary>
         protected override void UpdateOkCanExecute()

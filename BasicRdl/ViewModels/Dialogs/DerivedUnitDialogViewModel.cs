@@ -200,7 +200,11 @@ namespace BasicRdl.ViewModels
         /// </summary>
         protected override void UpdateTransaction()
         {
+            var orderedItems = this.Thing.UnitFactor.SortedItems.Values.ToList();
+
             base.UpdateTransaction();
+
+            this.RestoreSortKeysOfDeletedItems(this.Thing.UnitFactor, orderedItems);
 
             var containerRdl = this.Container as ReferenceDataLibrary;
 

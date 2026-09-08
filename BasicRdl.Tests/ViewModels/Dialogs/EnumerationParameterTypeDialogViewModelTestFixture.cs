@@ -183,5 +183,106 @@ namespace BasicRdl.Tests.ViewModels
             await this.viewmodel.InspectValueDefinitionCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<EnumerationValueDefinition>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        public async Task VerifyThatDeletingAValueDefinitionDoesNotReorderTheRemainingOnes(int indexToDelete)
+        {
+            var dialog = this.CreateCachedEnumerationParameterTypeDialog(out var parameterTypeClone, out var valueDefinitions);
+
+            var expectedSortKeys = parameterTypeClone.ValueDefinition.SortedItems.Select(x => new { x.Key, x.Value.Iid }).ToList();
+            var deletedValueDefinition = valueDefinitions[indexToDelete];
+
+            dialog.SelectedValueDefinition = dialog.ValueDefinition.Single(x => x.Thing == deletedValueDefinition);
+            await dialog.DeleteValueDefinitionCommand.Execute();
+
+            // the generated Delete command delivers its handler asynchronously, wait for the row of the deleted EnumerationValueDefinition to disappear
+            Assert.That(() => dialog.ValueDefinition.Select(x => x.Thing).Contains(deletedValueDefinition), Is.False.After(2000, 25), "the EnumerationValueDefinition was not deleted");
+
+            await dialog.OkCommand.Execute();
+
+            // the sort keys of the OrderedItemList may not change, a reordered EnumerationValueDefinition that is deleted in the
+            // same transaction cannot be resolved by the data-source, see https://github.com/STARIONGROUP/COMET-IME-Community-Edition/issues/1475
+            Assert.That(parameterTypeClone.ValueDefinition.SortedItems.Select(x => new { x.Key, x.Value.Iid }).ToList(), Is.EqualTo(expectedSortKeys));
+        }
+
+        [Test]
+        public async Task VerifyThatReorderingAfterADeleteKeepsTheSortKeyOfTheDeletedValueDefinition()
+        {
+            var dialog = this.CreateCachedEnumerationParameterTypeDialog(out var parameterTypeClone, out var valueDefinitions);
+
+            var sortKeys = parameterTypeClone.ValueDefinition.SortedItems.Keys.ToList();
+            var deletedValueDefinition = valueDefinitions[1];
+
+            dialog.SelectedValueDefinition = dialog.ValueDefinition.Single(x => x.Thing == deletedValueDefinition);
+            await dialog.DeleteValueDefinitionCommand.Execute();
+
+            Assert.That(() => dialog.ValueDefinition.Select(x => x.Thing).Contains(deletedValueDefinition), Is.False.After(2000, 25), "the EnumerationValueDefinition was not deleted");
+
+            dialog.SelectedValueDefinition = dialog.ValueDefinition.Single(x => x.Thing == valueDefinitions[2]);
+            await dialog.MoveUpValueDefinitionCommand.Execute();
+
+            Assert.That(() => dialog.ValueDefinition.First().Thing, Is.EqualTo(valueDefinitions[2]).After(2000, 25), "the EnumerationValueDefinition was not moved up");
+
+            await dialog.OkCommand.Execute();
+
+            // the deleted EnumerationValueDefinition keeps its sort key, the remaining ones are laid out over the other sort keys
+            // in the order in which they appear in the dialog
+            var expected = new[]
+            {
+                new { Key = sortKeys[0], valueDefinitions[2].Iid },
+                new { Key = sortKeys[1], deletedValueDefinition.Iid },
+                new { Key = sortKeys[2], valueDefinitions[0].Iid }
+            };
+
+            Assert.That(parameterTypeClone.ValueDefinition.SortedItems.Select(x => new { x.Key, x.Value.Iid }).ToList(), Is.EqualTo(expected));
+        }
+
+        /// <summary>
+        /// Creates a <see cref="EnumerationParameterTypeDialogViewModel"/> in Update mode for a cached <see cref="EnumerationParameterType"/>
+        /// that contains three <see cref="EnumerationValueDefinition"/>s. The <see cref="Thing"/>s are present in the cache, this makes the
+        /// <see cref="ThingTransaction"/> record them as updates and deletes, as it does when the dialog is opened from a browser.
+        /// </summary>
+        /// <param name="parameterTypeClone">
+        /// The clone of the <see cref="EnumerationParameterType"/> that is the subject of the returned dialog view-model
+        /// </param>
+        /// <param name="valueDefinitions">
+        /// The original <see cref="EnumerationValueDefinition"/>s, in the order in which they are contained by the <see cref="EnumerationParameterType"/>
+        /// </param>
+        /// <returns>
+        /// The <see cref="EnumerationParameterTypeDialogViewModel"/>
+        /// </returns>
+        private EnumerationParameterTypeDialogViewModel CreateCachedEnumerationParameterTypeDialog(out EnumerationParameterType parameterTypeClone, out List<EnumerationValueDefinition> valueDefinitions)
+        {
+            var uri = new Uri("http://test.com");
+            var cache = new Assembler(uri, new CDPMessageBus()).Cache;
+
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), cache, uri) { Name = "cachedRDL", ShortName = "cachedRDL", Container = this.siteDir };
+            var parameterType = new EnumerationParameterType(Guid.NewGuid(), cache, uri) { Name = "enumeration", ShortName = "enumeration", Symbol = "-" };
+
+            valueDefinitions = new[] { "first", "middle", "last" }
+                .Select(name => new EnumerationValueDefinition(Guid.NewGuid(), cache, uri) { Name = name, ShortName = name })
+                .ToList();
+
+            foreach (var valueDefinition in valueDefinitions)
+            {
+                parameterType.ValueDefinition.Add(valueDefinition);
+            }
+
+            rdl.ParameterType.Add(parameterType);
+            this.siteDir.SiteReferenceDataLibrary.Add(rdl);
+
+            foreach (var thing in new Thing[] { rdl, parameterType }.Concat(valueDefinitions))
+            {
+                cache.TryAdd(thing.CacheKey, new Lazy<Thing>(() => thing));
+            }
+
+            var rdlClone = rdl.Clone(false);
+            parameterTypeClone = parameterType.Clone(false);
+            var thingTransaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.siteDir), rdlClone);
+
+            return new EnumerationParameterTypeDialogViewModel(parameterTypeClone, thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, rdlClone);
+        }
     }
 }

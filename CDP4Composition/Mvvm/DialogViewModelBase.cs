@@ -37,9 +37,11 @@ namespace CDP4Composition.Mvvm
     using System.Threading.Tasks;
     using System.Windows;
 
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.Exceptions;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Common.Validation;
 
     using CDP4Composition.Navigation;
@@ -734,6 +736,46 @@ namespace CDP4Composition.Mvvm
             }
 
             orderedList.Move(selectedIndex, selectedIndex + 1);
+        }
+
+        /// <summary>
+        /// Restores the position, and therefore the sort key, of the <see cref="Thing"/>s that are marked for deletion in an
+        /// <see cref="OrderedItemList{T}"/> that has been reordered
+        /// </summary>
+        /// <typeparam name="TItem">
+        /// The type of <see cref="Thing"/> that is contained by the <see cref="OrderedItemList{T}"/>
+        /// </typeparam>
+        /// <param name="orderedItemList">
+        /// The <see cref="OrderedItemList{T}"/> of the clone that has been reordered
+        /// </param>
+        /// <param name="originalOrder">
+        /// The content of the <paramref name="orderedItemList"/> as it was before it was reordered
+        /// </param>
+        /// <remarks>
+        /// A <see cref="Thing"/> that is marked for deletion is not represented by a row, it does however remain part of the
+        /// <see cref="OrderedItemList{T}"/> of the clone: <see cref="ThingTransaction.Delete"/> leaves the removal on the original
+        /// container to the data-source. Applying the order of the rows assigns such an item a new sort key, which the data-source
+        /// cannot resolve for a <see cref="Thing"/> that is deleted in the same transaction. Moving it back to the position that it
+        /// had restores its sort key, the reordered rows keep their new relative order and are laid out over the other positions.
+        /// </remarks>
+        protected void RestoreSortKeysOfDeletedItems<TItem>(OrderedItemList<TItem> orderedItemList, IReadOnlyList<TItem> originalOrder) where TItem : Thing
+        {
+            for (var i = 0; i < originalOrder.Count; i++)
+            {
+                var item = originalOrder[i];
+
+                if (item.ChangeKind != ChangeKind.Delete)
+                {
+                    continue;
+                }
+
+                var currentIndex = orderedItemList.IndexOf(item);
+
+                if (currentIndex > -1 && currentIndex != i)
+                {
+                    orderedItemList.Move(currentIndex, i);
+                }
+            }
         }
 
         /// <summary>
