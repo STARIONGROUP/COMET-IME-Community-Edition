@@ -175,7 +175,9 @@ namespace CDP4Reporting.Utilities
         /// Normalizes a numeric value <see cref="string"/> to the invariant culture using the SDK's
         /// ECSS-E-TM-10-25 aware <see cref="ValueSetConverter.TryParseDouble"/>, so that values coming from a
         /// report control that are formatted with group separators (e.g. an "N2" formatted value) are written
-        /// back to the model correctly. Non-numeric <see cref="ParameterType"/>s and the default "-" marker are
+        /// back to the model correctly. When the SDK cannot parse the value (a current-culture format that combines
+        /// a group and a decimal separator, e.g. nl-NL "1.234,56"), it is parsed with <see cref="NumberStyles.Any"/>
+        /// in the current culture as a fallback. Non-numeric <see cref="ParameterType"/>s and the default "-" marker are
         /// returned unchanged; validation of the result is left to the SDK's
         /// <see cref="ValueValidator.Validate(ParameterType, object, MeasurementScale, IFormatProvider)"/>.
         /// </summary>
@@ -197,6 +199,11 @@ namespace CDP4Reporting.Utilities
             }
 
             if (ValueSetConverter.TryParseDouble(value, parameterType, out var doubleValue))
+            {
+                return doubleValue.ToString(CultureInfo.InvariantCulture);
+            }
+
+            if (double.TryParse(value, NumberStyles.Any, CultureInfo.CurrentCulture, out doubleValue))
             {
                 return doubleValue.ToString(CultureInfo.InvariantCulture);
             }

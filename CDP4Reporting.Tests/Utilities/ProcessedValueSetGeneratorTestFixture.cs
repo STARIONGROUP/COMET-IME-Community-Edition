@@ -26,6 +26,7 @@
 namespace CDP4Reporting.Tests.DataCollection
 {
     using System;
+    using System.Globalization;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -177,6 +178,27 @@ namespace CDP4Reporting.Tests.DataCollection
             var result = this.processedValueSetGenerator.NormalizeNumericValue("1,234.56", quantityKind);
 
             Assert.That(result, Is.EqualTo("1234.56"));
+        }
+
+        [Test]
+        public void VerifyThatCurrentCultureGroupSeparatedNumberIsNormalized()
+        {
+            var currentCulture = CultureInfo.CurrentCulture;
+
+            try
+            {
+                // nl-NL uses "." as group separator and "," as decimal separator, as an "N2" formatted report value would produce
+                CultureInfo.CurrentCulture = new CultureInfo("nl-NL");
+
+                var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+                var result = this.processedValueSetGenerator.NormalizeNumericValue("1.234,56", quantityKind);
+
+                Assert.That(result, Is.EqualTo("1234.56"));
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = currentCulture;
+            }
         }
 
         [Test]
