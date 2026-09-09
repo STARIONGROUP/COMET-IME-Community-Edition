@@ -156,9 +156,9 @@ namespace CDP4Requirements.ViewModels
                 this.Iterations.Add(new ReqIfExportIterationRowViewModel(iteration));
             }
 
-            this.WhenAnyValue(vm => vm.SelectedIteration).Subscribe(_ => this.PopulateRequirementsSpecifications());
+            this.Subscriptions.Add(this.WhenAnyValue(vm => vm.SelectedIteration).Subscribe(_ => this.PopulateRequirementsSpecifications()));
 
-            this.WhenAnyValue(vm => vm.IncludeDeprecated).Subscribe(_ => this.PopulateRequirementsSpecifications());
+            this.Subscriptions.Add(this.WhenAnyValue(vm => vm.IncludeDeprecated).Subscribe(_ => this.PopulateRequirementsSpecifications()));
 
             var canOk = this.WhenAnyValue(
                 vm => vm.Path,
@@ -171,11 +171,11 @@ namespace CDP4Requirements.ViewModels
 
             this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteOk, canOk);
 
-            this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(
+            this.Subscriptions.Add(this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(
                 x =>
             {
                 this.ErrorMessage = x.Message;
-            });
+            }));
 
             this.BrowseCommand = ReactiveCommandCreator.Create(this.ExecuteBrowse);
 
@@ -185,11 +185,11 @@ namespace CDP4Requirements.ViewModels
 
             this.CancelReqIfCommand = ReactiveCommandCreator.Create();
 
-            this.CancelReqIfCommand.Subscribe(_ =>
+            this.Subscriptions.Add(this.CancelReqIfCommand.Subscribe(_ =>
             {
                 this.cancellationTokenSource?.Cancel();
                 this.LoadingMessage = "Cancelling...";
-            });
+            }));
         }
 
         /// <summary>

@@ -58,10 +58,10 @@ namespace CDP4Requirements.Tests.ReqIF
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(AttributeDefinitionMapKind.FIRST_DEFINITION, new AttributeDefinitionMappingRowViewModel(textDefinition, null, () => { }).AttributeDefinitionMapKind);
-                Assert.AreEqual(AttributeDefinitionMapKind.NAME, new AttributeDefinitionMappingRowViewModel(nameDefinition, null, () => { }).AttributeDefinitionMapKind);
-                Assert.AreEqual(AttributeDefinitionMapKind.SHORTNAME, new AttributeDefinitionMappingRowViewModel(foreignIdDefinition, null, () => { }).AttributeDefinitionMapKind);
-                Assert.AreEqual(AttributeDefinitionMapKind.NONE, new AttributeDefinitionMappingRowViewModel(otherDefinition, null, () => { }).AttributeDefinitionMapKind);
+                Assert.That(new AttributeDefinitionMappingRowViewModel(textDefinition, null, () => { }).AttributeDefinitionMapKind, Is.EqualTo(AttributeDefinitionMapKind.FIRST_DEFINITION));
+                Assert.That(new AttributeDefinitionMappingRowViewModel(nameDefinition, null, () => { }).AttributeDefinitionMapKind, Is.EqualTo(AttributeDefinitionMapKind.NAME));
+                Assert.That(new AttributeDefinitionMappingRowViewModel(foreignIdDefinition, null, () => { }).AttributeDefinitionMapKind, Is.EqualTo(AttributeDefinitionMapKind.SHORTNAME));
+                Assert.That(new AttributeDefinitionMappingRowViewModel(otherDefinition, null, () => { }).AttributeDefinitionMapKind, Is.EqualTo(AttributeDefinitionMapKind.NONE));
             });
         }
     }

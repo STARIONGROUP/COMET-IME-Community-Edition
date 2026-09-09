@@ -691,24 +691,43 @@ namespace CDP4Requirements.ReqIFDal
         }
 
         /// <summary>
-        /// Converts an XHTML (rich-text) attribute value to readable plain text. Line-breaking elements become new
-        /// lines, the remaining tags are removed and the XML/HTML entities are decoded. This keeps the textual content
-        /// of DOORS/Capella (and other) XHTML attributes instead of importing the raw markup.
+        /// Matches <c>script</c> and <c>style</c> elements together with their content so their body is not leaked into the text
+        /// </summary>
+        private static readonly Regex ScriptOrStyleElementRegex = new Regex(@"<\s*(?:[a-zA-Z]+:)?(script|style)\b[^>]*>.*?<\s*/\s*(?:[a-zA-Z]+:)?\1\s*>", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Matches the line-breaking elements (with or without an xhtml prefix, opening or closing) that should become new lines
+        /// </summary>
+        private static readonly Regex LineBreakingElementRegex = new Regex(@"<\s*/?\s*(?:[a-zA-Z]+:)?(?:br|p|div|li|tr)(?:\s[^>]*)?/?\s*>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Matches any remaining markup tag
+        /// </summary>
+        private static readonly Regex RemainingTagRegex = new Regex("<[^>]+>", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Converts an XHTML (rich-text) attribute value to readable plain text. <c>script</c>/<c>style</c> elements are
+        /// dropped with their content, line-breaking elements become new lines, the remaining tags are removed and the
+        /// XML/HTML entities are decoded. This keeps the textual content of DOORS/Capella (and other) XHTML attributes
+        /// instead of importing the raw markup.
         /// </summary>
         /// <param name="xhtml">The XHTML markup</param>
         /// <returns>The plain-text representation</returns>
-        internal static string ConvertXhtmlToText(string xhtml)
+        private static string ConvertXhtmlToText(string xhtml)
         {
             if (string.IsNullOrEmpty(xhtml))
             {
                 return xhtml;
             }
 
-            // turn line-breaking elements (with or without an xhtml prefix, opening or closing) into new lines
-            var text = Regex.Replace(xhtml, @"<\s*/?\s*(?:[a-zA-Z]+:)?(?:br|p|div|li|tr)(?:\s[^>]*)?/?\s*>", "\n", RegexOptions.IgnoreCase);
+            // drop script/style elements together with their content
+            var text = ScriptOrStyleElementRegex.Replace(xhtml, string.Empty);
+
+            // turn line-breaking elements into new lines
+            text = LineBreakingElementRegex.Replace(text, "\n");
 
             // remove any remaining tags
-            text = Regex.Replace(text, "<[^>]+>", string.Empty);
+            text = RemainingTagRegex.Replace(text, string.Empty);
 
             // decode XML/HTML entities such as &amp; and &lt;
             text = WebUtility.HtmlDecode(text);

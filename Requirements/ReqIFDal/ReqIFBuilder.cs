@@ -723,45 +723,5 @@ namespace CDP4Requirements.ReqIFDal
         {
             //TODO
         }
-
-        /// <summary>
-        /// Compares two sets of <see cref="ParameterizedCategoryRule"/>s for equality, ignoring order, so that
-        /// requirements can be grouped by their applied rule-set.
-        /// </summary>
-        private sealed class RuleSetEqualityComparer : IEqualityComparer<ParameterizedCategoryRule[]>
-        {
-            /// <summary>
-            /// Determines whether two rule-sets contain the same rules, regardless of order.
-            /// </summary>
-            /// <param name="x">The first rule-set</param>
-            /// <param name="y">The second rule-set</param>
-            /// <returns>True if both rule-sets contain the same rules</returns>
-            public bool Equals(ParameterizedCategoryRule[] x, ParameterizedCategoryRule[] y)
-            {
-                if (x == null || y == null)
-                {
-                    return x == y;
-                }
-
-                return x.Length == y.Length && !x.Except(y).Any();
-            }
-
-            /// <summary>
-            /// Returns an order-independent hash-code for a rule-set.
-            /// </summary>
-            /// <param name="obj">The rule-set</param>
-            /// <returns>The hash-code</returns>
-            public int GetHashCode(ParameterizedCategoryRule[] obj)
-            {
-                var hash = 0;
-
-                foreach (var rule in obj)
-                {
-                    hash ^= rule.Iid.GetHashCode();
-                }
-
-                return hash;
-            }
-        }
     }
 }

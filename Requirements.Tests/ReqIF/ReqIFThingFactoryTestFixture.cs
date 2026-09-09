@@ -165,10 +165,10 @@ namespace CDP4Requirements.Tests.ReqIF
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(1, factory.RelationGroupMap.Count);
-                Assert.AreEqual(1, factory.SpecRelationMap.Count);
-                Assert.AreEqual(2, factory.SpecificationMap.Count);
-                Assert.IsTrue(factory.SpecificationMap.All(x => x.Value.Requirement.Count == 1));
+                Assert.That(factory.RelationGroupMap, Has.Count.EqualTo(1));
+                Assert.That(factory.SpecRelationMap, Has.Count.EqualTo(1));
+                Assert.That(factory.SpecificationMap, Has.Count.EqualTo(2));
+                Assert.That(factory.SpecificationMap.All(x => x.Value.Requirement.Count == 1), Is.True);
             });
 
             var reqSpec1 = factory.SpecificationMap[this.specification1];
@@ -181,46 +181,65 @@ namespace CDP4Requirements.Tests.ReqIF
 
             Assert.Multiple(() =>
             {
-                Assert.AreSame(specificationRelationship.Source, reqSpec1);
-                Assert.AreSame(specificationRelationship.Target, reqSpec2);
-                Assert.AreSame(reqRelatinoship.Source, req1);
-                Assert.AreSame(reqRelatinoship.Target, req2);
+                Assert.That(reqSpec1, Is.SameAs(specificationRelationship.Source));
+                Assert.That(reqSpec2, Is.SameAs(specificationRelationship.Target));
+                Assert.That(req1, Is.SameAs(reqRelatinoship.Source));
+                Assert.That(req2, Is.SameAs(reqRelatinoship.Target));
 
-                Assert.IsNotEmpty(req1.Definition);
-                Assert.IsNotEmpty(req2.Definition);
+                Assert.That(req1.Definition, Is.Not.Empty);
+                Assert.That(req2.Definition, Is.Not.Empty);
 
-                Assert.AreEqual(reqSpec1.Name, this.specValue1.TheValue);
-                Assert.AreEqual(reqSpec2.Name, this.specValue2.TheValue);
+                Assert.That(this.specValue1.TheValue, Is.EqualTo(reqSpec1.Name));
+                Assert.That(this.specValue2.TheValue, Is.EqualTo(reqSpec2.Name));
             });
 
             var parameterValue = reqRelatinoship.ParameterValue.Single();
-            Assert.AreEqual(parameterValue.Value[0], this.specrelationValue.TheValue);
+            Assert.That(this.specrelationValue.TheValue, Is.EqualTo(parameterValue.Value[0]));
 
             //todo to complete
         }
 
         [Test]
-        public void VerifyThatXhtmlAttributeValuesAreConvertedToPlainText()
+        public void VerifyThatXhtmlRequirementTextIsImportedAsPlainText()
         {
-            // the plain-namespace form that the COMET exporter produces
-            Assert.AreEqual("Hello & welcome", ThingFactory.ConvertXhtmlToText("<div xmlns=\"http://www.w3.org/1999/xhtml\">Hello &amp; welcome</div>"));
+            // a DOORS/Capella-style rich-text (XHTML) requirement value must import as readable plain text, not raw markup:
+            // entities are decoded, inline tags removed, line-breaking elements become new lines and script/style are dropped
+            var xhtmlDatatype = new DatatypeDefinitionXHTML();
+            var reqXhtmlAttribute = new AttributeDefinitionXHTML { DatatypeDefinition = xhtmlDatatype };
+            this.specobjecttype.SpecAttributes.Add(reqXhtmlAttribute);
 
-            // a DOORS-style, prefixed and formatted value must import as readable text, not as raw markup
-            var doorsStyle = "<xhtml:div><xhtml:p>Line 1<xhtml:br/>Line 2</xhtml:p></xhtml:div>";
-            var converted = ThingFactory.ConvertXhtmlToText(doorsStyle);
+            this.specobject1.Values.Clear();
+            this.specobject1.Values.Add(new AttributeValueXHTML
+            {
+                AttributeDefinition = reqXhtmlAttribute,
+                TheValue = "<xhtml:div><xhtml:p>Hello &amp; <b>welcome</b><xhtml:br/>Line 2</xhtml:p><xhtml:style>.a{color:red}</xhtml:style><xhtml:script>alert('x');</xhtml:script></xhtml:div>"
+            });
+
+            var datatypeMap = new Dictionary<DatatypeDefinition, DatatypeDefinitionMap>
+            {
+                { this.stringDatadef, new DatatypeDefinitionMap(this.stringDatadef, this.pt, null) }
+            };
+
+            var spectypeMap = new Dictionary<SpecType, SpecTypeMap>
+            {
+                { this.specificationtype, new SpecTypeMap(this.specificationtype, null, new[] { this.specCategory }, new[] { new AttributeDefinitionMap(this.specAttribute, AttributeDefinitionMapKind.NAME) }) },
+                { this.specobjecttype, new SpecObjectTypeMap(this.specobjecttype, null, new[] { this.reqCateory }, new[] { new AttributeDefinitionMap(reqXhtmlAttribute, AttributeDefinitionMapKind.FIRST_DEFINITION) }, true) },
+                { this.specrelationtype, new SpecRelationTypeMap(this.specrelationtype, new[] { this.parameterRule }, new[] { this.specRelationCategory }, new[] { new AttributeDefinitionMap(this.specRelationAttribute, AttributeDefinitionMapKind.PARAMETER_VALUE) }, new[] { this.reqRule }) },
+                { this.relationgrouptype, new RelationGroupTypeMap(this.relationgrouptype, null, new[] { this.relationGroupCategory }, new[] { new AttributeDefinitionMap(this.relationgroupAttribute, AttributeDefinitionMapKind.NONE) }, new[] { this.specRule }) }
+            };
+
+            var factory = new ThingFactory(this.iteration, datatypeMap, spectypeMap, this.domain, this.reqIf.Lang);
+            factory.ComputeRequirementThings(this.reqIf);
+
+            var definitionContent = factory.SpecificationMap[this.specification1].Requirement.Single().Definition.Single().Content;
 
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(converted.Contains("<"), "no raw markup remains");
-                StringAssert.Contains("Line 1", converted);
-                StringAssert.Contains("Line 2", converted);
-
-                // entities are decoded and inline tags removed
-                Assert.AreEqual("a <b> bold", ThingFactory.ConvertXhtmlToText("<div xmlns=\"http://www.w3.org/1999/xhtml\">a &lt;b&gt; <b>bold</b></div>"));
-
-                // null / empty are passed through unchanged
-                Assert.IsNull(ThingFactory.ConvertXhtmlToText(null));
-                Assert.AreEqual(string.Empty, ThingFactory.ConvertXhtmlToText(string.Empty));
+                Assert.That(definitionContent, Does.Contain("Hello & welcome"), "entities are decoded and inline tags removed");
+                Assert.That(definitionContent, Does.Contain("Line 2"), "line-breaking elements are honoured");
+                Assert.That(definitionContent, Does.Not.Contain("<"), "no raw markup remains");
+                Assert.That(definitionContent, Does.Not.Contain("alert"), "the script body is dropped");
+                Assert.That(definitionContent, Does.Not.Contain("color:red"), "the style body is dropped");
             });
         }
 

@@ -169,16 +169,16 @@ namespace CDP4Requirements.Tests.ReqIF
         public void VerifyThatMenuIsPopulated()
         {
             this.dialog.SelectedRow = this.dialog.MappingRows.First(x => x.Identifiable == this.stringDatadef);
-            Assert.AreEqual(4, this.dialog.CreateParameterTypeCommands.Count);
+            Assert.That(this.dialog.CreateParameterTypeCommands, Has.Count.EqualTo(4));
 
             this.dialog.SelectedRow = this.dialog.MappingRows.First(x => x.Identifiable == this.boolDatadef);
-            Assert.AreEqual(1, this.dialog.CreateParameterTypeCommands.Count);
+            Assert.That(this.dialog.CreateParameterTypeCommands, Has.Count.EqualTo(1));
 
             this.dialog.SelectedRow = this.dialog.MappingRows.First(x => x.Identifiable == this.enumDatadef);
-            Assert.AreEqual(1, this.dialog.CreateParameterTypeCommands.Count);
+            Assert.That(this.dialog.CreateParameterTypeCommands, Has.Count.EqualTo(1));
 
             this.dialog.SelectedRow = this.dialog.MappingRows.First(x => x.Identifiable == this.dateDatadef);
-            Assert.AreEqual(3, this.dialog.CreateParameterTypeCommands.Count);
+            Assert.That(this.dialog.CreateParameterTypeCommands, Has.Count.EqualTo(3));
         }
 
         [Test]
@@ -188,11 +188,11 @@ namespace CDP4Requirements.Tests.ReqIF
 
             // the enumeration datatype row itself can create an Enumeration Parameter Type
             this.dialog.SelectedRow = enumRow;
-            Assert.AreEqual(1, this.dialog.CreateParameterTypeCommands.Count);
+            Assert.That(this.dialog.CreateParameterTypeCommands, Has.Count.EqualTo(1));
 
             // but its enum-value child rows (the literals) cannot create a parameter type
             this.dialog.SelectedRow = enumRow.EnumValue.First();
-            Assert.AreEqual(0, this.dialog.CreateParameterTypeCommands.Count);
+            Assert.That(this.dialog.CreateParameterTypeCommands, Has.Count.EqualTo(0));
         }
 
         [Test]
@@ -245,7 +245,7 @@ namespace CDP4Requirements.Tests.ReqIF
             dialog.SelectedRow = dialog.MappingRows.First(x => x.Identifiable == enumDatatypeDefinition);
             dialog.CreateParameterTypeCommands.First().MenuCommand.Execute(null);
 
-            Assert.IsNotNull(capturedParameterType);
+            Assert.That(capturedParameterType, Is.Not.Null);
 
             var shortNamePattern = new Regex("^[a-zA-Z0-9_]+$");
             var shortNames = capturedParameterType.ValueDefinition.Select(x => x.ShortName).ToList();
@@ -279,7 +279,7 @@ namespace CDP4Requirements.Tests.ReqIF
         public async Task VerifyThatCancelCommandWorks()
         {
             await this.dialog.CancelCommand.Execute();
-            Assert.IsFalse(this.dialog.DialogResult.Result.Value);
+            Assert.That(this.dialog.DialogResult.Result.Value, Is.False);
         }
 
         [Test]
@@ -293,7 +293,7 @@ namespace CDP4Requirements.Tests.ReqIF
             }
 
             await this.dialog.NextCommand.Execute();
-            Assert.IsTrue(this.dialog.DialogResult.Result.Value);
+            Assert.That(this.dialog.DialogResult.Result.Value, Is.True);
         }
     }
 }

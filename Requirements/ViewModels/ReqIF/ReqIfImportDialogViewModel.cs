@@ -302,7 +302,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void ExecuteBrowse()
         {
-            var result = this.fileDialogService.GetOpenFileDialog(true, true, false, "ReqIF files (*.reqif, *.reqifz, *.zip)|*.reqif; *.reqifz; *.zip|All Files (*.*)|*.*", ".reqif", this.Path, 1);
+            var result = this.fileDialogService.GetOpenFileDialog(true, true, false, "ReqIF files (*.reqif, *.reqifz, *.zip, *.xml)|*.reqif; *.reqifz; *.zip; *.xml|All Files (*.*)|*.*", ".reqif", this.Path, 1);
             
             if (result == null)
             {
