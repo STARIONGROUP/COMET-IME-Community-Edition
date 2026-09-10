@@ -171,7 +171,7 @@ namespace CDP4Reporting.Utilities
             return true;
         }
 
-        /// <summary>
+          /// <summary>
         /// Normalizes a numeric value <see cref="string"/> to the invariant culture using the SDK's
         /// ECSS-E-TM-10-25 aware <see cref="ValueSetConverter.TryParseDouble"/>, so that values coming from a
         /// report control that are formatted with group separators (e.g. an "N2" formatted value) are written
@@ -179,29 +179,58 @@ namespace CDP4Reporting.Utilities
         /// returned unchanged; validation of the result is left to the SDK's
         /// <see cref="ValueValidator.Validate(ParameterType, object, MeasurementScale, IFormatProvider)"/>.
         /// </summary>
-        /// <param name="value">
+        /// <param name="input">
         /// The value <see cref="string"/> as received from the report control.
         /// </param>
         /// <param name="parameterType">
-        /// The <see cref="ParameterType"/> the <paramref name="value"/> belongs to.
+        /// The <see cref="ParameterType"/> the <paramref name="input"/> belongs to.
         /// </param>
         /// <returns>
         /// The normalized, invariant-culture value <see cref="string"/> for a numeric <see cref="QuantityKind"/>,
-        /// or the original <paramref name="value"/> when it is not numeric, is the default marker, or cannot be parsed.
+        /// or the original <paramref name="input"/> when it is not numeric, is the default marker, or cannot be parsed.
         /// </returns>
-        public string NormalizeNumericValue(string value, ParameterType parameterType)
+        public string NormalizeNumericValue(string input, ParameterType parameterType)
         {
-            if (!(parameterType is QuantityKind) || string.IsNullOrWhiteSpace(value) || value.Trim().Equals(ValueSetConverter.DefaultObject(parameterType)))
+            if (!(parameterType is QuantityKind) || string.IsNullOrWhiteSpace(input) || input.Trim().Equals(ValueSetConverter.DefaultObject(parameterType)))
             {
-                return value;
+                return input;
             }
-
-            if (ValueSetConverter.TryParseDouble(value, parameterType, out var doubleValue))
+ 
+            var result = 0;
+ 
+            if (string.IsNullOrWhiteSpace(input))
             {
-                return doubleValue.ToString(CultureInfo.InvariantCulture);
+                return result.ToString(CultureInfo.InvariantCulture);
             }
+ 
+            input = input.Trim();
+ 
+            var lastComma = input.LastIndexOf(',');
+            var lastDot = input.LastIndexOf('.');
+ 
+            var hasComma = lastComma >= 0;
+            var hasDot = lastDot >= 0;
+ 
+            if (hasComma ^ hasDot)
+            {
+                var sep = Math.Max(lastComma, lastDot);
+                var onlyOneSeparator = input.IndexOf(hasComma ? ',' : '.') == sep;
+ 
+                if (onlyOneSeparator && input.Length - sep - 1 == 3)
+                {
+                    
+                    if (double.TryParse(input, NumberStyles.Number, CultureInfo.CurrentCulture, out var currentCultureResult))
+                    {
+                        return currentCultureResult.ToString(CultureInfo.InvariantCulture);
+                    }
+                }
+            }
+ 
+            var nfi = lastComma > lastDot
+                ? new NumberFormatInfo { NumberDecimalSeparator = ",", NumberGroupSeparator = "." }
+                : new NumberFormatInfo { NumberDecimalSeparator = ".", NumberGroupSeparator = "," };
 
-            return value;
+            return double.TryParse(input, NumberStyles.Number, nfi, out var parsedResult) ? parsedResult.ToString(CultureInfo.InvariantCulture) : input;
         }
 
         /// <summary>
