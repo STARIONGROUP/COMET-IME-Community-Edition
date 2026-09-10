@@ -25,6 +25,7 @@
 
 namespace CDP4Requirements.ViewModels.Rows
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -56,6 +57,36 @@ namespace CDP4Requirements.ViewModels.Rows
         }
 
         /// <summary>
+        /// Builds one picker entry for each parametric constraint of a requirement, plus one for every relational
+        /// expression inside it, so a multi-expression constraint can be split across several V&amp;V items.
+        /// </summary>
+        /// <param name="requirement">The covered requirement.</param>
+        /// <returns>The choices, empty when the requirement states no constraint.</returns>
+        public static IReadOnlyList<ConstraintChoiceRowViewModel> Build(Requirement requirement)
+        {
+            var choices = new List<ConstraintChoiceRowViewModel>();
+
+            if (requirement == null)
+            {
+                return choices;
+            }
+
+            foreach (ParametricConstraint constraint in requirement.ParametricConstraint)
+            {
+                var expressions = constraint.Expression.OfType<RelationalExpression>().ToList();
+
+                choices.Add(new ConstraintChoiceRowViewModel(constraint, null));
+
+                if (expressions.Count > 1)
+                {
+                    choices.AddRange(expressions.Select(expression => new ConstraintChoiceRowViewModel(constraint, expression)));
+                }
+            }
+
+            return choices;
+        }
+
+        /// <summary>
         /// Gets the owning <see cref="ParametricConstraint"/>.
         /// </summary>
         public ParametricConstraint Constraint { get; }
@@ -67,20 +98,12 @@ namespace CDP4Requirements.ViewModels.Rows
         public RelationalExpression Expression { get; }
 
         /// <summary>
-        /// Gets the expression text this choice contributes to the acceptance criteria.
-        /// </summary>
-        public string ExpressionText =>
-            this.Expression != null
-                ? $"{this.Expression.ParameterType?.ShortName} {this.Expression.RelationalOperator.ToScientificNotationString()} {string.Join(", ", this.Expression.Value)}"
-                : this.Constraint.ToExpressionString();
-
-        /// <summary>
         /// Gets the text shown in the picker.
         /// </summary>
         public string Display =>
             this.Expression != null
-                ? $"expression: {this.ExpressionText}"
-                : $"whole constraint: {this.ExpressionText}";
+                ? $"expression: {this.QueryExpressionText()}"
+                : $"whole constraint: {this.QueryExpressionText()}";
 
         /// <summary>
         /// Gets the <see cref="ParameterOrOverrideBase"/> this choice is bound to, resolved through the
@@ -102,8 +125,6 @@ namespace CDP4Requirements.ViewModels.Rows
                     return null;
                 }
 
-                // scan the iteration rather than Thing.QueryRelationships: that list is maintained by the SDK's DTO
-                // resolver, so it is empty for anything assembled in memory
                 var expressionIids = expressions.Select(x => x.Iid).ToList();
 
                 return iteration.Relationship
@@ -113,6 +134,32 @@ namespace CDP4Requirements.ViewModels.Rows
                     .OfType<ParameterOrOverrideBase>()
                     .FirstOrDefault();
             }
+        }
+
+        /// <summary>
+        /// Returns the expression text this choice contributes to the acceptance criteria.
+        /// </summary>
+        /// <returns>
+        /// The single expression rendered by the SDK, or the whole constraint's expression string.
+        /// </returns>
+        /// <remarks>
+        /// The SDK's own <see cref="RelationalExpression.StringValue"/> is used rather than a hand-built string,
+        /// because it appends the <see cref="CDP4Common.SiteDirectoryData.MeasurementScale"/> short-name. Formatting
+        /// the parts here dropped it, so a constraint copied into the acceptance criteria read "mass &gt; 10" where the
+        /// requirement says "mass &gt; 10 kg", which is a different acceptance criterion. It trails a space when the
+        /// expression carries no scale, hence the trim, and it dereferences the parameter type unguarded, hence the
+        /// fallback for an expression that has none.
+        /// </remarks>
+        public string QueryExpressionText()
+        {
+            if (this.Expression == null)
+            {
+                return this.Constraint.ToExpressionString();
+            }
+
+            return this.Expression.ParameterType == null
+                ? $"{this.Expression.RelationalOperator.ToScientificNotationString()} {string.Join(", ", this.Expression.Value)}"
+                : this.Expression.StringValue.Trim();
         }
     }
 }

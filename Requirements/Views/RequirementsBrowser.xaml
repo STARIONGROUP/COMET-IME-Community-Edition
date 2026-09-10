@@ -300,6 +300,11 @@
                       Content="Show Parametric Constraints" IsChecked="{Binding IsParametricConstraintDisplayed,
                                                                 Mode=TwoWay,
                                                                 UpdateSourceTrigger=PropertyChanged}" />
+            <CheckBox Name="ShowVandV" Margin="20,0,0,0" VerticalAlignment="Center" FontSize="10"
+                      ToolTip="Show the V&amp;V plan and the V&amp;V report specifications. They hold the V&amp;V items, activities and procedure steps, which are normally worked on in the V&amp;V Register and V&amp;V Activities panels."
+                      Content="Show V&amp;V Specifications" IsChecked="{Binding IsVandVDisplayed,
+                                                                Mode=TwoWay,
+                                                                UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
         <views:LoadingControl Grid.Row="0" Grid.Column="0" Grid.RowSpan="4" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
     </Grid>

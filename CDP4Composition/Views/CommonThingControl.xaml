@@ -55,7 +55,7 @@
             Converter={dx:FormatStringConverter FormatString={}Refresh {0}}}" />
 
         <dxb:BarButtonItem Command="{Binding ExportCommand}"
-                           IsVisible="False"
+                           IsVisible="{Binding IsExportVisible, ElementName=Toolbar}"
                                Glyph="{dx:DXImage Image=Export_16x16.png}"
                                Hint="{Binding SelectedThingClassKindString,
             Converter={dx:FormatStringConverter FormatString={}Export {0}}}" />

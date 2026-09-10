@@ -87,8 +87,11 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().ViolatingThing, Does.Contain(uncovered.Iid));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().ViolatingThing, Does.Contain(uncovered.Iid));
+            });
         }
 
         [Test]

@@ -25,6 +25,8 @@
 
 namespace CDP4Requirements.ViewModels.Rows
 {
+    using System;
+
     using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
 
@@ -85,42 +87,54 @@ namespace CDP4Requirements.ViewModels.Rows
             this.SetProperties();
         }
 
-        /// <summary>Gets the step name.</summary>
+        /// <summary>
+        /// Gets the step name.
+        /// </summary>
         public string Name
         {
             get => this.name;
             private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets the step short-name.</summary>
+        /// <summary>
+        /// Gets the step short-name.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;
             private set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
-        /// <summary>Gets what the operator must do.</summary>
+        /// <summary>
+        /// Gets what the operator must do.
+        /// </summary>
         public string StepAction
         {
             get => this.stepAction;
             private set => this.RaiseAndSetIfChanged(ref this.stepAction, value);
         }
 
-        /// <summary>Gets what should be observed if the step passes.</summary>
+        /// <summary>
+        /// Gets what should be observed if the step passes.
+        /// </summary>
         public string StepExpected
         {
             get => this.stepExpected;
             private set => this.RaiseAndSetIfChanged(ref this.stepExpected, value);
         }
 
-        /// <summary>Gets what was actually observed.</summary>
+        /// <summary>
+        /// Gets what was actually observed.
+        /// </summary>
         public string StepActual
         {
             get => this.stepActual;
             private set => this.RaiseAndSetIfChanged(ref this.stepActual, value);
         }
 
-        /// <summary>Gets the step outcome.</summary>
+        /// <summary>
+        /// Gets the step outcome.
+        /// </summary>
         public string StepResult
         {
             get => this.stepResult;
@@ -142,11 +156,31 @@ namespace CDP4Requirements.ViewModels.Rows
         private void SetProperties()
         {
             this.ShortName = this.Thing.ShortName;
-            this.Name = this.Thing.Name;
-            this.StepAction = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepAction);
-            this.StepExpected = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepExpectedResult);
-            this.StepActual = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepActualResult);
+            this.Name = Flatten(this.Thing.Name);
+            this.StepAction = Flatten(VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepAction));
+            this.StepExpected = Flatten(VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepExpectedResult));
+            this.StepActual = Flatten(VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepActualResult));
             this.StepResult = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepResult);
+        }
+
+        /// <summary>
+        /// Reduces a stored value to a single line for the tree.
+        /// </summary>
+        /// <param name="value">The stored value.</param>
+        /// <returns>The value with its line breaks replaced by spaces.</returns>
+        /// <remarks>
+        /// Step text is written in multi-line editors, and a tree cell holding a line break renders as a row several
+        /// lines high, which showed up as an unexplained gap between two steps. The stored text keeps its line breaks;
+        /// only this projection is flattened.
+        /// </remarks>
+        private static string Flatten(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+
+            return string.Join(" ", value.Split((char[])null, StringSplitOptions.RemoveEmptyEntries));
         }
     }
 }

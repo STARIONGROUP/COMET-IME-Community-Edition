@@ -88,12 +88,41 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("states no reason"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("states no reason"));
+            });
 
             this.SetAttribute(item, "vnv_closeout_reason", "accepted at CDR");
+            this.SetAttribute(item, "vnv_closure", "Closes Out Requirement");
 
             Assert.That(this.rule.Verify(this.iteration), Is.Empty);
+        }
+
+        [Test]
+        public void VerifyThatAnItemClosedWithoutStatingItsRequirementClosureIsFlagged()
+        {
+            var item = this.AddVnVItem("VNV-1");
+            this.SetAttribute(item, "vnv_method", "Test");
+            this.SetAttribute(item, "vnv_stage", "CDR");
+            this.SetAttribute(item, "vnv_acceptance", "m <= 30 kg");
+            this.SetAttribute(item, "vnv_closed", "true");
+            this.SetAttribute(item, "vnv_result", "recorded outcome");
+            this.SetAttribute(item, "vnv_closeout_reason", "accepted at CDR");
+            this.AddVerifiesRelationship(item);
+
+            var violations = this.rule.Verify(this.iteration).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("closes the requirement out or further V&V is required"));
+            });
+
+            this.SetAttribute(item, "vnv_closure", "Further V&V Required");
+
+            Assert.That(this.rule.Verify(this.iteration), Is.Empty, "stating that more is owed is an answer too");
         }
 
         [Test]
@@ -106,13 +135,17 @@ namespace CDP4Requirements.Tests.Rules
             this.SetAttribute(item, "vnv_closed", "true");
             this.SetAttribute(item, "vnv_result", "recorded outcome");
             this.SetAttribute(item, "vnv_closeout_reason", "accepted");
+            this.SetAttribute(item, "vnv_closure", "Closes Out Requirement");
             this.SetAttribute(item, "vnv_compliance", "Partially Compliant");
             this.AddVerifiesRelationship(item);
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("without an accepted waiver or deviation"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("without an accepted waiver or deviation"));
+            });
 
             this.AddRequestForWaiver(item, AnnotationStatusKind.CLOSED);
 
@@ -134,8 +167,11 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("still open"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("still open"));
+            });
         }
 
         [Test]
@@ -163,12 +199,15 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().ViolatingThing, Does.Contain(item.Iid));
-            Assert.That(violations.Single().Description, Does.Contain("not linked"));
-            Assert.That(violations.Single().Description, Does.Contain("verification method"));
-            Assert.That(violations.Single().Description, Does.Contain("stage gate"));
-            Assert.That(violations.Single().Description, Does.Contain("acceptance criteria"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().ViolatingThing, Does.Contain(item.Iid));
+                Assert.That(violations.Single().Description, Does.Contain("not linked"));
+                Assert.That(violations.Single().Description, Does.Contain("verification method"));
+                Assert.That(violations.Single().Description, Does.Contain("stage gate"));
+                Assert.That(violations.Single().Description, Does.Contain("acceptance criteria"));
+            });
         }
 
         [Test]
@@ -183,8 +222,11 @@ namespace CDP4Requirements.Tests.Rules
 
             var violations = this.rule.Verify(this.iteration).ToList();
 
-            Assert.That(violations, Has.Count.EqualTo(1));
-            Assert.That(violations.Single().Description, Does.Contain("no result was recorded"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(violations, Has.Count.EqualTo(1));
+                Assert.That(violations.Single().Description, Does.Contain("no result was recorded"));
+            });
 
             this.SetAttribute(item, "vnv_result", "measured 28.4 kg");
 
@@ -198,6 +240,46 @@ namespace CDP4Requirements.Tests.Rules
             this.specification.Requirement.Add(requirement);
 
             Assert.That(this.rule.Verify(this.iteration), Is.Empty);
+        }
+
+        [Test]
+        public void VerifyThatAnItemInheritsItsPlanningAndExecutionFromTheActivityThatPerformsIt()
+        {
+            var item = this.AddVnVItem("VNV-1");
+            this.SetAttribute(item, "vnv_acceptance", "m <= 30 kg");
+            this.AddVerifiesRelationship(item);
+
+            var activity = this.AddActivity("ACT_1");
+            this.SetAttribute(activity, "vnv_method", "Analysis");
+            this.SetAttribute(activity, "vnv_stage", "CDR");
+            this.SetAttribute(activity, "vnv_status", "Passed");
+            this.SetAttribute(activity, "vnv_result", "mass budget issue 3");
+
+            this.AddPerformedByRelationship(item, activity);
+
+            Assert.That(this.rule.Verify(this.iteration), Is.Empty, "what the activity states must not be flagged as missing on the item");
+        }
+
+        private Requirement AddActivity(string shortName)
+        {
+            var activityCategory = new Category(Guid.NewGuid(), this.cache, this.uri) { ShortName = "VnVActivity", Name = "VnV Activity" };
+            activityCategory.PermissibleClass.Add(ClassKind.Requirement);
+
+            var activity = new Requirement(Guid.NewGuid(), this.cache, this.uri) { ShortName = shortName, Name = shortName };
+            activity.Category.Add(activityCategory);
+            this.specification.Requirement.Add(activity);
+
+            return activity;
+        }
+
+        private void AddPerformedByRelationship(Requirement item, Requirement activity)
+        {
+            var performedByCategory = new Category(Guid.NewGuid(), this.cache, this.uri) { ShortName = "performedBy", Name = "performed by" };
+            performedByCategory.PermissibleClass.Add(ClassKind.BinaryRelationship);
+
+            var relationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = item, Target = activity };
+            relationship.Category.Add(performedByCategory);
+            this.iteration.Relationship.Add(relationship);
         }
 
         private void AddRequestForWaiver(Requirement item, AnnotationStatusKind status)
@@ -227,21 +309,7 @@ namespace CDP4Requirements.Tests.Rules
 
         private void SetAttribute(Requirement item, string parameterTypeShortName, string value)
         {
-            var existing = item.ParameterValue.FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == parameterTypeShortName);
-
-            if (existing != null)
-            {
-                existing.Value = new ValueArray<string>(new[] { value });
-                return;
-            }
-
-            var simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), this.cache, this.uri)
-            {
-                ParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri) { ShortName = parameterTypeShortName },
-                Value = new ValueArray<string>(new[] { value })
-            };
-
-            item.ParameterValue.Add(simpleParameterValue);
+            item.SetVandVAttribute(parameterTypeShortName, value, this.cache, this.uri);
         }
 
         private void AddVerifiesRelationship(Requirement item)

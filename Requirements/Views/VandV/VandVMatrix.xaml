@@ -4,8 +4,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:CDP4Requirements.Converters"
              d:DesignHeight="400"
              d:DesignWidth="800"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -15,6 +17,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:VandVGateStateToBrushConverter x:Key="GateStateToBrushConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -22,30 +26,56 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <dxb:ToolBarControl Grid.Row="0" Height="30">
-            <dxb:BarButtonItem Command="{Binding RefreshCommand}"
+            <dxb:BarButtonItem Command="{Binding RebuildCommand}"
                                Content="Refresh"
                                Glyph="{dx:DXImage Image=Refresh_16x16.png}"
                                Hint="Rebuild the coverage matrix" />
         </dxb:ToolBarControl>
 
-        <TextBlock Grid.Row="1"
+        <StackPanel Grid.Row="1"
+                    Margin="8,6,8,0"
+                    Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center"
+                       Text="Stage gate: " />
+            <dxe:ComboBoxEdit Width="180"
+                              VerticalAlignment="Center"
+                              IsTextEditable="False"
+                              ItemsSource="{Binding PossibleStages}"
+                              EditValue="{Binding SelectedStage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              ToolTip="Review one stage gate at a time, or show every gate side by side" />
+            <dxe:CheckEdit Margin="16,0,0,0"
+                           VerticalAlignment="Center"
+                           Content="Only requirements needing a decision"
+                           IsChecked="{Binding ShowOnlyUndefined, Mode=TwoWay}"
+                           ToolTip="Hide everything already decided, leaving the requirements whose V&amp;V is still undefined" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="2"
                    Margin="8,6"
                    FontWeight="Bold"
                    Text="{Binding Summary}" />
 
-        <dxg:GridControl Grid.Row="2"
+        <dxg:GridControl Grid.Row="3"
                          AutoGenerateColumns="AddNew"
                          ItemsSource="{Binding MatrixTable}">
             <dxg:GridControl.View>
-                <dxg:TableView Name="MatrixView"
+               <dxg:TableView Name="MatrixView"
                                AllowEditing="False"
                                AutoWidth="False"
                                ShowGroupPanel="False"
-                               ShowIndicator="False" />
+                               ShowIndicator="False"
+                               UseLightweightTemplates="Row">
+                    <dxg:TableView.CellStyle>
+                        <Style TargetType="{x:Type dxg:LightweightCellEditor}">
+                            <Setter Property="Background" Value="{Binding Value, Converter={StaticResource GateStateToBrushConverter}}" />
+                        </Style>
+                    </dxg:TableView.CellStyle>
+                </dxg:TableView>
             </dxg:GridControl.View>
         </dxg:GridControl>
     </Grid>

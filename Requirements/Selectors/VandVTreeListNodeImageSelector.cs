@@ -87,6 +87,12 @@ namespace CDP4Requirements.Selectors
         private static readonly Uri VandVStepIconUri = QueryImageUri("ListBullets_16x16.png");
 
         /// <summary>
+        /// The shared activity icon: a piece of work to be carried out, deliberately not the recurrence glyph (which
+        /// reads as "repeats") and not the requirement or V&amp;V item glyph.
+        /// </summary>
+        private static readonly Uri VandVActivityIconUri = QueryImageUri("Technology_16x16.png");
+
+        /// <summary>
         /// Selects the icon for a row.
         /// </summary>
         /// <param name="rowData">The <see cref="TreeListRowData"/>.</param>
@@ -96,6 +102,11 @@ namespace CDP4Requirements.Selectors
             if (rowData.Row is VandVStepRowViewModel)
             {
                 return this.QueryIcon(VandVStepIconUri);
+            }
+
+            if (rowData.Row is VandVActivityRowViewModel)
+            {
+                return this.QueryIcon(VandVActivityIconUri);
             }
 
             if (rowData.Row is VandVItemRowViewModel vandVItemRow)

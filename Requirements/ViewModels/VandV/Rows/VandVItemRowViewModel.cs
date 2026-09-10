@@ -161,91 +161,117 @@ namespace CDP4Requirements.ViewModels.Rows
             this.SetProperties();
         }
 
-        /// <summary>Gets the name of the V&amp;V item.</summary>
+        /// <summary>
+        /// Gets the name of the V&amp;V item.
+        /// </summary>
         public string Name
         {
             get => this.name;
             private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets the short-name of the V&amp;V item.</summary>
+        /// <summary>
+        /// Gets the short-name of the V&amp;V item.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;
             private set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
-        /// <summary>Gets the first definition of the V&amp;V item.</summary>
+        /// <summary>
+        /// Gets the first definition of the V&amp;V item.
+        /// </summary>
         public string Definition
         {
             get => this.definition;
             private set => this.RaiseAndSetIfChanged(ref this.definition, value);
         }
 
-        /// <summary>Gets the verification method (<c>vnv_method</c>).</summary>
+        /// <summary>
+        /// Gets the verification method (<c>vnv_method</c>).
+        /// </summary>
         public string Method
         {
             get => this.method;
             private set => this.RaiseAndSetIfChanged(ref this.method, value);
         }
 
-        /// <summary>Gets the stage gate (<c>vnv_stage</c>).</summary>
+        /// <summary>
+        /// Gets the stage gate (<c>vnv_stage</c>).
+        /// </summary>
         public string Stage
         {
             get => this.stage;
             private set => this.RaiseAndSetIfChanged(ref this.stage, value);
         }
 
-        /// <summary>Gets the integration level (<c>vnv_level</c>).</summary>
+        /// <summary>
+        /// Gets the integration level (<c>vnv_level</c>).
+        /// </summary>
         public string Level
         {
             get => this.level;
             private set => this.RaiseAndSetIfChanged(ref this.level, value);
         }
 
-        /// <summary>Gets the status (<c>vnv_status</c>).</summary>
+        /// <summary>
+        /// Gets the status (<c>vnv_status</c>).
+        /// </summary>
         public string Status
         {
             get => this.status;
             private set => this.RaiseAndSetIfChanged(ref this.status, value);
         }
 
-        /// <summary>Gets the criticality (<c>vnv_criticality</c>).</summary>
+        /// <summary>
+        /// Gets the criticality (<c>vnv_criticality</c>).
+        /// </summary>
         public string Criticality
         {
             get => this.criticality;
             private set => this.RaiseAndSetIfChanged(ref this.criticality, value);
         }
 
-        /// <summary>Gets the planned date (<c>vnv_planned_date</c>).</summary>
+        /// <summary>
+        /// Gets the planned date (<c>vnv_planned_date</c>).
+        /// </summary>
         public string PlannedDate
         {
             get => this.plannedDate;
             private set => this.RaiseAndSetIfChanged(ref this.plannedDate, value);
         }
 
-        /// <summary>Gets the actual date (<c>vnv_actual_date</c>).</summary>
+        /// <summary>
+        /// Gets the actual date (<c>vnv_actual_date</c>).
+        /// </summary>
         public string ActualDate
         {
             get => this.actualDate;
             private set => this.RaiseAndSetIfChanged(ref this.actualDate, value);
         }
 
-        /// <summary>Gets the activity number (<c>vnv_activity_no</c>).</summary>
+        /// <summary>
+        /// Gets the activity number (<c>vnv_activity_no</c>).
+        /// </summary>
         public string ActivityNumber
         {
             get => this.activityNumber;
             private set => this.RaiseAndSetIfChanged(ref this.activityNumber, value);
         }
 
-        /// <summary>Gets the acceptance criteria (<c>vnv_acceptance</c>).</summary>
+        /// <summary>
+        /// Gets the acceptance criteria (<c>vnv_acceptance</c>).
+        /// </summary>
         public string Acceptance
         {
             get => this.acceptance;
             private set => this.RaiseAndSetIfChanged(ref this.acceptance, value);
         }
 
-        /// <summary>Gets the result (<c>vnv_result</c>).</summary>
+        /// <summary>
+        /// Gets the result (<c>vnv_result</c>).
+        /// </summary>
         public string Result
         {
             get => this.result;
@@ -290,14 +316,18 @@ namespace CDP4Requirements.ViewModels.Rows
             private set => this.RaiseAndSetIfChanged(ref this.procedure, value);
         }
 
-        /// <summary>Gets the evidence reference (<c>vnv_evidence_ref</c>).</summary>
+        /// <summary>
+        /// Gets the evidence reference (<c>vnv_evidence_ref</c>).
+        /// </summary>
         public string EvidenceReference
         {
             get => this.evidenceReference;
             private set => this.RaiseAndSetIfChanged(ref this.evidenceReference, value);
         }
 
-        /// <summary>Gets the responsible domain (native <c>Owner</c>).</summary>
+        /// <summary>
+        /// Gets the responsible domain (native <c>Owner</c>).
+        /// </summary>
         public string Owner
         {
             get => this.owner;
@@ -384,8 +414,6 @@ namespace CDP4Requirements.ViewModels.Rows
                 return;
             }
 
-            // "recorded" means a human has set the step's Result to something other than Not Run. Nothing is
-            // executed by the tool; this counts how much of the as-run record has been filled in.
             var recorded = steps.Count(step =>
             {
                 var result = VandVCoverageQuery.Attribute(step, VandVParameter.StepResult);
@@ -437,20 +465,25 @@ namespace CDP4Requirements.ViewModels.Rows
         /// </summary>
         private void SetProperties()
         {
+            var iteration = this.Thing.GetContainerOfType<Iteration>();
+
+            var performingActivity = VandVActivityQuery.QueryActivity(iteration, this.Thing);
+
             this.Name = this.Thing.Name;
             this.ShortName = this.Thing.ShortName;
             this.Definition = this.Thing.Definition.FirstOrDefault()?.Content;
-            this.Method = this.Attribute(VandVParameter.Method);
-            this.Stage = this.Attribute(VandVParameter.Stage);
-            this.Level = this.Attribute(VandVParameter.Level);
-            this.Status = this.Attribute(VandVParameter.Status);
+
+            this.Method = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Method);
+            this.Stage = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Stage);
+            this.Level = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Level);
+            this.Status = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Status);
             this.Criticality = this.Attribute(VandVParameter.Criticality);
-            this.PlannedDate = this.Attribute(VandVParameter.PlannedDate);
-            this.ActualDate = this.Attribute(VandVParameter.ActualDate);
-            this.ActivityNumber = this.Attribute(VandVParameter.ActivityNumber);
+            this.PlannedDate = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.PlannedDate);
+            this.ActualDate = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.ActualDate);
+            this.ActivityNumber = performingActivity?.ShortName ?? this.Attribute(VandVParameter.ActivityNumber);
             this.Acceptance = this.Attribute(VandVParameter.AcceptanceCriteria);
-            this.Result = this.Attribute(VandVParameter.Result);
-            this.EvidenceReference = this.Attribute(VandVParameter.EvidenceReference);
+            this.Result = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.Result);
+            this.EvidenceReference = VandVActivityQuery.EffectiveAttribute(this.Thing, performingActivity, VandVParameter.EvidenceReference);
             this.Owner = this.Thing.Owner?.ShortName;
             this.Compliance = VandVCloseOut.QueryCompliance(this.Thing);
 
@@ -466,16 +499,13 @@ namespace CDP4Requirements.ViewModels.Rows
         }
 
         /// <summary>
-        /// Returns the first value of the <see cref="SimpleParameterValue"/> whose <see cref="ParameterType"/> has the
-        /// supplied short-name, or null when the V&amp;V item does not carry that attribute.
+        /// Returns the value the V&amp;V item itself carries for an attribute, or null when it carries none.
         /// </summary>
         /// <param name="shortName">The parameter type short-name.</param>
         /// <returns>The attribute value, or null.</returns>
         private string Attribute(string shortName)
         {
-            return this.Thing.ParameterValue
-                .FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == shortName)?
-                .Value.FirstOrDefault();
+            return VandVCoverageQuery.Attribute(this.Thing, shortName);
         }
     }
 }

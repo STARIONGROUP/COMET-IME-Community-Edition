@@ -137,10 +137,13 @@ namespace CDP4Requirements.Tests.Services
 
             var relationships = this.captured.Operations.Select(o => o.ModifiedThing).OfType<DTO.BinaryRelationship>().ToList();
 
-            Assert.That(relationships, Has.Count.EqualTo(2));
-            Assert.That(relationships.Select(x => x.Target), Does.Contain(this.parameter.Iid));
-            Assert.That(relationships.Select(x => x.Target), Does.Contain(this.elementDefinition.Iid));
-            Assert.That(relationships.All(x => x.Source == this.vandVItem.Iid), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(relationships, Has.Count.EqualTo(2));
+                Assert.That(relationships.Select(x => x.Target), Does.Contain(this.parameter.Iid));
+                Assert.That(relationships.Select(x => x.Target), Does.Contain(this.elementDefinition.Iid));
+                Assert.That(relationships.All(x => x.Source == this.vandVItem.Iid), Is.True);
+            });
         }
 
         [Test]
@@ -157,10 +160,13 @@ namespace CDP4Requirements.Tests.Services
 
             var relationships = this.captured.Operations.Select(o => o.ModifiedThing).OfType<DTO.BinaryRelationship>().ToList();
 
-            Assert.That(relationships, Has.Count.EqualTo(4), "parameter + element + one option + one state");
-            Assert.That(relationships.Select(x => x.Target), Does.Contain(this.optionA.Iid));
-            Assert.That(relationships.Select(x => x.Target), Does.Contain(this.stateOn.Iid));
-            Assert.That(relationships.Select(x => x.Target), Does.Not.Contain(this.optionB.Iid), "only the chosen option is linked");
+            Assert.Multiple(() =>
+            {
+                Assert.That(relationships, Has.Count.EqualTo(4), "parameter + element + one option + one state");
+                Assert.That(relationships.Select(x => x.Target), Does.Contain(this.optionA.Iid));
+                Assert.That(relationships.Select(x => x.Target), Does.Contain(this.stateOn.Iid));
+                Assert.That(relationships.Select(x => x.Target), Does.Not.Contain(this.optionB.Iid), "only the chosen option is linked");
+            });
         }
 
         [Test]

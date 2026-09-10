@@ -184,6 +184,31 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
+        public async Task VerifyThatTheVandVSpecificationsAreHiddenUntilAskedFor()
+        {
+            var vandVSpecification = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri) { ShortName = "VNV", Name = "V&V Plan" };
+            this.iteration.RequirementsSpecification.Add(vandVSpecification);
+
+            var report = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri) { ShortName = "FAT_REPORT", Name = "FAT Report" };
+            report.Category.Add(new Category(Guid.NewGuid(), this.cache, this.uri) { ShortName = "VnVReport" });
+            this.iteration.RequirementsSpecification.Add(report);
+
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            Assert.IsFalse(vm.IsVandVDisplayed, "V&V bookkeeping is out of the way by default");
+            Assert.AreEqual(1, vm.ReqSpecificationRows.Count, "neither the V&V plan nor the report is shown");
+
+            vm.IsVandVDisplayed = true;
+
+            Assert.AreEqual(3, vm.ReqSpecificationRows.Count, "ticking the box brings both of them in");
+
+            vm.IsVandVDisplayed = false;
+
+            Assert.AreEqual(1, vm.ReqSpecificationRows.Count, "unticking takes them out again");
+        }
+
+        [Test]
         public async Task VerifyThatPropertiesAreSet()
         {
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
@@ -307,7 +332,6 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         /// <returns>an awaitable <see cref="Task"/></returns>
         private async Task DelayedCheck(Func<bool> check, int maxNumberOfChecks = 10)
         {
-            // wait 1000ms for background worker to be finished
             for (var i = 0; i < maxNumberOfChecks; i++)
             {
                 await Task.Delay(100);

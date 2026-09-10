@@ -69,6 +69,7 @@ namespace CDP4Requirements.ViewModels
         public VandVRibbonViewModel(ICDPMessageBus messageBus)
         {
             this.Browser = new VandVBrowserRibbonViewModel(messageBus);
+            this.ActivityBrowser = new VandVActivityBrowserRibbonViewModel(messageBus);
 
             this.OpenModels = new ReactiveList<VandVModelMenuItemViewModel>();
             this.OpenModels.CountChanged.Subscribe(count => this.HasModels = count != 0);
@@ -107,6 +108,13 @@ namespace CDP4Requirements.ViewModels
         /// single data context, so the group's view-model owns both.
         /// </summary>
         public VandVBrowserRibbonViewModel Browser { get; }
+
+        /// <summary>
+        /// Gets the view-model behind the "Open Activities" button. The activities panel plans the work (which
+        /// deliverable, which task); the register judges the requirements. They are separate panels because they are
+        /// separate jobs, done by different people at different times.
+        /// </summary>
+        public VandVActivityBrowserRibbonViewModel ActivityBrowser { get; }
 
         /// <summary>
         /// Adds a menu item for a newly opened <see cref="EngineeringModel"/>.

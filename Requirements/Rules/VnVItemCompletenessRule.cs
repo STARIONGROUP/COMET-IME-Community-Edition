@@ -29,6 +29,7 @@ namespace CDP4Requirements.Rules
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Requirements.Extensions;
     using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
 
@@ -65,14 +66,16 @@ namespace CDP4Requirements.Rules
                     .Where(relationship => relationship.Source != null && VandVCoverageQuery.IsCoverageLink(relationship))
                     .Select(relationship => relationship.Source.Iid));
 
+            var activityByItem = VandVActivityQuery.QueryActivityMap(iteration);
+
             var violations = new List<RuleViolation>();
 
-            foreach (var item in iteration.RequirementsSpecification
-                         .Where(specification => !specification.IsDeprecated)
-                         .SelectMany(specification => specification.Requirement)
-                         .Where(requirement => !requirement.IsDeprecated && VandVCoverageQuery.IsVnVItem(requirement) && !VandVProcedureWriter.IsStep(requirement)))
+            foreach (var item in iteration.QueryNonDeprecatedRequirements()
+                         .Where(requirement => VandVCoverageQuery.IsVnVItem(requirement) && !VandVProcedureWriter.IsStep(requirement)))
             {
-                var status = VandVCoverageQuery.Attribute(item, VandVParameter.Status);
+                var performingActivity = activityByItem.TryGetValue(item.Iid, out var activity) ? activity : null;
+
+                var status = VandVActivityQuery.EffectiveAttribute(item, performingActivity, VandVParameter.Status);
 
                 var defects = new List<string>();
 
@@ -81,12 +84,12 @@ namespace CDP4Requirements.Rules
                     defects.Add("it is not linked to any requirement by a 'verifies' or 'validates' relationship");
                 }
 
-                if (IsBlank(item, VandVParameter.Method))
+                if (IsEffectivelyBlank(item, performingActivity, VandVParameter.Method))
                 {
                     defects.Add("it has no verification method");
                 }
 
-                if (IsBlank(item, VandVParameter.Stage))
+                if (IsEffectivelyBlank(item, performingActivity, VandVParameter.Stage))
                 {
                     defects.Add("it has no stage gate");
                 }
@@ -96,16 +99,14 @@ namespace CDP4Requirements.Rules
                     defects.Add("it has no acceptance criteria");
                 }
 
-                // close-out is the separate vnv_closed flag, checked below in its own right, and never a status value
                 var isConcluded = VandVStatus.Concluded.Any(concluded => VandVCoverageQuery.AreSameEnumValue(concluded, status));
 
-                if ((isConcluded || VandVCloseOut.IsClosed(item)) && IsBlank(item, VandVParameter.Result))
+                if ((isConcluded || VandVCloseOut.IsClosed(item)) && IsEffectivelyBlank(item, performingActivity, VandVParameter.Result))
                 {
                     var conclusion = isConcluded ? $"its status is '{status}'" : "it is closed out";
                     defects.Add($"{conclusion} but no result was recorded");
                 }
 
-                // a procedure whose step failed cannot support a passing verdict on the activity that ran it
                 var failedSteps = VandVProcedureWriter.QuerySteps(iteration, item)
                     .Where(step => VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(step, VandVParameter.StepResult), VandVStepResult.Fail))
                     .Select(VandVProcedureWriter.QueryStepNumber)
@@ -119,8 +120,6 @@ namespace CDP4Requirements.Rules
                     defects.Add($"procedure step(s) {string.Join(", ", failedSteps)} failed, but the item reports a passing outcome");
                 }
 
-                // ECSS-E-ST-10-02 Annex B wants the close-out status recorded with its reason, and a shortfall
-                // against the requirement closed out only through an accepted waiver or deviation
                 if (VandVCloseOut.IsClosed(item))
                 {
                     if (IsBlank(item, VandVCloseOut.CloseOutReasonShortName))
@@ -136,6 +135,11 @@ namespace CDP4Requirements.Rules
                     if (AnnotationQuery.QueryFor(iteration, item).Any(AnnotationQuery.IsOpen))
                     {
                         defects.Add("it is closed out while a review request against it is still open");
+                    }
+
+                    if (VandVCoverageQuery.AreSameEnumValue(VandVStageGateQuery.QueryClosure(item), VandVClosure.NotAssessed))
+                    {
+                        defects.Add("it is closed out without stating whether it closes the requirement out or further V&V is required");
                     }
                 }
 
@@ -166,6 +170,22 @@ namespace CDP4Requirements.Rules
         private static bool IsBlank(Requirement item, string shortName)
         {
             var value = VandVCoverageQuery.Attribute(item, shortName);
+
+            return string.IsNullOrWhiteSpace(value) || value == "-";
+        }
+
+        /// <summary>
+        /// Asserts whether an attribute is absent or empty on the item <b>and</b> on the activity performing it. Used
+        /// for the attributes a shared activity supplies (method, stage, result); the per-item judgements (acceptance
+        /// criteria, close-out reason) keep using <see cref="IsBlank"/>.
+        /// </summary>
+        /// <param name="item">The V&amp;V item.</param>
+        /// <param name="performingActivity">The activity performing the item, resolved once for the rule run.</param>
+        /// <param name="shortName">The parameter type short-name.</param>
+        /// <returns>true when neither the item nor its activity carries a meaningful value.</returns>
+        private static bool IsEffectivelyBlank(Requirement item, Requirement performingActivity, string shortName)
+        {
+            var value = VandVActivityQuery.EffectiveAttribute(item, performingActivity, shortName);
 
             return string.IsNullOrWhiteSpace(value) || value == "-";
         }

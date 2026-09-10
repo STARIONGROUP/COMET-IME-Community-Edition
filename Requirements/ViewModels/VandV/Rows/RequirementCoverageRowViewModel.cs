@@ -25,6 +25,7 @@
 
 namespace CDP4Requirements.ViewModels.Rows
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -72,14 +73,18 @@ namespace CDP4Requirements.ViewModels.Rows
             this.SetProperties();
         }
 
-        /// <summary>Gets the requirement name.</summary>
+        /// <summary>
+        /// Gets the requirement name.
+        /// </summary>
         public string Name
         {
             get => this.name;
             private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets the requirement short-name.</summary>
+        /// <summary>
+        /// Gets the requirement short-name.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;
@@ -112,7 +117,17 @@ namespace CDP4Requirements.ViewModels.Rows
         /// </summary>
         public void RefreshCoverage()
         {
-            this.RollUp = VandVCoverageQuery.RollUp(this.ContainedRows.OfType<VandVItemRowViewModel>().Select(x => x.Thing));
+            this.RefreshCoverage(null);
+        }
+
+        /// <summary>
+        /// Refreshes the coverage summary from the current child rows, deriving each item's status through an
+        /// already built item-to-activity map so a tree refresh does not rescan the relationships per row.
+        /// </summary>
+        /// <param name="activityByItem">The item-to-activity map, or null to resolve per item.</param>
+        public void RefreshCoverage(IReadOnlyDictionary<Guid, Requirement> activityByItem)
+        {
+            this.RollUp = VandVCoverageQuery.RollUp(this.ContainedRows.OfType<VandVItemRowViewModel>().Select(x => x.Thing), activityByItem);
             this.Coverage = this.RollUp.ToRequirementSummary();
         }
 

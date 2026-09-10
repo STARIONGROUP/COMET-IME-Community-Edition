@@ -186,5 +186,6 @@ namespace CDP4Requirements.Services
 
             await session.Write(transaction.FinalizeTransaction());
         }
+
     }
 }

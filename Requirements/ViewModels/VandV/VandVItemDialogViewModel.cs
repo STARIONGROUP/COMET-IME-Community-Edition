@@ -116,6 +116,11 @@ namespace CDP4Requirements.ViewModels
         private ConstraintChoiceRowViewModel selectedParametricConstraint;
 
         /// <summary>
+        /// Backing field for <see cref="SelectedActivityChoice"/>
+        /// </summary>
+        private SelectableThingRowViewModel selectedActivityChoice;
+
+        /// <summary>
         /// Backing field for <see cref="SelectedElementDefinition"/>
         /// </summary>
         private ElementDefinition selectedElementDefinition;
@@ -191,11 +196,6 @@ namespace CDP4Requirements.ViewModels
         private string facility;
 
         /// <summary>
-        /// Backing field for <see cref="ActivityNumber"/>
-        /// </summary>
-        private string activityNumber;
-
-        /// <summary>
         /// Backing field for <see cref="ResponsibleExternal"/>
         /// </summary>
         private string responsibleExternal;
@@ -209,6 +209,11 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="Compliance"/>
         /// </summary>
         private string compliance;
+
+        /// <summary>
+        /// Backing field for <see cref="Closure"/>
+        /// </summary>
+        private string closure;
 
         /// <summary>
         /// Backing field for <see cref="AnalysisCheck"/>
@@ -313,6 +318,13 @@ namespace CDP4Requirements.ViewModels
                 this.PossibleCompliances = VandVCloseOut.PossibleCompliances;
             }
 
+            this.PossibleClosures = EnumerationValues(mrdl, VandVParameter.Closure);
+
+            if (!this.PossibleClosures.Any())
+            {
+                this.PossibleClosures = VandVClosure.All;
+            }
+
             this.PossibleStepResults = EnumerationValues(mrdl, VandVParameter.StepResult);
 
             if (!this.PossibleStepResults.Any())
@@ -322,7 +334,7 @@ namespace CDP4Requirements.ViewModels
 
             this.PossibleLinkTypes = new[] { VerifiesLink, ValidatesLink };
             this.PossibleOwners = model.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name).ToList();
-            this.PossibleParametricConstraints = BuildConstraintChoices(requirement);
+            this.PossibleParametricConstraints = ConstraintChoiceRowViewModel.Build(requirement);
 
             this.coveringItemCount = VandVItemCreator.CountCoveringItems(iteration, requirement);
 
@@ -333,6 +345,18 @@ namespace CDP4Requirements.ViewModels
                     .Select(x => x.ShortName));
 
             this.PossibleElementDefinitions = iteration.Element.OrderBy(x => x.Name).ToList();
+
+            this.PossibleActivities = VandVActivityQuery.QueryActivities(iteration)
+                .Select(activity => new SelectableThingRowViewModel(activity, $"{activity.ShortName}: {activity.Name}"))
+                .ToList();
+
+            this.SuggestedPlanReferences = VandVActivityQuery.QuerySuggestions(iteration, VandVCloseOut.PlanReferenceShortName);
+
+            this.SuggestedEvidenceReferences = VandVActivityQuery.QuerySuggestions(iteration, VandVParameter.EvidenceReference)
+                .Concat(VandVActivityQuery.QueryReports(iteration).Select(report => report.ShortName))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(value => value)
+                .ToList();
 
             this.Subscriptions.Add(
                 this.WhenAnyValue(x => x.SelectedElementDefinition)
@@ -355,12 +379,13 @@ namespace CDP4Requirements.ViewModels
                 this.LoadFrom(vandVItem, existingLinkType);
                 this.LoadCoverage(iteration, vandVItem);
 
+                var performingActivity = VandVActivityQuery.QueryActivity(iteration, vandVItem);
+                this.SelectedActivityChoice = this.PossibleActivities.FirstOrDefault(x => x.Thing == performingActivity);
+
                 this.ProcedureSteps.AddRange(
                     VandVProcedureWriter.QuerySteps(iteration, vandVItem).Select(step => new VandVProcedureStep(step)));
             }
 
-            // merged rather than one WhenAnyValue: the close-out fields take the count past the overloads
-            // ReactiveUI provides, and they must gate OK too, or a closed item can be saved with no reason
             var identificationChanged = this.WhenAnyValue(
                     x => x.ShortName,
                     x => x.Name,
@@ -372,10 +397,30 @@ namespace CDP4Requirements.ViewModels
                 .Select(_ => Unit.Default);
 
             var closeOutChanged = this.WhenAnyValue(x => x.IsClosed, x => x.CloseOutReason).Select(_ => Unit.Default);
+            var activityChanged = this.WhenAnyValue(x => x.SelectedActivityChoice).Select(_ => Unit.Default);
 
             var canOk = identificationChanged
                 .Merge(closeOutChanged)
+                .Merge(activityChanged)
                 .Select(_ => !this.HasValidationErrors());
+
+            this.Subscriptions.Add(
+                this.WhenAnyValue(x => x.SelectedActivityChoice, x => x.Method, x => x.Stage)
+                    .Subscribe(_ =>
+                    {
+                        this.RaisePropertyChanged(nameof(this.IsPerformedByActivity));
+                        this.RaisePropertyChanged(nameof(this.MethodInheritanceNote));
+                        this.RaisePropertyChanged(nameof(this.StageInheritanceNote));
+                    }));
+
+            this.Subscriptions.Add(
+                this.WhenAnyValue(x => x.SelectedActivityChoice)
+                    .Skip(1)
+                    .Subscribe(_ =>
+                    {
+                        this.RaisePropertyChanged(nameof(this.Method));
+                        this.RaisePropertyChanged(nameof(this.Stage));
+                    }));
 
             var hasSelectedStep = this.WhenAnyValue(x => x.SelectedStep).Select(step => step != null);
 
@@ -427,22 +472,34 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string RequirementCaption => $"{this.Requirement.ShortName}: {this.Requirement.Name}";
 
-        /// <summary>Gets the possible link types (<c>verifies</c> / <c>validates</c>).</summary>
+        /// <summary>
+        /// Gets the possible link types (<c>verifies</c> / <c>validates</c>).
+        /// </summary>
         public IReadOnlyList<string> PossibleLinkTypes { get; }
 
-        /// <summary>Gets the possible <c>vnv_method</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_method</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleMethods { get; }
 
-        /// <summary>Gets the possible <c>vnv_stage</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_stage</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleStages { get; }
 
-        /// <summary>Gets the possible <c>vnv_level</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_level</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleLevels { get; }
 
-        /// <summary>Gets the possible <c>vnv_criticality</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_criticality</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleCriticalities { get; }
 
-        /// <summary>Gets the possible <c>vnv_status</c> values.</summary>
+        /// <summary>
+        /// Gets the possible <c>vnv_status</c> values.
+        /// </summary>
         public IReadOnlyList<string> PossibleStatuses { get; }
 
         /// <summary>
@@ -457,6 +514,26 @@ namespace CDP4Requirements.ViewModels
         {
             get => this.compliance;
             set => this.RaiseAndSetIfChanged(ref this.compliance, value);
+        }
+
+        /// <summary>
+        /// Gets the selectable closure values, read from the RDL and falling back to the manifest.
+        /// </summary>
+        public IReadOnlyList<string> PossibleClosures { get; }
+
+        /// <summary>
+        /// Gets or sets the closure: whether completing this item completes the verification of the requirement, or
+        /// further V&amp;V is owed at a later stage gate.
+        /// </summary>
+        /// <remarks>
+        /// Distinct from <see cref="IsClosed"/> on purpose. Closing this item says the work recorded here is finished
+        /// and accepted; the closure says whether the requirement itself is finished. A requirement verified by
+        /// analysis at PDR and by test at FAT has two closed items, only the second of which closes it out.
+        /// </remarks>
+        public string Closure
+        {
+            get => this.closure;
+            set => this.RaiseAndSetIfChanged(ref this.closure, value);
         }
 
         /// <summary>
@@ -562,8 +639,62 @@ namespace CDP4Requirements.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.planReference, value);
         }
 
-        /// <summary>Gets the possible owning <see cref="DomainOfExpertise"/>s.</summary>
+        /// <summary>
+        /// Gets the possible owning <see cref="DomainOfExpertise"/>s.
+        /// </summary>
         public IReadOnlyList<DomainOfExpertise> PossibleOwners { get; }
+
+        /// <summary>
+        /// Gets the shared V&amp;V activities this item can be performed by, one entry per activity in the model.
+        /// </summary>
+        public IReadOnlyList<SelectableThingRowViewModel> PossibleActivities { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the model has any shared activity to offer.
+        /// </summary>
+        public bool HasPossibleActivities => this.PossibleActivities.Any();
+
+        /// <summary>
+        /// Gets or sets the picked activity entry, or null when the item stands on its own.
+        /// </summary>
+        public SelectableThingRowViewModel SelectedActivityChoice
+        {
+            get => this.selectedActivityChoice;
+            set => this.RaiseAndSetIfChanged(ref this.selectedActivityChoice, value);
+        }
+
+        /// <summary>
+        /// Gets the activity that performs this item, or null. Attributes the item leaves empty (method, stage,
+        /// status, dates, result, evidence) are inherited from it in the register and the export.
+        /// </summary>
+        public Requirement SelectedActivity => this.SelectedActivityChoice?.Thing as Requirement;
+
+        /// <summary>
+        /// Gets a value indicating whether a shared activity performs this item, so the procedure and execution tabs
+        /// can say that what they show is inherited.
+        /// </summary>
+        public bool IsPerformedByActivity => this.SelectedActivityChoice != null;
+
+        /// <summary>
+        /// Gets the sentence under the method picker: what the activity supplies, and whether this item is currently
+        /// overriding it. Blank when no activity performs the item, so a standalone item shows nothing extra.
+        /// </summary>
+        public string MethodInheritanceNote => VandVInheritanceNote.Describe(this.SelectedActivity, "method", this.Method, VandVParameter.Method);
+
+        /// <summary>
+        /// Gets the sentence under the stage gate picker, see <see cref="MethodInheritanceNote"/>.
+        /// </summary>
+        public string StageInheritanceNote => VandVInheritanceNote.Describe(this.SelectedActivity, "stage gate", this.Stage, VandVParameter.Stage);
+
+        /// <summary>
+        /// Gets the plan references already in use.
+        /// </summary>
+        public IReadOnlyList<string> SuggestedPlanReferences { get; }
+
+        /// <summary>
+        /// Gets the evidence references already in use, plus the reports defined in the model.
+        /// </summary>
+        public IReadOnlyList<string> SuggestedEvidenceReferences { get; }
 
         /// <summary>
         /// Gets the <see cref="ParametricConstraint"/>s already defined on the covered requirement. These are the
@@ -660,147 +791,180 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public bool IsParameterStateDependent => this.SelectedParameter?.StateDependence != null;
 
-        /// <summary>Gets or sets the short-name of the V&amp;V item. Required.</summary>
+        /// <summary>
+        /// Gets or sets the short-name of the V&amp;V item. Required.
+        /// </summary>
         public string ShortName
         {
             get => this.shortName;
             set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
-        /// <summary>Gets or sets the name of the V&amp;V item. Required.</summary>
+        /// <summary>
+        /// Gets or sets the name of the V&amp;V item. Required.
+        /// </summary>
         public string Name
         {
             get => this.name;
             set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
-        /// <summary>Gets or sets whether this item verifies or validates the requirement. Required.</summary>
+        /// <summary>
+        /// Gets or sets whether this item verifies or validates the requirement. Required.
+        /// </summary>
         public string LinkType
         {
             get => this.linkType;
             set => this.RaiseAndSetIfChanged(ref this.linkType, value);
         }
 
-        /// <summary>Gets or sets the verification method. Required.</summary>
+        /// <summary>
+        /// Gets or sets the verification method. Required.
+        /// </summary>
         public string Method
         {
             get => this.method;
             set => this.RaiseAndSetIfChanged(ref this.method, value);
         }
 
-        /// <summary>Gets or sets the stage gate. Required.</summary>
+        /// <summary>
+        /// Gets or sets the stage gate. Required.
+        /// </summary>
         public string Stage
         {
             get => this.stage;
             set => this.RaiseAndSetIfChanged(ref this.stage, value);
         }
 
-        /// <summary>Gets or sets the integration level.</summary>
+        /// <summary>
+        /// Gets or sets the integration level.
+        /// </summary>
         public string Level
         {
             get => this.level;
             set => this.RaiseAndSetIfChanged(ref this.level, value);
         }
 
-        /// <summary>Gets or sets the criticality.</summary>
+        /// <summary>
+        /// Gets or sets the criticality.
+        /// </summary>
         public string Criticality
         {
             get => this.criticality;
             set => this.RaiseAndSetIfChanged(ref this.criticality, value);
         }
 
-        /// <summary>Gets or sets the status.</summary>
+        /// <summary>
+        /// Gets or sets the status.
+        /// </summary>
         public string Status
         {
             get => this.status;
             set => this.RaiseAndSetIfChanged(ref this.status, value);
         }
 
-        /// <summary>Gets or sets the acceptance criteria. Required.</summary>
+        /// <summary>
+        /// Gets or sets the acceptance criteria. Required.
+        /// </summary>
         public string Acceptance
         {
             get => this.acceptance;
             set => this.RaiseAndSetIfChanged(ref this.acceptance, value);
         }
 
-        /// <summary>Gets or sets the activity description.</summary>
+        /// <summary>
+        /// Gets or sets the activity description.
+        /// </summary>
         public string Description
         {
             get => this.description;
             set => this.RaiseAndSetIfChanged(ref this.description, value);
         }
 
-        /// <summary>Gets or sets the entry conditions.</summary>
+        /// <summary>
+        /// Gets or sets the entry conditions.
+        /// </summary>
         public string Preconditions
         {
             get => this.preconditions;
             set => this.RaiseAndSetIfChanged(ref this.preconditions, value);
         }
 
-        /// <summary>Gets or sets the environmental and operational conditions.</summary>
+        /// <summary>
+        /// Gets or sets the environmental and operational conditions.
+        /// </summary>
         public string Conditions
         {
             get => this.conditions;
             set => this.RaiseAndSetIfChanged(ref this.conditions, value);
         }
 
-        /// <summary>Gets or sets the facility.</summary>
+        /// <summary>
+        /// Gets or sets the facility.
+        /// </summary>
         public string Facility
         {
             get => this.facility;
             set => this.RaiseAndSetIfChanged(ref this.facility, value);
         }
 
-        /// <summary>Gets or sets the programme activity number.</summary>
-        public string ActivityNumber
-        {
-            get => this.activityNumber;
-            set => this.RaiseAndSetIfChanged(ref this.activityNumber, value);
-        }
-
-        /// <summary>Gets or sets the external responsible party.</summary>
+        /// <summary>
+        /// Gets or sets the external responsible party.
+        /// </summary>
         public string ResponsibleExternal
         {
             get => this.responsibleExternal;
             set => this.RaiseAndSetIfChanged(ref this.responsibleExternal, value);
         }
 
-        /// <summary>Gets or sets the coverage note.</summary>
+        /// <summary>
+        /// Gets or sets the coverage note.
+        /// </summary>
         public string CoverageNote
         {
             get => this.coverageNote;
             set => this.RaiseAndSetIfChanged(ref this.coverageNote, value);
         }
 
-        /// <summary>Gets or sets the evidence reference.</summary>
+        /// <summary>
+        /// Gets or sets the evidence reference.
+        /// </summary>
         public string EvidenceReference
         {
             get => this.evidenceReference;
             set => this.RaiseAndSetIfChanged(ref this.evidenceReference, value);
         }
 
-        /// <summary>Gets or sets the recorded result.</summary>
+        /// <summary>
+        /// Gets or sets the recorded result.
+        /// </summary>
         public string Result
         {
             get => this.result;
             set => this.RaiseAndSetIfChanged(ref this.result, value);
         }
 
-        /// <summary>Gets or sets the planned execution date.</summary>
+        /// <summary>
+        /// Gets or sets the planned execution date.
+        /// </summary>
         public DateTime? PlannedDate
         {
             get => this.plannedDate;
             set => this.RaiseAndSetIfChanged(ref this.plannedDate, value);
         }
 
-        /// <summary>Gets or sets the actual execution date.</summary>
+        /// <summary>
+        /// Gets or sets the actual execution date.
+        /// </summary>
         public DateTime? ActualDate
         {
             get => this.actualDate;
             set => this.RaiseAndSetIfChanged(ref this.actualDate, value);
         }
 
-        /// <summary>Gets or sets the owning <see cref="DomainOfExpertise"/>. Required.</summary>
+        /// <summary>
+        /// Gets or sets the owning <see cref="DomainOfExpertise"/>. Required.
+        /// </summary>
         public DomainOfExpertise Owner
         {
             get => this.owner;
@@ -863,10 +1027,14 @@ namespace CDP4Requirements.ViewModels
                         return string.IsNullOrWhiteSpace(this.LinkType) ? "Choose whether this item verifies or validates the requirement." : string.Empty;
 
                     case nameof(this.Method):
-                        return string.IsNullOrWhiteSpace(this.Method) ? "The verification method is mandatory." : string.Empty;
+                        return VandVInheritanceNote.IsSuppliedByItemOrActivity(this.SelectedActivity, this.Method, VandVParameter.Method)
+                            ? string.Empty
+                            : "The verification method is mandatory, unless the activity performing this item states one.";
 
                     case nameof(this.Stage):
-                        return string.IsNullOrWhiteSpace(this.Stage) ? "The stage gate is mandatory." : string.Empty;
+                        return VandVInheritanceNote.IsSuppliedByItemOrActivity(this.SelectedActivity, this.Stage, VandVParameter.Stage)
+                            ? string.Empty
+                            : "The stage gate is mandatory, unless the activity performing this item states one.";
 
                     case nameof(this.Acceptance):
                         return string.IsNullOrWhiteSpace(this.Acceptance) ? "The acceptance criteria are mandatory." : string.Empty;
@@ -896,12 +1064,12 @@ namespace CDP4Requirements.ViewModels
                 { VandVParameter.Preconditions, this.Preconditions },
                 { VandVParameter.Conditions, this.Conditions },
                 { VandVParameter.Facility, this.Facility },
-                { VandVParameter.ActivityNumber, this.ActivityNumber },
                 { VandVParameter.ExternalResponsible, this.ResponsibleExternal },
                 { VandVParameter.CoverageNote, this.CoverageNote },
                 { VandVParameter.EvidenceReference, this.EvidenceReference },
                 { VandVParameter.Result, this.Result },
                 { VandVCloseOut.ComplianceShortName, this.Compliance },
+                { VandVParameter.Closure, this.Closure },
                 { VandVCloseOut.ClosedShortName, this.IsClosed ? "true" : string.Empty },
                 { VandVCloseOut.CloseOutReasonShortName, this.CloseOutReason },
                 { VandVCloseOut.ClosedByShortName, this.ClosedBy },
@@ -945,9 +1113,10 @@ namespace CDP4Requirements.ViewModels
             this.lastGeneratedName = this.BuildSuggestedName();
             this.Name = this.lastGeneratedName;
             this.Status = this.PossibleStatuses.FirstOrDefault();
-            // explicitly, not simply the first RDL value: an item nobody has judged is Not Assessed
             this.Compliance = this.PossibleCompliances.FirstOrDefault(x => VandVCoverageQuery.AreSameEnumValue(x, VandVCloseOut.NotAssessed))
                               ?? this.PossibleCompliances.FirstOrDefault();
+            this.Closure = this.PossibleClosures.FirstOrDefault(x => VandVCoverageQuery.AreSameEnumValue(x, VandVClosure.NotAssessed))
+                           ?? this.PossibleClosures.FirstOrDefault();
             this.Owner = session.OpenIterations.TryGetValue(iteration, out var tuple) ? tuple?.Item1 : null;
         }
 
@@ -963,43 +1132,30 @@ namespace CDP4Requirements.ViewModels
             this.Owner = vandVItem.Owner;
             this.LinkType = string.IsNullOrWhiteSpace(existingLinkType) ? VerifiesLink : existingLinkType;
 
-            this.Method = Attribute(vandVItem, VandVParameter.Method);
-            this.Stage = Attribute(vandVItem, VandVParameter.Stage);
-            this.Level = Attribute(vandVItem, VandVParameter.Level);
-            this.Criticality = Attribute(vandVItem, VandVParameter.Criticality);
-            this.Status = Attribute(vandVItem, VandVParameter.Status);
-            this.Acceptance = Attribute(vandVItem, VandVParameter.AcceptanceCriteria);
-            this.Description = Attribute(vandVItem, VandVParameter.Description);
-            this.Preconditions = Attribute(vandVItem, VandVParameter.Preconditions);
-            this.Conditions = Attribute(vandVItem, VandVParameter.Conditions);
-            this.Facility = Attribute(vandVItem, VandVParameter.Facility);
-            this.ActivityNumber = Attribute(vandVItem, VandVParameter.ActivityNumber);
-            this.ResponsibleExternal = Attribute(vandVItem, VandVParameter.ExternalResponsible);
-            this.CoverageNote = Attribute(vandVItem, VandVParameter.CoverageNote);
-            this.EvidenceReference = Attribute(vandVItem, VandVParameter.EvidenceReference);
-            this.Result = Attribute(vandVItem, VandVParameter.Result);
+            this.Method = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Method);
+            this.Stage = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Stage);
+            this.Level = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Level);
+            this.Criticality = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Criticality);
+            this.Status = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Status);
+            this.Acceptance = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.AcceptanceCriteria);
+            this.Description = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Description);
+            this.Preconditions = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Preconditions);
+            this.Conditions = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Conditions);
+            this.Facility = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Facility);
+            this.ResponsibleExternal = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.ExternalResponsible);
+            this.CoverageNote = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.CoverageNote);
+            this.EvidenceReference = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.EvidenceReference);
+            this.Result = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.Result);
             this.Compliance = VandVCloseOut.QueryCompliance(vandVItem);
+            this.Closure = VandVStageGateQuery.QueryClosure(vandVItem);
             this.IsClosed = VandVCloseOut.IsClosed(vandVItem);
-            this.CloseOutReason = Attribute(vandVItem, VandVCloseOut.CloseOutReasonShortName);
-            this.ClosedBy = Attribute(vandVItem, VandVCloseOut.ClosedByShortName);
-            this.ClosedOn = ParseDate(Attribute(vandVItem, VandVCloseOut.ClosedOnShortName));
-            this.PlanReference = Attribute(vandVItem, VandVCloseOut.PlanReferenceShortName);
-            this.ProcedureReference = Attribute(vandVItem, VandVParameter.ProcedureReference);
-            this.PlannedDate = ParseDate(Attribute(vandVItem, VandVParameter.PlannedDate));
-            this.ActualDate = ParseDate(Attribute(vandVItem, VandVParameter.ActualDate));
-        }
-
-        /// <summary>
-        /// Reads a V&amp;V attribute off an item.
-        /// </summary>
-        /// <param name="item">The V&amp;V item.</param>
-        /// <param name="shortName">The parameter type short-name.</param>
-        /// <returns>The value, or null.</returns>
-        private static string Attribute(Requirement item, string shortName)
-        {
-            return item.ParameterValue
-                .FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == shortName)?
-                .Value.FirstOrDefault();
+            this.CloseOutReason = VandVCoverageQuery.Attribute(vandVItem, VandVCloseOut.CloseOutReasonShortName);
+            this.ClosedBy = VandVCoverageQuery.Attribute(vandVItem, VandVCloseOut.ClosedByShortName);
+            this.ClosedOn = ParseDate(VandVCoverageQuery.Attribute(vandVItem, VandVCloseOut.ClosedOnShortName));
+            this.PlanReference = VandVCoverageQuery.Attribute(vandVItem, VandVCloseOut.PlanReferenceShortName);
+            this.ProcedureReference = VandVCoverageQuery.Attribute(vandVItem, VandVParameter.ProcedureReference);
+            this.PlannedDate = ParseDate(VandVCoverageQuery.Attribute(vandVItem, VandVParameter.PlannedDate));
+            this.ActualDate = ParseDate(VandVCoverageQuery.Attribute(vandVItem, VandVParameter.ActualDate));
         }
 
         /// <summary>
@@ -1021,7 +1177,7 @@ namespace CDP4Requirements.ViewModels
         /// <param name="mrdl">The model's <see cref="ReferenceDataLibrary"/>, or null.</param>
         /// <param name="parameterTypeShortName">The parameter type short-name.</param>
         /// <returns>The values to offer in the pick-list.</returns>
-        private static IReadOnlyList<string> EnumerationValues(ReferenceDataLibrary mrdl, string parameterTypeShortName)
+        internal static IReadOnlyList<string> EnumerationValues(ReferenceDataLibrary mrdl, string parameterTypeShortName)
         {
             var fromRdl = mrdl?
                 .QueryParameterTypesFromChainOfRdls()
@@ -1051,9 +1207,6 @@ namespace CDP4Requirements.ViewModels
             var parameter = VandVCoverageWriter.QueryCoveredThings<ParameterOrOverrideBase>(iteration, vandVItem, VandVCoverageWriter.CoversParameter).FirstOrDefault();
             var element = VandVCoverageWriter.QueryCoveredThings<ElementDefinition>(iteration, vandVItem, VandVCoverageWriter.VerifiedOn).FirstOrDefault();
 
-            // the parameter is assigned first on purpose: setting the element definition runs PopulateParameters
-            // synchronously, and that is where a stored ParameterOverride gets added to the list so the combo can show
-            // it. Assigning the parameter afterwards left it selected but absent from the list, i.e. blank on screen
             this.SelectedParameter = parameter;
             this.SelectedElementDefinition = element ?? QueryOwningElement(parameter);
 
@@ -1077,7 +1230,6 @@ namespace CDP4Requirements.ViewModels
         /// <param name="parameter">The dropped parameter.</param>
         public void PreselectParameter(ParameterOrOverrideBase parameter)
         {
-            // assigned in this order for the reason given in LoadCoverage
             this.SelectedParameter = parameter;
             this.SelectedElementDefinition = QueryOwningElement(parameter);
         }
@@ -1190,9 +1342,6 @@ namespace CDP4Requirements.ViewModels
                 this.PossibleParameters.AddRange(this.SelectedElementDefinition.Parameter.OrderBy(x => x.ParameterType?.Name));
             }
 
-            // a stored ParameterOverride is kept visible (its usage points at the selected element), but a
-            // parameter belonging to a different element is dropped: keeping it let a mismatched element and
-            // parameter pairing be saved as coverage
             if (current != null && (this.SelectedElementDefinition == null || QueryOwningElement(current) == this.SelectedElementDefinition))
             {
                 if (!this.PossibleParameters.Contains(current))
@@ -1242,31 +1391,6 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Builds one picker entry for each parametric constraint of the requirement, plus one for every relational
-        /// expression inside it, so a multi-expression constraint can be split across several V&amp;V items.
-        /// </summary>
-        /// <param name="requirement">The covered requirement.</param>
-        /// <returns>The choices.</returns>
-        private static IReadOnlyList<ConstraintChoiceRowViewModel> BuildConstraintChoices(Requirement requirement)
-        {
-            var choices = new List<ConstraintChoiceRowViewModel>();
-
-            foreach (ParametricConstraint constraint in requirement.ParametricConstraint)
-            {
-                var expressions = constraint.Expression.OfType<RelationalExpression>().ToList();
-
-                choices.Add(new ConstraintChoiceRowViewModel(constraint, null));
-
-                if (expressions.Count > 1)
-                {
-                    choices.AddRange(expressions.Select(expression => new ConstraintChoiceRowViewModel(constraint, expression)));
-                }
-            }
-
-            return choices;
-        }
-
-        /// <summary>
         /// Builds the suggested name: the action implied by the link type, the requirement, and an ordinal when the
         /// requirement is already covered so two items never share a name.
         /// </summary>
@@ -1309,7 +1433,7 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            var expression = choice.ExpressionText;
+            var expression = choice.QueryExpressionText();
 
             if (!string.IsNullOrWhiteSpace(expression))
             {
@@ -1318,7 +1442,6 @@ namespace CDP4Requirements.ViewModels
                     : $"{this.Acceptance}{Environment.NewLine}{expression}";
             }
 
-            // a constraint bound to a parameter tells us exactly what this activity measures, so set the coverage too
             var parameter = choice.LinkedParameter;
 
             if (parameter != null)

@@ -41,20 +41,31 @@ namespace CDP4Requirements.Services
     public sealed class VandVCoverage
     {
         /// <summary>
+        /// The item-to-activity map of the iteration, resolved once by <see cref="VandVCoverageQuery.Build"/>.
+        /// </summary>
+        private readonly IReadOnlyDictionary<Guid, Requirement> activityByItem;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VandVCoverage"/> class.
         /// </summary>
         /// <param name="requirement">The covered <see cref="Requirement"/>.</param>
         /// <param name="vandVItems">The V&amp;V items covering it.</param>
-        public VandVCoverage(Requirement requirement, IReadOnlyList<Requirement> vandVItems)
+        /// <param name="activityByItem">The item-to-activity map, or null when derivation is not needed.</param>
+        public VandVCoverage(Requirement requirement, IReadOnlyList<Requirement> vandVItems, IReadOnlyDictionary<Guid, Requirement> activityByItem = null)
         {
             this.Requirement = requirement;
             this.VandVItems = vandVItems;
+            this.activityByItem = activityByItem;
         }
 
-        /// <summary>Gets the covered <see cref="Requirement"/>.</summary>
+        /// <summary>
+        /// Gets the covered <see cref="Requirement"/>.
+        /// </summary>
         public Requirement Requirement { get; }
 
-        /// <summary>Gets the V&amp;V items covering the requirement.</summary>
+        /// <summary>
+        /// Gets the V&amp;V items covering the requirement.
+        /// </summary>
         public IReadOnlyList<Requirement> VandVItems { get; }
 
         /// <summary>
@@ -65,11 +76,12 @@ namespace CDP4Requirements.Services
         public string CellText(string stage)
         {
             var atStage = this.VandVItems
-                .Where(item => VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(item, VandVParameter.Stage), stage))
+                .Where(item => VandVCoverageQuery.AreSameEnumValue(VandVActivityQuery.EffectiveAttribute(item, this.QueryPerformingActivity(item), VandVParameter.Stage), stage))
                 .Select(item =>
                 {
-                    var method = VandVCoverageQuery.Attribute(item, VandVParameter.Method);
-                    var status = VandVCoverageQuery.Attribute(item, VandVParameter.Status);
+                    var performingActivity = this.QueryPerformingActivity(item);
+                    var method = VandVActivityQuery.EffectiveAttribute(item, performingActivity, VandVParameter.Method);
+                    var status = VandVActivityQuery.EffectiveAttribute(item, performingActivity, VandVParameter.Status);
 
                     string activity;
 
@@ -79,7 +91,6 @@ namespace CDP4Requirements.Services
                     }
                     else if (string.IsNullOrWhiteSpace(method))
                     {
-                        // without this branch a status-only item rendered as " (Executed)" with orphaned parentheses
                         activity = status;
                     }
                     else
@@ -87,8 +98,6 @@ namespace CDP4Requirements.Services
                         activity = $"{method} ({status})";
                     }
 
-                    // lead with the item short-name: without it the matrix says what is planned but never which
-                    // activity to go and look at
                     return string.IsNullOrWhiteSpace(activity) ? item.ShortName : $"{item.ShortName}: {activity}";
                 })
                 .Where(text => !string.IsNullOrWhiteSpace(text))
@@ -96,10 +105,26 @@ namespace CDP4Requirements.Services
 
             return string.Join("; ", atStage);
         }
+
+        /// <summary>
+        /// Resolves the activity performing an item from the map built once per <see cref="VandVCoverageQuery.Build"/>,
+        /// falling back to a direct lookup when this coverage was constructed without one.
+        /// </summary>
+        /// <param name="item">The V&amp;V item.</param>
+        /// <returns>The performing activity, or null.</returns>
+        private Requirement QueryPerformingActivity(Requirement item)
+        {
+            if (this.activityByItem != null)
+            {
+                return this.activityByItem.TryGetValue(item.Iid, out var activity) ? activity : null;
+            }
+
+            return VandVActivityQuery.QueryActivity(item.GetContainerOfType<Iteration>(), item);
+        }
     }
 
     /// <summary>
-    /// The coverage of every requirement in an iteration, plus the stage gates that form the RVM columns.
+    /// The coverage of every requirement in an iteration, plus the stage gates that form the VCRM columns.
     /// </summary>
     public sealed class VandVCoverageModel
     {
@@ -108,19 +133,33 @@ namespace CDP4Requirements.Services
         /// </summary>
         /// <param name="coverages">The per-requirement coverage.</param>
         /// <param name="stages">The stage gates forming the matrix columns.</param>
-        public VandVCoverageModel(IReadOnlyList<VandVCoverage> coverages, IReadOnlyList<string> stages)
+        /// <param name="activityByItem">The item-to-activity map, resolved once for the whole iteration.</param>
+        public VandVCoverageModel(IReadOnlyList<VandVCoverage> coverages, IReadOnlyList<string> stages, IReadOnlyDictionary<Guid, Requirement> activityByItem = null)
         {
             this.Coverages = coverages;
             this.Stages = stages;
+            this.ActivityByItem = activityByItem ?? new Dictionary<Guid, Requirement>();
         }
 
-        /// <summary>Gets the per-requirement coverage.</summary>
+        /// <summary>
+        /// Gets the per-requirement coverage.
+        /// </summary>
         public IReadOnlyList<VandVCoverage> Coverages { get; }
 
-        /// <summary>Gets the stage gates forming the matrix columns.</summary>
+        /// <summary>
+        /// Gets the stage gates forming the matrix columns.
+        /// </summary>
         public IReadOnlyList<string> Stages { get; }
 
-        /// <summary>Gets the number of requirements with no covering V&amp;V item.</summary>
+        /// <summary>
+        /// Gets the map from a V&amp;V item's <see cref="Thing.Iid"/> to the activity performing it, resolved once so
+        /// consumers iterating many items (the exporter above all) do not rescan the relationships per item.
+        /// </summary>
+        public IReadOnlyDictionary<Guid, Requirement> ActivityByItem { get; }
+
+        /// <summary>
+        /// Gets the number of requirements with no covering V&amp;V item.
+        /// </summary>
         public int UncoveredCount => this.Coverages.Count(x => !x.VandVItems.Any());
     }
 
@@ -138,7 +177,7 @@ namespace CDP4Requirements.Services
         /// <returns>The <see cref="ModelReferenceDataLibrary"/>.</returns>
         public static ModelReferenceDataLibrary QueryRequiredRdl(Iteration iteration)
         {
-            var mrdl = ((EngineeringModel)iteration.Container).EngineeringModelSetup.RequiredRdl.FirstOrDefault();
+            var mrdl = ((EngineeringModel)iteration.Container)?.EngineeringModelSetup?.RequiredRdl.FirstOrDefault();
 
             if (mrdl == null)
             {
@@ -155,8 +194,6 @@ namespace CDP4Requirements.Services
         /// <returns>The <see cref="VandVCoverageModel"/>.</returns>
         public static VandVCoverageModel Build(Iteration iteration)
         {
-            // only links whose source really is a V&V item count: a 'verifies' link authored between two ordinary
-            // requirements is requirement traceability, not verification coverage
             var itemsByRequirement = iteration.Relationship
                 .OfType<BinaryRelationship>()
                 .Where(relationship =>
@@ -169,19 +206,20 @@ namespace CDP4Requirements.Services
                     group => group.Key,
                     group => group.Select(x => (Requirement)x.Source).Where(x => !x.IsDeprecated).ToList());
 
-            // the V&V specification holds the activities, not requirements to be verified; without this the
-            // export and the rules report V&V items as uncovered requirements that the tree never shows
+            var activityByItem = VandVActivityQuery.QueryActivityMap(iteration);
+
             var coverages = iteration.RequirementsSpecification
-                .Where(specification => !specification.IsDeprecated && specification.ShortName != VandVItemCreator.VandVSpecificationShortName)
+                .Where(specification => !specification.IsDeprecated && specification.ShortName != VandVItemCreator.VandVSpecificationShortName && !VandVActivityQuery.IsReport(specification))
                 .SelectMany(specification => specification.Requirement)
-                .Where(requirement => !requirement.IsDeprecated && !IsVnVItem(requirement) && !VandVProcedureWriter.IsStep(requirement))
+                .Where(requirement => !requirement.IsDeprecated && !IsVnVItem(requirement) && !VandVProcedureWriter.IsStep(requirement) && !VandVActivityQuery.IsActivity(requirement))
                 .OrderBy(requirement => requirement.ShortName)
                 .Select(requirement => new VandVCoverage(
                     requirement,
-                    itemsByRequirement.TryGetValue(requirement.Iid, out var items) ? items : new List<Requirement>()))
+                    itemsByRequirement.TryGetValue(requirement.Iid, out var items) ? items : new List<Requirement>(),
+                    activityByItem))
                 .ToList();
 
-            return new VandVCoverageModel(coverages, QueryStages(iteration, coverages));
+            return new VandVCoverageModel(coverages, QueryStages(iteration, coverages, activityByItem), activityByItem);
         }
 
         /// <summary>
@@ -191,10 +229,11 @@ namespace CDP4Requirements.Services
         /// </summary>
         /// <param name="iteration">The iteration.</param>
         /// <param name="coverages">The coverage already computed.</param>
+        /// <param name="activityByItem">The item-to-activity map, resolved once by <see cref="Build"/>.</param>
         /// <returns>The ordered stage gates.</returns>
-        private static IReadOnlyList<string> QueryStages(Iteration iteration, IReadOnlyList<VandVCoverage> coverages)
+        private static IReadOnlyList<string> QueryStages(Iteration iteration, IReadOnlyList<VandVCoverage> coverages, IReadOnlyDictionary<Guid, Requirement> activityByItem)
         {
-            var mrdl = ((EngineeringModel)iteration.Container).EngineeringModelSetup.RequiredRdl.FirstOrDefault();
+            var mrdl = ((EngineeringModel)iteration.Container)?.EngineeringModelSetup?.RequiredRdl.FirstOrDefault();
 
             var stages = mrdl?
                 .QueryParameterTypesFromChainOfRdls()
@@ -213,12 +252,13 @@ namespace CDP4Requirements.Services
 
             var used = coverages
                 .SelectMany(coverage => coverage.VandVItems)
-                .Select(item => Attribute(item, VandVParameter.Stage))
+                .Select(item => VandVActivityQuery.EffectiveAttribute(
+                    item,
+                    activityByItem.TryGetValue(item.Iid, out var performingActivity) ? performingActivity : null,
+                    VandVParameter.Stage))
                 .Where(stage => !string.IsNullOrWhiteSpace(stage))
                 .Distinct();
 
-            // compare normalized: the stock parameter-value editor stores enum shortNames ("Post_Landing") while
-            // this plugin stores names ("Post Landing"); both spellings must map onto one stage column
             foreach (var stage in used.Where(stage => !stages.Any(known => AreSameEnumValue(known, stage))))
             {
                 stages.Add(stage);
@@ -252,8 +292,23 @@ namespace CDP4Requirements.Services
         /// The one exception is a shortfall closed out without an accepted concession: counting that as passed made the
         /// roll-up claim a requirement was verified while <c>VnVItemCompletenessRule</c> reported a violation on the
         /// very same item.
+        /// An item without its own execution status inherits the status of the activity that performs it, so one
+        /// activity passing moves every item it performs, which is the whole point of a shared activity. Close-out and
+        /// compliance stay strictly per item.
         /// </remarks>
         public static VandVStatusRollUp RollUp(IEnumerable<Requirement> items)
+        {
+            return RollUp(items, null);
+        }
+
+        /// <summary>
+        /// Summarises a set of V&amp;V items, resolving each item's performing activity from an already built map so
+        /// callers rolling up many items do not rescan the relationships per item.
+        /// </summary>
+        /// <param name="items">The V&amp;V items being rolled up.</param>
+        /// <param name="activityByItem">The item-to-activity map, or null to resolve per item.</param>
+        /// <returns>The counts of closed-out, failed and open items.</returns>
+        public static VandVStatusRollUp RollUp(IEnumerable<Requirement> items, IReadOnlyDictionary<Guid, Requirement> activityByItem)
         {
             var passed = 0;
             var failed = 0;
@@ -275,7 +330,9 @@ namespace CDP4Requirements.Services
                     continue;
                 }
 
-                var status = Attribute(item, VandVParameter.Status);
+                var status = activityByItem == null
+                    ? VandVActivityQuery.EffectiveAttribute(item, VandVParameter.Status)
+                    : VandVActivityQuery.EffectiveAttribute(item, activityByItem.TryGetValue(item.Iid, out var performingActivity) ? performingActivity : null, VandVParameter.Status);
 
                 if (AreSameEnumValue(VandVStatus.Failed, status) || VandVCloseOut.IsShortfall(VandVCloseOut.QueryCompliance(item)))
                 {
@@ -346,24 +403,39 @@ namespace CDP4Requirements.Services
         }
 
         /// <summary>
-        /// Returns the <see cref="Thing.Iid"/> of every parameter covered by a V&amp;V item, so a caller can decide in
-        /// constant time whether a changed parameter is one the register cares about.
+        /// Builds, in one pass over the iteration's relationships, the V&amp;V items covering each parameter, keyed by
+        /// the parameter's <see cref="Thing.Iid"/>. A caller can then decide in constant time whether a changed
+        /// parameter matters at all, and refresh only the item rows that actually cover it instead of every row in
+        /// the register.
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/>.</param>
-        /// <returns>The covered parameter identifiers.</returns>
-        public static IEnumerable<Guid> QueryCoveredParameterIids(Iteration iteration)
+        /// <returns>The covering item <see cref="Thing.Iid"/>s per covered parameter.</returns>
+        public static IReadOnlyDictionary<Guid, IReadOnlyList<Guid>> QueryCoveredParameterMap(Iteration iteration)
         {
+            var map = new Dictionary<Guid, List<Guid>>();
+
             if (iteration == null)
             {
-                return Enumerable.Empty<Guid>();
+                return new Dictionary<Guid, IReadOnlyList<Guid>>();
             }
 
-            return iteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(relationship =>
-                    relationship.Target is ParameterOrOverrideBase
+            foreach (var relationship in iteration.Relationship.OfType<BinaryRelationship>())
+            {
+                if (relationship.Source != null
+                    && relationship.Target is ParameterOrOverrideBase
                     && IsCategorizedAs(relationship, new[] { VandVCategory.CoversParameter }))
-                .Select(relationship => relationship.Target.Iid);
+                {
+                    if (!map.TryGetValue(relationship.Target.Iid, out var items))
+                    {
+                        items = new List<Guid>();
+                        map.Add(relationship.Target.Iid, items);
+                    }
+
+                    items.Add(relationship.Source.Iid);
+                }
+            }
+
+            return map.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<Guid>)pair.Value);
         }
 
         /// <summary>

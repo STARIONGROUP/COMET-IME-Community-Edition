@@ -121,7 +121,7 @@ namespace CDP4Requirements.Services
                 .Cast<EngineeringModelDataAnnotation>()
                 .Concat(model.GenericNote)
                 .Where(annotation => annotation.RelatedThing.Any(reference => reference.ReferencedThing == thing))
-                .OrderBy(annotation => annotation.UserFriendlyShortName)
+                .OrderBy(AnnotationKind.QueryShortName)
                 .ToList();
         }
 

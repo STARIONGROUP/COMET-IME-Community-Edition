@@ -142,20 +142,25 @@ namespace CDP4Requirements.Tests.Services
             var created = this.captured.Operations.Select(o => o.ModifiedThing).OfType<DTO.Requirement>().ToList();
             var links = this.captured.Operations.Select(o => o.ModifiedThing).OfType<DTO.BinaryRelationship>().ToList();
 
-            Assert.That(created, Has.Count.EqualTo(2));
-            Assert.That(links, Has.Count.EqualTo(2), "each step is linked back to the item it belongs to");
-            Assert.That(links.All(x => x.Source == this.vandVItem.Iid), Is.True);
-            Assert.That(links.All(x => x.Category.Contains(this.hasStepCategory.Iid)), Is.True);
-            Assert.That(created.All(x => x.Category.Contains(this.stepCategory.Iid)), Is.True);
-
-            Assert.That(created.Select(x => x.ShortName), Is.EquivalentTo(new[] { "VNV_1_S01", "VNV_1_S02" }));
-            Assert.That(created.Any(x => x.Name == "Step 1: Power on the unit"), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(created, Has.Count.EqualTo(2));
+                Assert.That(links, Has.Count.EqualTo(2), "each step is linked back to the item it belongs to");
+                Assert.That(links.All(x => x.Source == this.vandVItem.Iid), Is.True);
+                Assert.That(links.All(x => x.Category.Contains(this.hasStepCategory.Iid)), Is.True);
+                Assert.That(created.All(x => x.Category.Contains(this.stepCategory.Iid)), Is.True);
+                Assert.That(created.Select(x => x.ShortName), Is.EquivalentTo(new[] { "VNV_1_S01", "VNV_1_S02" }));
+                Assert.That(created.Any(x => x.Name == "Step 1: Power on the unit"), Is.True);
+            });
 
             var values = this.captured.Operations.Select(o => o.ModifiedThing).OfType<DTO.SimpleParameterValue>().ToList();
 
-            Assert.That(values.Any(x => x.Value.Contains("Power on the unit")), Is.True);
-            Assert.That(values.Any(x => x.Value.Contains("Drew 98 mA")), Is.True);
-            Assert.That(values.Count(x => x.Value.Contains("1") || x.Value.Contains("2")), Is.GreaterThan(0), "steps carry their number");
+            Assert.Multiple(() =>
+            {
+                Assert.That(values.Any(x => x.Value.Contains("Power on the unit")), Is.True);
+                Assert.That(values.Any(x => x.Value.Contains("Drew 98 mA")), Is.True);
+                Assert.That(values.Count(x => x.Value.Contains("1") || x.Value.Contains("2")), Is.GreaterThan(0), "steps carry their number");
+            });
         }
 
         [Test]
@@ -176,10 +181,13 @@ namespace CDP4Requirements.Tests.Services
             // a Requirement is deprecatable and the SDK refuses to hard delete one, so a dropped step is deprecated
             var deprecated = updated.OfType<DTO.Requirement>().SingleOrDefault(x => x.Iid == removed.Iid);
 
-            Assert.That(deprecated, Is.Not.Null, "the dropped step is written back");
-            Assert.That(deprecated.IsDeprecated, Is.True, "and is deprecated, which is how a requirement is retired");
-            Assert.That(deleted.OfType<DTO.BinaryRelationship>(), Is.Not.Empty, "the link that held it is deleted outright");
-            Assert.That(updated.OfType<DTO.Requirement>().Any(x => x.Iid == kept.Iid && x.IsDeprecated), Is.False, "the kept step stays live");
+            Assert.Multiple(() =>
+            {
+                Assert.That(deprecated, Is.Not.Null, "the dropped step is written back");
+                Assert.That(deprecated.IsDeprecated, Is.True, "and is deprecated, which is how a requirement is retired");
+                Assert.That(deleted.OfType<DTO.BinaryRelationship>(), Is.Not.Empty, "the link that held it is deleted outright");
+                Assert.That(updated.OfType<DTO.Requirement>().Any(x => x.Iid == kept.Iid && x.IsDeprecated), Is.False, "the kept step stays live");
+            });
 
             var iterationUpdate = this.captured.Operations
                 .Where(o => o.OperationKind != OperationKind.Delete)
@@ -206,9 +214,12 @@ namespace CDP4Requirements.Tests.Services
             Assert.That(steps.Select(x => VandVCoverageQuery.Attribute(x, "vnv_step_action")),
                 Is.EqualTo(new[] { "first", "second", "no number" }));
 
-            Assert.That(VandVProcedureWriter.QueryStepNumber(unnumbered), Is.EqualTo(int.MaxValue));
-            Assert.That(VandVProcedureWriter.IsStep(steps.First()), Is.True);
-            Assert.That(VandVProcedureWriter.IsStep(this.vandVItem), Is.False, "the item itself is not one of its own steps");
+            Assert.Multiple(() =>
+            {
+                Assert.That(VandVProcedureWriter.QueryStepNumber(unnumbered), Is.EqualTo(int.MaxValue));
+                Assert.That(VandVProcedureWriter.IsStep(steps.First()), Is.True);
+                Assert.That(VandVProcedureWriter.IsStep(this.vandVItem), Is.False, "the item itself is not one of its own steps");
+            });
         }
 
         private Category AddCategory(string shortName, ClassKind permissibleClass)

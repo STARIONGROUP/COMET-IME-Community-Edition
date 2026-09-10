@@ -58,6 +58,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Operations;
 
     using CDP4Requirements.Comparers;
+    using CDP4Requirements.Services;
     using CDP4Requirements.Utils;
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
@@ -137,6 +138,11 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="IsParametricConstraintDisplayed"/>
         /// </summary>
         private bool isParametricConstraintDisplayed;
+
+        /// <summary>
+        /// Backing field for <see cref="IsVandVDisplayed"/>
+        /// </summary>
+        private bool isVandVDisplayed;
 
         /// <summary>
         /// The Panel Caption
@@ -327,6 +333,21 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the V&amp;V specifications are displayed: the V&amp;V plan holding
+        /// the V&amp;V items, and the report specifications holding the shared activities.
+        /// </summary>
+        /// <remarks>
+        /// Off by default. Those specifications hold verification bookkeeping, not requirements to be engineered, and
+        /// they are browsed in the V&amp;V Register and the V&amp;V Activities panels. Showing them here by default
+        /// doubled the size of the tree for everyone who never touches V&amp;V.
+        /// </remarks>
+        public bool IsVandVDisplayed
+        {
+            get => this.isVandVDisplayed;
+            set => this.RaiseAndSetIfChanged(ref this.isVandVDisplayed, value);
+        }
+
+        /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
@@ -401,7 +422,7 @@ namespace CDP4Requirements.ViewModels
 
                     var toBeAdded = new List<RequirementsSpecificationRowViewModel>();
 
-                    foreach (var requirementsSpecification in this.Thing.RequirementsSpecification)
+                    foreach (var requirementsSpecification in this.QueryVisibleSpecifications())
                     {
                         if (!this.ReqSpecificationRows.Select(x => x.Thing).Contains(requirementsSpecification))
                         {
@@ -437,7 +458,7 @@ namespace CDP4Requirements.ViewModels
         private void UpdateRequirementSpecificationsRows()
         {
             var currentReqSpec = this.ReqSpecificationRows.Select(x => x.Thing).ToList();
-            var updatedReqSpec = this.Thing.RequirementsSpecification;
+            var updatedReqSpec = this.QueryVisibleSpecifications().ToList();
 
             var added = updatedReqSpec.Except(currentReqSpec).ToList();
             var removed = currentReqSpec.Except(updatedReqSpec).ToList();
@@ -459,6 +480,25 @@ namespace CDP4Requirements.ViewModels
             {
                 this.RemoveSpecificationRow(requirementsSpecification);
             }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="RequirementsSpecification"/>s the tree shows: all of them, or, while
+        /// <see cref="IsVandVDisplayed"/> is off, everything except the V&amp;V plan and the V&amp;V report
+        /// specifications.
+        /// </summary>
+        /// <returns>The specifications to show.</returns>
+        private IEnumerable<RequirementsSpecification> QueryVisibleSpecifications()
+        {
+            if (this.IsVandVDisplayed)
+            {
+                return this.Thing.RequirementsSpecification;
+            }
+
+            return this.Thing.RequirementsSpecification
+                .Where(specification =>
+                    specification.ShortName != VandVItemCreator.VandVSpecificationShortName
+                    && !VandVActivityQuery.IsReport(specification));
         }
 
         /// <summary>
@@ -532,6 +572,16 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
+            this.Disposables.Add(
+                this.WhenAnyValue(x => x.IsVandVDisplayed)
+                    .Skip(1)
+                    .Subscribe(_ =>
+                    {
+                        this.HasUpdateStarted = true;
+                        this.UpdateRequirementSpecificationsRows();
+                        this.HasUpdateStarted = false;
+                    }));
+
             var engineeringModelSetupSubscription = this.CDPMessageBus
                 .Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                 .Where(
