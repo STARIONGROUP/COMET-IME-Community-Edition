@@ -8,8 +8,8 @@
     <Product>CDP4Scripting</Product>
     <Description>CDP4-COMET Scripting Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>11.0.1.3</AssemblyVersion>
-    <FileVersion>11.0.1.3</FileVersion>
+    <AssemblyVersion>11.1.0.4</AssemblyVersion>
+    <FileVersion>11.1.0.4</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
