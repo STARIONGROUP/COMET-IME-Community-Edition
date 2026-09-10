@@ -26,6 +26,7 @@
 namespace CDP4Requirements.Tests
 {
     using System;
+    using System.IO;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -314,20 +315,148 @@ namespace CDP4Requirements.Tests
             var builder = new ReqIFBuilder();
 
             var reqif = builder.BuildReqIF(this.session.Object, this.iteration);
-            Assert.IsNotNull(reqif);
 
-            // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
-            Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
-            Assert.AreEqual(2, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
-            Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
-            Assert.AreEqual(1, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif, Is.Not.Null);
 
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Single().SpecRelations);
+                // 2 + 1 extra datatype for requriement text
+                Assert.That(reqif.CoreContent.DataTypes, Has.Count.EqualTo(3)); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
+                Assert.That(reqif.CoreContent.SpecObjects, Has.Count.EqualTo(6)); // 4 requirements + 2 groups
+                Assert.That(reqif.CoreContent.Specifications, Has.Count.EqualTo(2)); // 2 specification
+                Assert.That(reqif.CoreContent.SpecTypes, Has.Count.EqualTo(5)); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+                Assert.That(reqif.CoreContent.SpecRelations, Has.Count.EqualTo(3)); // 3 specRelation from 3 relationship
+                Assert.That(reqif.CoreContent.SpecRelationGroups, Has.Count.EqualTo(1)); // 1 RelationGroup from 1 binaryRelationship
+
+                Assert.That(reqif.CoreContent.SpecRelationGroups.Single().SpecRelations, Is.Not.Empty);
+            });
 
             var serializer = new ReqIFSerializer(false);
             serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
+        }
+
+        [Test]
+        public void VerifyThatRequirementsWithDifferentParametersShareOneCollapsedType()
+        {
+            // a second requirement whose parameter differs from the boolean one used by all the others
+            var textParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "text", ShortName = "txt" };
+            this.srdl.ParameterType.Add(textParameterType);
+
+            var requirementWithText = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ReqText", ShortName = "RT" };
+            requirementWithText.Category.Add(this.reqCategory);
+            requirementWithText.ParameterValue.Add(new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = textParameterType, Value = new ValueArray<string>(new[] { "hello" }) });
+            this.reqSpec.Requirement.Add(requirementWithText);
+
+            var builder = new ReqIFBuilder();
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true);
+
+            // all requirements share the same rule-set, so there is exactly ONE requirement SpecObjectType
+            var requirementTypes = reqif.CoreContent.SpecTypes.OfType<SpecObjectType>()
+                .Where(x => !x.LongName.StartsWith(ThingToReqIfMapper.GroupNamePrefix))
+                .ToList();
+
+            var requirementType = requirementTypes.FirstOrDefault();
+
+            // the single collapsed type carries attribute definitions for BOTH parameter types (the union)
+            var datatypeIdentifiers = requirementType?.SpecAttributes.Select(x => x.DatatypeDefinition.Identifier).ToArray() ?? Array.Empty<string>();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(requirementTypes, Has.Count.EqualTo(1));
+                Assert.That(requirementType?.LongName, Is.EqualTo(this.parameRule.ShortName));
+                Assert.That(datatypeIdentifiers, Does.Contain(this.booleanParameterType.Iid.ToString()));
+                Assert.That(datatypeIdentifiers, Does.Contain(textParameterType.Iid.ToString()));
+            });
+        }
+
+        [Test]
+        public void VerifyThatOmgProfileExportsNativeNamesAndNoXhtml()
+        {
+            var builder = new ReqIFBuilder();
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true, null, ReqIfExportProfile.Omg);
+
+            var attributeNames = reqif.CoreContent.SpecTypes.SelectMany(st => st.SpecAttributes).Select(a => a.LongName).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif.CoreContent.DataTypes.OfType<DatatypeDefinitionXHTML>().Any(), Is.False, "no XHTML datatype in the OMG profile");
+                Assert.That(reqif.CoreContent.SpecObjects.SelectMany(so => so.Values).OfType<AttributeValueXHTML>(), Is.Empty, "no XHTML values in the OMG profile");
+                Assert.That(attributeNames, Does.Contain(ThingToReqIfMapper.ShortNameAttributeDefName));
+                Assert.That(attributeNames, Does.Contain(ThingToReqIfMapper.NameAttributeDefName));
+                Assert.That(attributeNames.Contains(ThingToReqIfMapper.ReqIfNameAttributeDefName), Is.False, "the OMG profile does not use the reserved names");
+            });
+        }
+
+        [Test]
+        public void VerifyThatDoorsCapellaProfileUsesReservedNamesAndXhtml()
+        {
+            var builder = new ReqIFBuilder();
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true, null, ReqIfExportProfile.DoorsCapella);
+
+            var attributeNames = reqif.CoreContent.SpecTypes.SelectMany(st => st.SpecAttributes).Select(a => a.LongName).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif.CoreContent.DataTypes.OfType<DatatypeDefinitionXHTML>().Any(), Is.True, "the DOORS/Capella profile exports an XHTML datatype");
+                Assert.That(attributeNames, Does.Contain(ThingToReqIfMapper.ReqIfNameAttributeDefName));
+                Assert.That(attributeNames, Does.Contain(ThingToReqIfMapper.ReqIfForeignIdAttributeDefName));
+                Assert.That(attributeNames.Contains(ThingToReqIfMapper.NameAttributeDefName), Is.False, "the DOORS/Capella profile uses the reserved names instead of the native ones");
+            });
+        }
+
+        [Test]
+        public void VerifyThatRequirementTextIsExportedAsXhtmlAndRoundtrips()
+        {
+            var builder = new ReqIFBuilder();
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true, null, ReqIfExportProfile.DoorsCapella);
+
+            var xhtmlValues = reqif.CoreContent.SpecObjects
+                .SelectMany(specObject => specObject.Values)
+                .OfType<AttributeValueXHTML>()
+                .ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif.CoreContent.DataTypes.OfType<DatatypeDefinitionXHTML>().Any(), Is.True, "an XHTML datatype is exported");
+                Assert.That(xhtmlValues, Is.Not.Empty, "requirement text is also exported as XHTML");
+                Assert.That(xhtmlValues.Any(v => v.TheValue.Contains("def1")), Is.True, "the requirement definition content is wrapped in the XHTML value");
+                Assert.That(xhtmlValues.All(v => v.TheValue.Contains("http://www.w3.org/1999/xhtml")), Is.True, "the XHTML value declares the XHTML namespace so it is valid");
+
+                // the plain-text string representation is kept so the COMET importer keeps round-tripping
+                Assert.That(reqif.CoreContent.SpecObjects.SelectMany(so => so.Values).OfType<AttributeValueString>().Any(v => v.TheValue == "def1"), Is.True);
+            });
+
+            // the produced document is valid ReqIF: it serializes and re-deserializes without error
+            var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "xhtml_roundtrip.reqif");
+            new ReqIFSerializer(false).Serialize(reqif, path, (o, e) => throw new Exception());
+
+            var reloaded = new ReqIFDeserializer().Deserialize(path, false, null).Single();
+            var reloadedXhtml = reloaded.CoreContent.SpecObjects.SelectMany(so => so.Values).OfType<AttributeValueXHTML>().ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reloadedXhtml, Is.Not.Empty);
+                Assert.That(reloadedXhtml.Any(v => v.TheValue.Contains("def1")), Is.True);
+            });
+        }
+
+        [Test]
+        public void VerifyThatOnlySelectedRequirementsSpecificationsAreExported()
+        {
+            var builder = new ReqIFBuilder();
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, false, new[] { this.reqSpec });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif, Is.Not.Null);
+                Assert.That(reqif.CoreContent.Specifications, Has.Count.EqualTo(1)); // only the single selected specification
+                Assert.That(reqif.CoreContent.Specifications.Single().Identifier, Is.EqualTo(this.reqSpec.Iid.ToString()));
+            });
         }
 
         [Test]
@@ -336,18 +465,22 @@ namespace CDP4Requirements.Tests
             var builder = new ReqIFBuilder();
 
             var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true);
-            Assert.IsNotNull(reqif);
 
-            // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
-            Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 5 requirements + 2 groups
-            Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 3 specification
-            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type,3 Spec type, 1 Relation type, 1 relationGroup type
-            Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 4 specRelation from 3 relationship
-            Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 2 RelationGroup from 1 binaryRelationship
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif, Is.Not.Null);
 
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.First().SpecRelations);
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations);
+                // 2 + 1 extra datatype for requriement text
+                Assert.That(reqif.CoreContent.DataTypes, Has.Count.EqualTo(3)); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
+                Assert.That(reqif.CoreContent.SpecObjects, Has.Count.EqualTo(7)); // 5 requirements + 2 groups
+                Assert.That(reqif.CoreContent.Specifications, Has.Count.EqualTo(3)); // 3 specification
+                Assert.That(reqif.CoreContent.SpecTypes, Has.Count.EqualTo(5)); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+                Assert.That(reqif.CoreContent.SpecRelations, Has.Count.EqualTo(4)); // 4 specRelation from 3 relationship
+                Assert.That(reqif.CoreContent.SpecRelationGroups, Has.Count.EqualTo(2)); // 2 RelationGroup from 1 binaryRelationship
+
+                Assert.That(reqif.CoreContent.SpecRelationGroups.First().SpecRelations, Is.Not.Empty);
+                Assert.That(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations, Is.Not.Empty);
+            });
 
             var serializer = new ReqIFSerializer(false);
             serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
@@ -361,18 +494,22 @@ namespace CDP4Requirements.Tests
             this.deprecatedRequirementsSpecification.IsDeprecated = false;
 
             var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true);
-            Assert.IsNotNull(reqif);
 
-            // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
-            Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
-            Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
-            Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
-            Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif, Is.Not.Null);
 
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.First().SpecRelations);
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations);
+                // 2 + 1 extra datatype for requriement text
+                Assert.That(reqif.CoreContent.DataTypes, Has.Count.EqualTo(3)); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
+                Assert.That(reqif.CoreContent.SpecObjects, Has.Count.EqualTo(7)); // 4 requirements + 2 groups
+                Assert.That(reqif.CoreContent.Specifications, Has.Count.EqualTo(3)); // 2 specification
+                Assert.That(reqif.CoreContent.SpecTypes, Has.Count.EqualTo(5)); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+                Assert.That(reqif.CoreContent.SpecRelations, Has.Count.EqualTo(4)); // 3 specRelation from 3 relationship
+                Assert.That(reqif.CoreContent.SpecRelationGroups, Has.Count.EqualTo(2)); // 1 RelationGroup from 1 binaryRelationship
+
+                Assert.That(reqif.CoreContent.SpecRelationGroups.First().SpecRelations, Is.Not.Empty);
+                Assert.That(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations, Is.Not.Empty);
+            });
 
             var serializer = new ReqIFSerializer(false);
             serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
@@ -386,23 +523,27 @@ namespace CDP4Requirements.Tests
             this.deprecatedRequirement.IsDeprecated = false;
 
             var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true);
-            Assert.IsNotNull(reqif);
 
-            // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
-            Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
-            Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
-            Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
-            Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif, Is.Not.Null);
 
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.First().SpecRelations);
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations);
+                // 2 + 1 extra datatype for requriement text
+                Assert.That(reqif.CoreContent.DataTypes, Has.Count.EqualTo(3)); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
+                Assert.That(reqif.CoreContent.SpecObjects, Has.Count.EqualTo(7)); // 4 requirements + 2 groups
+                Assert.That(reqif.CoreContent.Specifications, Has.Count.EqualTo(3)); // 2 specification
+                Assert.That(reqif.CoreContent.SpecTypes, Has.Count.EqualTo(5)); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
+                Assert.That(reqif.CoreContent.SpecRelations, Has.Count.EqualTo(4)); // 3 specRelation from 3 relationship
+                Assert.That(reqif.CoreContent.SpecRelationGroups, Has.Count.EqualTo(2)); // 1 RelationGroup from 1 binaryRelationship
+
+                Assert.That(reqif.CoreContent.SpecRelationGroups.First().SpecRelations, Is.Not.Empty);
+                Assert.That(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations, Is.Not.Empty);
+            });
 
             var serializer = new ReqIFSerializer(false);
             serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
         }
-        
+
         [Test]
         public void VerifyThatRequirementSpecificationCanBeExportedIntoReqIF_Default_HavingDeprecatedRequirementsSpecification()
         {
@@ -411,18 +552,22 @@ namespace CDP4Requirements.Tests
             this.deprecatedRequirementsSpecification.IsDeprecated = false;
 
             var reqif = builder.BuildReqIF(this.session.Object, this.iteration);
-            Assert.IsNotNull(reqif);
 
-            // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
-            Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
-            Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
-            Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
-            Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif, Is.Not.Null);
 
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.First().SpecRelations);
-            Assert.IsEmpty(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations);
+                // 2 + 1 extra datatype for requriement text
+                Assert.That(reqif.CoreContent.DataTypes, Has.Count.EqualTo(3)); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
+                Assert.That(reqif.CoreContent.SpecObjects, Has.Count.EqualTo(6)); // 4 requirements + 2 groups
+                Assert.That(reqif.CoreContent.Specifications, Has.Count.EqualTo(3)); // 2 specification
+                Assert.That(reqif.CoreContent.SpecTypes, Has.Count.EqualTo(5)); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+                Assert.That(reqif.CoreContent.SpecRelations, Has.Count.EqualTo(3)); // 3 specRelation from 3 relationship
+                Assert.That(reqif.CoreContent.SpecRelationGroups, Has.Count.EqualTo(2)); // 1 RelationGroup from 1 binaryRelationship
+
+                Assert.That(reqif.CoreContent.SpecRelationGroups.First().SpecRelations, Is.Not.Empty);
+                Assert.That(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations, Is.Empty);
+            });
 
             var serializer = new ReqIFSerializer(false);
             serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
@@ -436,20 +581,47 @@ namespace CDP4Requirements.Tests
             this.deprecatedRequirement.IsDeprecated = false;
 
             var reqif = builder.BuildReqIF(this.session.Object, this.iteration);
-            Assert.IsNotNull(reqif);
 
-            // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
-            Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
-            Assert.AreEqual(2, reqif.CoreContent.Specifications.Count); // 2 specification
-            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
-            Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
-            Assert.AreEqual(1, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+            Assert.Multiple(() =>
+            {
+                Assert.That(reqif, Is.Not.Null);
 
-            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Single().SpecRelations);
+                // 2 + 1 extra datatype for requriement text
+                Assert.That(reqif.CoreContent.DataTypes, Has.Count.EqualTo(3)); // booleanPt and boolean and Text datatype (OMG default, no XHTML)
+                Assert.That(reqif.CoreContent.SpecObjects, Has.Count.EqualTo(6)); // 4 requirements + 2 groups
+                Assert.That(reqif.CoreContent.Specifications, Has.Count.EqualTo(2)); // 2 specification
+                Assert.That(reqif.CoreContent.SpecTypes, Has.Count.EqualTo(5)); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
+                Assert.That(reqif.CoreContent.SpecRelations, Has.Count.EqualTo(3)); // 3 specRelation from 3 relationship
+                Assert.That(reqif.CoreContent.SpecRelationGroups, Has.Count.EqualTo(1)); // 1 RelationGroup from 1 binaryRelationship
+
+                Assert.That(reqif.CoreContent.SpecRelationGroups.Single().SpecRelations, Is.Not.Empty);
+            });
 
             var serializer = new ReqIFSerializer(false);
             serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
+        }
+
+        [Test]
+        public void VerifyThatRequirementsWithIdenticalTypeShareASingleSpecObjectType()
+        {
+            // All exported requirements share the same category/rule and parameter type, so they must
+            // collapse onto a single requirement SpecObjectType instead of one per requirement (GH #1487)
+            var builder = new ReqIFBuilder();
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration);
+
+            var requirementSpecObjectTypes = reqif.CoreContent.SpecTypes
+                .OfType<SpecObjectType>()
+                .Where(x => !x.LongName.StartsWith(ThingToReqIfMapper.GroupNamePrefix))
+                .ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(requirementSpecObjectTypes, Has.Count.EqualTo(1));
+
+                // the attribute definition created for the requirement's parameter value carries the parameter type name
+                Assert.That(requirementSpecObjectTypes.Any(t => t.SpecAttributes.Any(x => x.LongName == this.booleanParameterType.ShortName)), Is.True);
+            });
         }
 
         [Test]

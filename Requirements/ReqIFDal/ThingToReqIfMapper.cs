@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ThingToReqIfMapper.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2021 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
@@ -29,6 +29,7 @@ namespace CDP4Requirements.ReqIFDal
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Security;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -83,9 +84,49 @@ namespace CDP4Requirements.ReqIFDal
         public const string RequirementTextAttributeDefName = "Requirement Text";
 
         /// <summary>
+        /// The <see cref="AttributeDefinition.LongName"/> for the requirement text in XHTML (rich-text) form.
+        /// This uses the prostep ivip reserved name so that tools such as DOORS and Capella recognize it as the
+        /// requirement's rich text on import.
+        /// </summary>
+        public const string RequirementTextXhtmlAttributeDefName = "ReqIF.Text";
+
+        /// <summary>
         /// The <see cref="AttributeDefinition.LongName"/> for the <see cref="Requirement.IsDeprecated"/> and <see cref="RequirementsSpecification.IsDeprecated"/>
         /// </summary>
         public const string IsDeprecatedAttributeDefName = "IsDeprecated";
+
+        /// <summary>
+        /// The prostep ivip reserved <see cref="AttributeDefinition.LongName"/> for the name, used in the
+        /// <see cref="ReqIfExportProfile.DoorsCapella"/> profile so that DOORS and Capella map it to their name field.
+        /// </summary>
+        public const string ReqIfNameAttributeDefName = "ReqIF.Name";
+
+        /// <summary>
+        /// The prostep ivip reserved <see cref="AttributeDefinition.LongName"/> for the external identifier (short-name),
+        /// used in the <see cref="ReqIfExportProfile.DoorsCapella"/> profile.
+        /// </summary>
+        public const string ReqIfForeignIdAttributeDefName = "ReqIF.ForeignID";
+
+        /// <summary>
+        /// Gets or sets the <see cref="ReqIfExportProfile"/> that the export targets. Defaults to
+        /// <see cref="ReqIfExportProfile.Omg"/>.
+        /// </summary>
+        public ReqIfExportProfile Profile { get; set; } = ReqIfExportProfile.Omg;
+
+        /// <summary>
+        /// Gets the profile-dependent <see cref="AttributeDefinition.LongName"/> for the name attribute.
+        /// </summary>
+        public string NameAttributeName => this.Profile == ReqIfExportProfile.DoorsCapella ? ReqIfNameAttributeDefName : NameAttributeDefName;
+
+        /// <summary>
+        /// Gets the profile-dependent <see cref="AttributeDefinition.LongName"/> for the short-name attribute.
+        /// </summary>
+        public string ShortNameAttributeName => this.Profile == ReqIfExportProfile.DoorsCapella ? ReqIfForeignIdAttributeDefName : ShortNameAttributeDefName;
+
+        /// <summary>
+        /// Gets a value indicating whether the requirement text should also be exported as rich-text (XHTML).
+        /// </summary>
+        public bool ExportXhtmlText => this.Profile == ReqIfExportProfile.DoorsCapella;
 
         /// <summary>
         /// Creates a new instance of the <see cref="ThingToReqIfMapper"/> classs
@@ -116,6 +157,29 @@ namespace CDP4Requirements.ReqIFDal
             Description = "A boolean datatype",
             LastChange = DateTime.Now
         };
+
+        /// <summary>
+        /// The <see cref="DatatypeDefinitionXHTML"/> used for the rich-text (XHTML) representation of the requirement text
+        /// </summary>
+        public readonly DatatypeDefinitionXHTML XhtmlDatatypeDefinition = new()
+        {
+            LongName = "XHTML",
+            Identifier = "b1f4a1d6-8f3a-4a0e-9d21-6f0c0a3b2e77",
+            Description = "An XHTML datatype",
+            LastChange = DateTime.UtcNow
+        };
+
+        /// <summary>
+        /// Wraps plain text in a self-contained XHTML <c>div</c> (declaring the XHTML namespace locally) so that it is a
+        /// valid <see cref="AttributeValueXHTML"/> value. ReqIFSharp writes the value verbatim and does not declare the
+        /// XHTML namespace itself, so the namespace must be carried on the element.
+        /// </summary>
+        /// <param name="text">The plain text to wrap</param>
+        /// <returns>The XHTML string representation</returns>
+        public static string ToXhtmlDiv(string text)
+        {
+            return $"<div xmlns=\"http://www.w3.org/1999/xhtml\">{SecurityElement.Escape(text ?? string.Empty)}</div>";
+        }
 
         /// <summary>
         /// Returns a <see cref="SpecObjectType"/> associated to a <see cref="RequirementsGroup"/> and a set of rules
@@ -195,25 +259,25 @@ namespace CDP4Requirements.ReqIFDal
         }
 
         /// <summary>
-        /// Returns the <see cref="SpecObjectType"/> corresponding to a <see cref="Requirement"/>
+        /// Returns the single <see cref="SpecObjectType"/> shared by all <see cref="Requirement"/>s that have the same
+        /// set of applied <see cref="ParameterizedCategoryRule"/>s.
         /// </summary>
-        /// <param name="requirement">The <see cref="Requirement"/></param>
-        /// <param name="appliedRules">The applied <see cref="ParameterizedCategoryRule"/></param>
+        /// <param name="appliedRules">The applied <see cref="ParameterizedCategoryRule"/>s that name the type</param>
+        /// <param name="parameterTypes">
+        /// The union of all <see cref="ParameterType"/>s used by the requirements that share this type; each becomes an
+        /// optional attribute definition so that a single type can represent requirements with different parameters
+        /// (as ReqIF tools such as DOORS and Capella expect), rather than one type per parameter combination.
+        /// </param>
         /// <param name="parameterTypeMap">The map of <see cref="ParameterType"/> to <see cref="DatatypeDefinition"/></param>
         /// <returns>the <see cref="SpecObjectType"/></returns>
-        public SpecObjectType ToReqIfSpecObjectType(Requirement requirement, IReadOnlyCollection<ParameterizedCategoryRule> appliedRules, IReadOnlyDictionary<ParameterType, DatatypeDefinition> parameterTypeMap)
+        public SpecObjectType ToReqIfSpecObjectType(IReadOnlyCollection<ParameterizedCategoryRule> appliedRules, IReadOnlyCollection<ParameterType> parameterTypes, IReadOnlyDictionary<ParameterType, DatatypeDefinition> parameterTypeMap)
         {
-            if (requirement == null)
-            {
-                throw new ArgumentNullException(nameof(requirement));
-            }
-
             var specObjectType = new SpecObjectType()
             {
                 Identifier = Guid.NewGuid().ToString(),
-                LongName = appliedRules.Any() ? string.Join(", ", appliedRules.Select(r => r.ShortName)) : requirement.ClassKind.ToString(),
+                LongName = appliedRules.Any() ? string.Join(", ", appliedRules.Select(r => r.ShortName)) : ClassKind.Requirement.ToString(),
                 LastChange = DateTime.UtcNow,
-                Description = appliedRules.Any() ? string.Join(", ", appliedRules.Select(r => r.Name)) : requirement.ClassKind.ToString()
+                Description = appliedRules.Any() ? string.Join(", ", appliedRules.Select(r => r.Name)) : ClassKind.Requirement.ToString()
             };
 
             this.AddCommonAttributeDefinition(specObjectType);
@@ -229,6 +293,20 @@ namespace CDP4Requirements.ReqIFDal
 
             specObjectType.SpecAttributes.Add(requirementAttDefinition);
 
+            if (this.ExportXhtmlText)
+            {
+                var requirementXhtmlAttDefinition = new AttributeDefinitionXHTML
+                {
+                    LongName = RequirementTextXhtmlAttributeDefName,
+                    LastChange = DateTime.UtcNow,
+                    Description = "The Requirement Text (rich-text) Attribute Definition",
+                    Identifier = Guid.NewGuid().ToString(),
+                    Type = this.XhtmlDatatypeDefinition
+                };
+
+                specObjectType.SpecAttributes.Add(requirementXhtmlAttDefinition);
+            }
+
             var isDeprecatedAttributeDefinition = new AttributeDefinitionBoolean()
             {
                 LongName = IsDeprecatedAttributeDefName,
@@ -240,13 +318,8 @@ namespace CDP4Requirements.ReqIFDal
 
             specObjectType.SpecAttributes.Add(isDeprecatedAttributeDefinition);
 
-            // set the attribute-definition
-            var parameterTypes = appliedRules.SelectMany(r => r.ParameterType).ToList();
-            var requirementParameterTypes = requirement.ParameterValue.Select(spv => spv.ParameterType);
-
-            parameterTypes.AddRange(requirementParameterTypes);
-
-            foreach (var parameterType in parameterTypes.Distinct())
+            // one optional attribute definition per parameter type in the union
+            foreach (var parameterType in parameterTypes.Where(x => x != null).Distinct())
             {
                 var attibuteDef = this.ToReqIfAttributeDefinition(parameterType, parameterTypeMap);
                 specObjectType.SpecAttributes.Add(attibuteDef);
@@ -304,6 +377,21 @@ namespace CDP4Requirements.ReqIFDal
                 };
 
                 specObject.Values.Add(requirementValue);
+
+                // Also add the rich-text (XHTML) representation so tools such as DOORS and Capella render it as
+                // formatted text; the plain string above is kept so that the COMET importer keeps round-tripping.
+                if (this.ExportXhtmlText)
+                {
+                    var xhtmlAttributeDefinition = (AttributeDefinitionXHTML)specObjectType.SpecAttributes.Single(def => def.DatatypeDefinition == this.XhtmlDatatypeDefinition && def.LongName == RequirementTextXhtmlAttributeDefName);
+
+                    var requirementXhtmlValue = new AttributeValueXHTML
+                    {
+                        TheValue = ToXhtmlDiv(definition.Content),
+                        Definition = xhtmlAttributeDefinition
+                    };
+
+                    specObject.Values.Add(requirementXhtmlValue);
+                }
             }
 
             // Add extra AttributeValue corresponding to the isDeprecated property            
@@ -751,6 +839,7 @@ namespace CDP4Requirements.ReqIFDal
             }
 
             attributeDefinition.Identifier = Guid.NewGuid().ToString();
+            attributeDefinition.LongName = parameterType.ShortName;
             return attributeDefinition;
         }
 
@@ -891,7 +980,7 @@ namespace CDP4Requirements.ReqIFDal
                 Type = this.TextDatatypeDefinition,
                 Description = "The Short-Name Attribute",
                 LastChange = DateTime.UtcNow,
-                LongName = ShortNameAttributeDefName
+                LongName = this.ShortNameAttributeName
             };
 
             spectType.SpecAttributes.Add(shortNameAttributeDef);
@@ -902,7 +991,7 @@ namespace CDP4Requirements.ReqIFDal
                 Type = this.TextDatatypeDefinition,
                 Description = "The Name Attribute",
                 LastChange = DateTime.UtcNow,
-                LongName = NameAttributeDefName
+                LongName = this.NameAttributeName
             };
 
             spectType.SpecAttributes.Add(nameAttributeDef);
@@ -926,8 +1015,8 @@ namespace CDP4Requirements.ReqIFDal
         /// <param name="thing">The associated <see cref="ICategorizableThing"/></param>
         private void SetCommonAttributeValues(SpecElementWithAttributes elementWithAttributes, ICategorizableThing thing)
         {
-            var shortNameType = (AttributeDefinitionString)elementWithAttributes.SpecType.SpecAttributes.Single(x => x.DatatypeDefinition == this.TextDatatypeDefinition && x.LongName == ShortNameAttributeDefName);
-            var nameType = (AttributeDefinitionString)elementWithAttributes.SpecType.SpecAttributes.Single(x => x.DatatypeDefinition == this.TextDatatypeDefinition && x.LongName == NameAttributeDefName);
+            var shortNameType = (AttributeDefinitionString)elementWithAttributes.SpecType.SpecAttributes.Single(x => x.DatatypeDefinition == this.TextDatatypeDefinition && x.LongName == this.ShortNameAttributeName);
+            var nameType = (AttributeDefinitionString)elementWithAttributes.SpecType.SpecAttributes.Single(x => x.DatatypeDefinition == this.TextDatatypeDefinition && x.LongName == this.NameAttributeName);
             var categoryType = (AttributeDefinitionString)elementWithAttributes.SpecType.SpecAttributes.Single(x => x.DatatypeDefinition == this.TextDatatypeDefinition && x.LongName == CategoryAttributeDefName);
 
             var castthing = (Thing)thing;

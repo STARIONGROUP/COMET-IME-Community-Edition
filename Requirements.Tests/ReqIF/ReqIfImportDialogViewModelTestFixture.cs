@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportDialogViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -179,78 +179,99 @@ namespace CDP4Requirements.Tests.ReqIF
         public async Task VerifyThatCancelCommandWorks()
         {
             await this.dialog.CancelCommand.Execute();
-            Assert.IsFalse(this.dialog.DialogResult.Result.Value);
+            Assert.That(this.dialog.DialogResult.Result.Value, Is.False);
         }
 
         [Test]
         public async Task VerifyBrowseCommand()
         {
             await this.dialog.BrowseCommand.Execute();
-            this.fileDialogService.Verify(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1), Times.Once);
-            Assert.IsNotNull(this.dialog.Path);
+            this.fileDialogService.Verify(x => x.GetOpenFileDialog(true, true, false, It.Is<string>(filter => filter.Contains(".reqifz") && filter.Contains(".zip")), It.IsAny<string>(), It.IsAny<string>(), 1), Times.Once);
+            Assert.That(this.dialog.Path, Is.Not.Null);
         }
 
         [Test]
         public async Task VerifyThatExecuteOkWorks()
         {
-            Assert.IsFalse(this.dialog.CanExecuteImport);
+            Assert.That(this.dialog.CanExecuteImport, Is.False);
             this.dialog.Path = this.path;
             this.dialog.SelectedIteration = this.dialog.Iterations.First();
 
-            Assert.IsTrue(this.dialog.CanExecuteImport);
+            Assert.That(this.dialog.CanExecuteImport, Is.True);
             await this.dialog.OkCommand.Execute();
             this.reqIfSerialiser.Verify(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null), Times.Once);
             this.pluginSettingService.Verify(x => x.Read<RequirementsModuleSettings>(true, It.IsAny<JsonConverter[]>()), Times.Once);
             var result = this.dialog.DialogResult as ReqIfImportResult;
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result?.Result.Value);
-            Assert.AreSame(this.settings.SavedConfigurations[0], result.MappingConfiguration);
-            Assert.IsNotNull(result.Iteration);
-            Assert.IsNotNull(result.ReqIfObject);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result?.Result.Value, Is.True);
+                Assert.That(result.MappingConfiguration, Is.SameAs(this.settings.SavedConfigurations[0]));
+                Assert.That(result.Iteration, Is.Not.Null);
+                Assert.That(result.ReqIfObject, Is.Not.Null);
+            });
         }
 
         [Test]
         public async Task VerifyThatSavedConfigurationArePickedUpCorrectly()
         {
-            Assert.IsFalse(this.dialog.CanExecuteImport);
+            Assert.That(this.dialog.CanExecuteImport, Is.False);
             this.dialog.Path = this.path;
             this.dialog.SelectedIteration = this.dialog.Iterations.First();
 
             // Without Any Configuration
             this.dialog.SelectedMappingConfiguration = this.dialog.AvailableMappingConfiguration.FirstOrDefault(x => x.Name == ReqIfImportDialogViewModel.NoConfigurationText);
-            Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.NoConfigurationText);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.NoConfigurationText, Is.True);
 
-            Assert.IsTrue(this.dialog.CanExecuteImport);
+                Assert.That(this.dialog.CanExecuteImport, Is.True);
+            });
             await this.dialog.OkCommand.Execute();
             var resultNoConfiguration = this.dialog.DialogResult as ReqIfImportResult;
-            Assert.IsNotNull(resultNoConfiguration);
-            Assert.IsTrue(resultNoConfiguration?.Result.Value);
-            Assert.IsNull(resultNoConfiguration.MappingConfiguration);
+            Assert.Multiple(() =>
+            {
+                Assert.That(resultNoConfiguration, Is.Not.Null);
+                Assert.That(resultNoConfiguration?.Result.Value, Is.True);
+                Assert.That(resultNoConfiguration.MappingConfiguration, Is.Null);
+            });
 
             //With AUTO selection of the mapping configuration
             this.dialog.SelectedMappingConfiguration = this.dialog.AvailableMappingConfiguration.FirstOrDefault(x => x.Name == ReqIfImportDialogViewModel.AutoConfigurationText);
-            Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.AutoConfigurationText);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.AutoConfigurationText, Is.True);
 
-            Assert.IsTrue(this.dialog.CanExecuteImport);
+                Assert.That(this.dialog.CanExecuteImport, Is.True);
+            });
             await this.dialog.OkCommand.Execute();
 
-            Assert.IsNotNull(this.dialog.SelectedMappingConfiguration);
+            Assert.That(this.dialog.SelectedMappingConfiguration, Is.Not.Null);
             var resultAutoSelectedConfiguration = this.dialog.DialogResult as ReqIfImportResult;
-            Assert.IsNotNull(resultAutoSelectedConfiguration);
-            Assert.IsTrue(resultAutoSelectedConfiguration?.Result.Value);
-            Assert.AreSame(this.settings.SavedConfigurations[0], resultAutoSelectedConfiguration.MappingConfiguration);
+            Assert.Multiple(() =>
+            {
+                Assert.That(resultAutoSelectedConfiguration, Is.Not.Null);
+                Assert.That(resultAutoSelectedConfiguration?.Result.Value, Is.True);
+                Assert.That(resultAutoSelectedConfiguration.MappingConfiguration, Is.SameAs(this.settings.SavedConfigurations[0]));
+            });
 
             //With explicite selection
             this.dialog.SelectedMappingConfiguration = this.dialog.AvailableMappingConfiguration.Last();
-            Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == this.settings.SavedConfigurations.Last().Name);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.dialog.SelectedMappingConfiguration.Name == this.settings.SavedConfigurations.Last().Name, Is.True);
 
-            Assert.IsTrue(this.dialog.CanExecuteImport);
+                Assert.That(this.dialog.CanExecuteImport, Is.True);
+            });
             await this.dialog.OkCommand.Execute();
-            Assert.IsNotNull(this.dialog.SelectedMappingConfiguration);
+            Assert.That(this.dialog.SelectedMappingConfiguration, Is.Not.Null);
             var result = this.dialog.DialogResult as ReqIfImportResult;
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result?.Result.Value);
-            Assert.AreSame(this.settings.SavedConfigurations[0], result.MappingConfiguration);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result?.Result.Value, Is.True);
+                Assert.That(result.MappingConfiguration, Is.SameAs(this.settings.SavedConfigurations[0]));
+            });
 
             //Verifications on Mocks
 
