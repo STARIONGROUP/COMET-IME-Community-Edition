@@ -179,28 +179,79 @@ namespace CDP4Reporting.Tests.DataCollection
 
             Assert.That(result, Is.EqualTo("1234.56"));
         }
-
+        
         [Test]
-        public void VerifyThatCurrentCultureGroupSeparatedNumberIsNormalized()
-        {
-            var currentCulture = CultureInfo.CurrentCulture;
-
-            try
-            {
-                // nl-NL uses "." as group separator and "," as decimal separator, as an "N2" formatted report value would produce
-                CultureInfo.CurrentCulture = new CultureInfo("nl-NL");
-
-                var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
-                var result = this.processedValueSetGenerator.NormalizeNumericValue("1.234,56", quantityKind);
-
-                Assert.That(result, Is.EqualTo("1234.56"));
-            }
-            finally
-            {
-                CultureInfo.CurrentCulture = currentCulture;
-            }
-        }
-
+       public void VerifyThatInvariantGroupSeparatedNumberIsNormalized2()
+       {
+           var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+           var result = this.processedValueSetGenerator.NormalizeNumericValue("1.234,56", quantityKind);
+ 
+           Assert.That(result, Is.EqualTo("1234.56"));
+       }
+ 
+       [Test]
+       public void VerifyThatPlainInvariantNumberIsUnchanged2()
+       {
+           var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+           var result = this.processedValueSetGenerator.NormalizeNumericValue("1234,56", quantityKind);
+ 
+           Assert.That(result, Is.EqualTo("1234.56"));
+       }
+ 
+       [Test]
+       public void VerifyThatThreeDecimalsOrGroupsIshandledByCurrentCulture1()
+       {
+           var culture = new CultureInfo("en-GB")
+           {
+               NumberFormat =
+               {
+                   NumberDecimalSeparator = ",",
+                   NumberGroupSeparator = "."
+               }
+           };
+ 
+           System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+ 
+           var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+           var result = this.processedValueSetGenerator.NormalizeNumericValue("123,456", quantityKind);
+ 
+           Assert.That(result, Is.EqualTo("123.456"));
+ 
+           culture.NumberFormat.NumberDecimalSeparator = ".";
+           culture.NumberFormat.NumberGroupSeparator = ",";
+ 
+           var result2 = this.processedValueSetGenerator.NormalizeNumericValue("123,456", quantityKind);
+ 
+           Assert.That(result2, Is.EqualTo("123456"));
+       }
+ 
+       [Test]
+       public void VerifyThatThreeDecimalsOrGroupsIshandledByCurrentCulture2()
+       {
+           var culture = new CultureInfo("en-GB")
+           {
+               NumberFormat =
+               {
+                   NumberDecimalSeparator = ",",
+                   NumberGroupSeparator = "."
+               }
+           };
+ 
+           System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+ 
+           var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+           var result = this.processedValueSetGenerator.NormalizeNumericValue("123.456", quantityKind);
+ 
+           Assert.That(result, Is.EqualTo("123456"));
+ 
+           culture.NumberFormat.NumberDecimalSeparator = ".";
+           culture.NumberFormat.NumberGroupSeparator = ",";
+ 
+           var result2 = this.processedValueSetGenerator.NormalizeNumericValue("123.456", quantityKind);
+ 
+           Assert.That(result2, Is.EqualTo("123.456"));
+       }
+       
         [Test]
         public void VerifyThatPlainInvariantNumberIsUnchanged()
         {
