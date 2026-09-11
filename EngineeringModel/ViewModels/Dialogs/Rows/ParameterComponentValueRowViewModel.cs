@@ -35,6 +35,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Validation;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -160,7 +161,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         {
             base.UpdateValues();
             var compoundParameterType = (CompoundParameterType)this.Thing.ParameterType;
-            this.Scale = compoundParameterType.Component[this.ValueIndex].Scale;
+            this.Scale = compoundParameterType.QueryComponent(this.ValueIndex)?.Scale;
             this.ScaleShortName = this.Scale == null ? "-" : this.Scale.ShortName;
         }
 
