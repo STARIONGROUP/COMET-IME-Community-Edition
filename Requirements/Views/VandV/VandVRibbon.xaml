@@ -53,7 +53,7 @@
 
     <dxb:BarSplitButtonItem Name="OpenVandVActivityBrowserBarItem"
                             ActAsDropDown="True"
-                            Content="Open Activities"
+                            Content="Activities"
                             RibbonStyle="Large"
                             IsEnabled="{Binding ActivityBrowser.HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=Task_32x32.png}"
@@ -73,7 +73,7 @@
 
     <dxb:BarSplitButtonItem Name="OpenVandVBrowserBarItem"
                             ActAsDropDown="True"
-                            Content="Open VCD"
+                            Content="VCD"
                             RibbonStyle="Large"
                             IsEnabled="{Binding Browser.HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=BOReport_32x32.png}"
@@ -82,6 +82,26 @@
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>
                     <dxb:Gallery GroupsSource="{av:Binding Browser.OpenModels}"
+                                 GroupTemplate="{StaticResource groupTemplate}"
+                                 ItemCheckMode="Multiple"
+                                 IsGroupCaptionVisible="True"
+                                 ColCount="1" />
+                </dxr:GalleryDropDownPopupMenu.Gallery>
+            </dxr:GalleryDropDownPopupMenu>
+        </dxb:BarSplitButtonItem.PopupControl>
+    </dxb:BarSplitButtonItem>
+
+    <dxb:BarSplitButtonItem Name="OpenVandVMatrixBarItem"
+                            ActAsDropDown="True"
+                            Content="Coverage Matrix"
+                            RibbonStyle="Large"
+                            IsEnabled="{Binding Matrix.HasModels, UpdateSourceTrigger=PropertyChanged}"
+                            LargeGlyph="{dx:DXImage Image=Pivot_32x32.png}"
+                            Hint="Open the VCRM (V&amp;V Coverage Matrix) for the selected iteration: requirements down, stage gates across">
+        <dxb:BarSplitButtonItem.PopupControl>
+            <dxr:GalleryDropDownPopupMenu>
+                <dxr:GalleryDropDownPopupMenu.Gallery>
+                    <dxb:Gallery GroupsSource="{av:Binding Matrix.OpenModels}"
                                  GroupTemplate="{StaticResource groupTemplate}"
                                  ItemCheckMode="Multiple"
                                  IsGroupCaptionVisible="True"
