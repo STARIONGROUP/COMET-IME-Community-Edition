@@ -70,6 +70,7 @@ namespace CDP4Requirements.ViewModels
         {
             this.Browser = new VandVBrowserRibbonViewModel(messageBus);
             this.ActivityBrowser = new VandVActivityBrowserRibbonViewModel(messageBus);
+            this.Matrix = new VandVMatrixRibbonViewModel(messageBus);
 
             this.OpenModels = new ReactiveList<VandVModelMenuItemViewModel>();
             this.OpenModels.CountChanged.Subscribe(count => this.HasModels = count != 0);
@@ -115,6 +116,12 @@ namespace CDP4Requirements.ViewModels
         /// separate jobs, done by different people at different times.
         /// </summary>
         public VandVActivityBrowserRibbonViewModel ActivityBrowser { get; }
+
+        /// <summary>
+        /// Gets the view-model behind the "Open Coverage Matrix" button. The VCRM is a full-screen document panel, so,
+        /// like the other V&amp;V panels, it is opened from the ribbon rather than from inside the VCD browser.
+        /// </summary>
+        public VandVMatrixRibbonViewModel Matrix { get; }
 
         /// <summary>
         /// Adds a menu item for a newly opened <see cref="EngineeringModel"/>.

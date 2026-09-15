@@ -440,7 +440,7 @@ The completeness rule then enforces the ECSS discipline:
 
 ### 3.7 Stage gate review, the coverage matrix (VCRM)
 
-**Coverage Matrix** on the toolbar opens a live requirements-by-stage-gate matrix. Each cell says what that gate has
+**Open Coverage Matrix** on the V&V ribbon opens a live requirements-by-stage-gate matrix. Each cell says what that gate has
 to decide about that requirement, and the last column gives the single verdict that answers "is this requirement
 verified and validated".
 

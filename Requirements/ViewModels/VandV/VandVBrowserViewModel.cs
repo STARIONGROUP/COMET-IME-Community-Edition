@@ -49,7 +49,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
@@ -117,11 +116,6 @@ namespace CDP4Requirements.ViewModels
         /// Every requirement row in the tree, flattened, so coverage can be refreshed without walking the hierarchy.
         /// </summary>
         private readonly List<RequirementCoverageRowViewModel> requirementRows = new List<RequirementCoverageRowViewModel>();
-
-        /// <summary>
-        /// The coverage-matrix panel opened from this browser, if any.
-        /// </summary>
-        private VandVMatrixViewModel matrixViewModel;
 
         /// <summary>
         /// The requirements the stage filter lets through, recomputed once per rebuild. Null when nothing is
@@ -193,7 +187,6 @@ namespace CDP4Requirements.ViewModels
 
             this.ExportWorkbookCommand = ReactiveCommandCreator.Create(this.ExecuteExportWorkbook);
             this.RunAnalysisCheckCommand = ReactiveCommandCreator.Create(this.ExecuteRunAnalysisCheck);
-            this.OpenMatrixCommand = ReactiveCommandCreator.Create(this.ExecuteOpenMatrix);
 
             this.CreateAnnotationCommands = AnnotationKind.All.ToDictionary(
                 kind => kind,
@@ -280,11 +273,6 @@ namespace CDP4Requirements.ViewModels
         public ReactiveCommand<Unit, Unit> RunAnalysisCheckCommand { get; }
 
         /// <summary>
-        /// Gets the command that opens the coverage-matrix panel.
-        /// </summary>
-        public ReactiveCommand<Unit, Unit> OpenMatrixCommand { get; }
-
-        /// <summary>
         /// Gets the command that raises each kind of annotation against the selected thing, keyed by kind.
         /// </summary>
         public IReadOnlyDictionary<AnnotationKind, ReactiveCommand<Unit, Unit>> CreateAnnotationCommands { get; }
@@ -367,15 +355,6 @@ namespace CDP4Requirements.ViewModels
                         MenuItemKind.Create,
                         ClassKind.Requirement));
             }
-
-            this.ContextMenu.Insert(
-                index++,
-                new ContextMenuItemViewModel(
-                    "Open Coverage Matrix (VCRM)",
-                    "",
-                    this.OpenMatrixCommand,
-                    MenuItemKind.Navigate,
-                    ClassKind.NotThing));
 
             this.ContextMenu.Insert(
                 index++,
@@ -897,25 +876,6 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Opens (or focuses) the coverage-matrix panel.
-        /// </summary>
-        private void ExecuteOpenMatrix()
-        {
-            if (this.matrixViewModel == null)
-            {
-                this.matrixViewModel = new VandVMatrixViewModel(
-                    this.Thing,
-                    this.Session,
-                    this.ThingDialogNavigationService,
-                    this.PanelNavigationService,
-                    this.DialogNavigationService,
-                    this.PluginSettingsService);
-            }
-
-            this.PanelNavigationService.OpenInDock(this.matrixViewModel);
-        }
-
-        /// <summary>
         /// Builds the specification → group → requirement → V&amp;V item hierarchy. Report specifications are skipped:
         /// they hold the shared activities, which are browsed in the V&amp;V Activities panel.
         /// </summary>
@@ -1155,11 +1115,6 @@ namespace CDP4Requirements.ViewModels
                     .Where(x => x.ChangedThing.TopContainer == this.Thing.TopContainer)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.RefreshAnnotationStates()));
-
-            this.Disposables.Add(
-                this.CDPMessageBus.Listen<NavigationPanelEvent>()
-                    .Where(x => x.ViewModel == this.matrixViewModel && x.PanelStatus == PanelStatus.Closed)
-                    .Subscribe(_ => this.matrixViewModel = null));
 
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))

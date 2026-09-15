@@ -86,10 +86,6 @@
                 </dxb:BarEditItem.EditSettings>
             </dxb:BarEditItem>
             <dxb:BarItemSeparator />
-            <dxb:BarButtonItem Command="{Binding OpenMatrixCommand}"
-                               Content="Coverage Matrix"
-                               Glyph="{dx:DXImage Image=Pivot_16x16.png}"
-                               Hint="Open the VCRM coverage matrix" />
             <dxb:BarButtonItem Command="{Binding RunAnalysisCheckCommand}"
                                Content="Run Analysis Check"
                                Glyph="{dx:DXImage Image=Recurrence_16x16.png}"
