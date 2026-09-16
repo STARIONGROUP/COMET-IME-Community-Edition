@@ -185,7 +185,6 @@ namespace CDP4Requirements.ViewModels
                 this.ExecuteCreateActivityFromItem,
                 this.WhenAnyValue(x => x.SelectedThing, x => x.CanCreateVandVItem, (row, canCreate) => canCreate && row is VandVItemRowViewModel));
 
-            this.ExportWorkbookCommand = ReactiveCommandCreator.Create(this.ExecuteExportWorkbook);
             this.RunAnalysisCheckCommand = ReactiveCommandCreator.Create(this.ExecuteRunAnalysisCheck);
 
             this.CreateAnnotationCommands = AnnotationKind.All.ToDictionary(
@@ -261,11 +260,6 @@ namespace CDP4Requirements.ViewModels
         /// Gets the command that turns the selected V&amp;V item's own plan and procedure into a shared activity.
         /// </summary>
         public ReactiveCommand<Unit, Unit> CreateActivityFromItemCommand { get; }
-
-        /// <summary>
-        /// Gets the command that exports the VCD / VCRM workbook.
-        /// </summary>
-        public ReactiveCommand<Unit, Unit> ExportWorkbookCommand { get; }
 
         /// <summary>
         /// Gets the command that re-runs the automatic analysis check over the whole register and reports a summary.
@@ -370,7 +364,7 @@ namespace CDP4Requirements.ViewModels
                 new ContextMenuItemViewModel(
                     "Export VCD / VCRM workbook...",
                     "",
-                    this.ExportWorkbookCommand,
+                    this.ExportCommand,
                     MenuItemKind.Export,
                     ClassKind.NotThing));
 
@@ -579,13 +573,13 @@ namespace CDP4Requirements.ViewModels
         {
             if (this.QueryOwningItem(this.SelectedThing) is Requirement owningItem)
             {
-                this.EditVandVItem(owningItem, tabIndex: VandVItemDialogViewModel.ProcedureTabIndex);
+                this.EditVandVItem(owningItem, tabIndex: VandVItemDialogViewModel.ProcedureTabIndex, readOnly: true);
                 return;
             }
 
             if (this.SelectedThing is VandVItemRowViewModel vandVItemRow)
             {
-                this.EditVandVItem(vandVItemRow.Thing);
+                this.EditVandVItem(vandVItemRow.Thing, readOnly: true);
                 return;
             }
 
@@ -593,17 +587,23 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Opens the V&amp;V dialog in edit mode for an existing item and, on OK, writes the changes.
+        /// Opens the V&amp;V dialog for an existing item: for editing (writing the changes on OK) or, when
+        /// <paramref name="readOnly"/> is set, for inspection only, with every field read-only and no OK button.
         /// </summary>
-        /// <param name="vandVItem">The V&amp;V item to edit.</param>
+        /// <param name="vandVItem">The V&amp;V item to edit or inspect.</param>
+        /// <param name="preselectedParameter">A parameter to preselect on the Coverage tab, or null.</param>
+        /// <param name="tabIndex">The tab to open on, or null for the default.</param>
+        /// <param name="readOnly">true to open the dialog for inspection only.</param>
         /// <remarks>
         /// Declared <c>async void</c> deliberately: the overridden <see cref="ExecuteUpdateCommand"/> is void, and
         /// blocking on the write with <c>GetAwaiter().GetResult()</c> would deadlock the UI thread against the
         /// captured synchronization context. Every exception is handled inside, so nothing escapes.
         /// </remarks>
-        private async void EditVandVItem(Requirement vandVItem, ParameterOrOverrideBase preselectedParameter = null, int? tabIndex = null)
+        private async void EditVandVItem(Requirement vandVItem, ParameterOrOverrideBase preselectedParameter = null, int? tabIndex = null, bool readOnly = false)
         {
-            if (!this.EnsureReferenceData("Edit V&V Item"))
+            var caption = readOnly ? "Inspect V&V Item" : "Edit V&V Item";
+
+            if (!this.EnsureReferenceData(caption))
             {
                 return;
             }
@@ -614,8 +614,8 @@ namespace CDP4Requirements.ViewModels
             if (covered == null)
             {
                 DXMessageBox.Show(
-                    "This V&V item is not linked to a requirement, so it cannot be edited here.",
-                    "Edit V&V Item",
+                    "This V&V item is not linked to a requirement, so it cannot be shown here.",
+                    caption,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
@@ -623,7 +623,7 @@ namespace CDP4Requirements.ViewModels
             }
 
             var linkType = VandVItemCreator.QueryLinkType(this.Thing, vandVItem);
-            var dialogViewModel = new VandVItemDialogViewModel(covered, this.Session, vandVItem, linkType);
+            var dialogViewModel = new VandVItemDialogViewModel(covered, this.Session, vandVItem, linkType, readOnly);
 
             if (preselectedParameter != null)
             {
@@ -845,9 +845,10 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Asks for a destination and writes the VCD / VCRM workbook.
+        /// Asks for a destination and writes the VCD / VCRM workbook. Overrides the stock Export command so the register
+        /// exports through the same toolbar button every other browser uses rather than a button of its own.
         /// </summary>
-        private void ExecuteExportWorkbook()
+        protected override void ExecuteExportCommand()
         {
             var fileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 

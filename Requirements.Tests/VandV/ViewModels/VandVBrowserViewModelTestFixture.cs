@@ -29,7 +29,9 @@ namespace CDP4Requirements.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
 
@@ -49,6 +51,8 @@ namespace CDP4Requirements.Tests.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -515,6 +519,29 @@ namespace CDP4Requirements.Tests.ViewModels
             browser.DragOver(dropInfo.Object);
 
             Assert.That(dropInfo.Object.Effects, Is.EqualTo(DragDropEffects.None), "a requirement row is not a coverage target");
+        }
+
+        [Test]
+        public async Task VerifyThatTheStandardExportCommandExportsTheWorkbook()
+        {
+            var serviceLocator = new Mock<IServiceLocator>();
+            var fileDialogService = new Mock<IOpenSaveFileDialogService>();
+
+            fileDialogService
+                .Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
+                .Returns(string.Empty);
+
+            serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(fileDialogService.Object);
+            ServiceLocator.SetLocatorProvider(() => serviceLocator.Object);
+
+            var browser = this.CreateBrowser();
+
+            await browser.ExportCommand.Execute();
+
+            fileDialogService.Verify(
+                x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()),
+                Times.Once,
+                "the standard Export button must trigger the VCD / VCRM workbook export");
         }
 
         private VandVBrowserViewModel CreateBrowser()

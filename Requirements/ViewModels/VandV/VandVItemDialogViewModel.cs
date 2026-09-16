@@ -297,10 +297,12 @@ namespace CDP4Requirements.ViewModels
         /// <param name="session">The <see cref="ISession"/>.</param>
         /// <param name="vandVItem">The V&amp;V item being edited, or null when creating a new one.</param>
         /// <param name="existingLinkType">The current link type when editing.</param>
-        public VandVItemDialogViewModel(Requirement requirement, ISession session, Requirement vandVItem, string existingLinkType)
+        /// <param name="isReadOnly">true to open the dialog for inspection only, with no editing or saving.</param>
+        public VandVItemDialogViewModel(Requirement requirement, ISession session, Requirement vandVItem, string existingLinkType, bool isReadOnly = false)
         {
             this.Requirement = requirement;
             this.VandVItem = vandVItem;
+            this.IsReadOnly = isReadOnly;
 
             var iteration = requirement.GetContainerOfType<Iteration>();
             var model = (EngineeringModel)iteration.Container;
@@ -402,7 +404,7 @@ namespace CDP4Requirements.ViewModels
             var canOk = identificationChanged
                 .Merge(closeOutChanged)
                 .Merge(activityChanged)
-                .Select(_ => !this.HasValidationErrors());
+                .Select(_ => this.IsEditable && !this.HasValidationErrors());
 
             this.Subscriptions.Add(
                 this.WhenAnyValue(x => x.SelectedActivityChoice, x => x.Method, x => x.Stage)
@@ -458,9 +460,26 @@ namespace CDP4Requirements.ViewModels
         public bool IsEditMode => this.VandVItem != null;
 
         /// <summary>
+        /// Gets a value indicating whether the dialog is open for inspection only, with no editing or saving.
+        /// </summary>
+        public bool IsReadOnly { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the dialog's fields may be edited. The inverse of <see cref="IsReadOnly"/>,
+        /// exposed so the view can bind an editor's enabled/read-only state to it directly.
+        /// </summary>
+        public bool IsEditable => !this.IsReadOnly;
+
+        /// <summary>
+        /// Gets a value indicating whether the confirm button is shown. Hidden when inspecting, so an inspection cannot
+        /// be saved.
+        /// </summary>
+        public bool IsOkVisible => !this.IsReadOnly;
+
+        /// <summary>
         /// Gets the window title.
         /// </summary>
-        public string Title => this.IsEditMode ? "Edit V&V Item" : "Create V&V Item";
+        public string Title => this.IsReadOnly ? "Inspect V&V Item" : this.IsEditMode ? "Edit V&V Item" : "Create V&V Item";
 
         /// <summary>
         /// Gets the caption of the confirm button.

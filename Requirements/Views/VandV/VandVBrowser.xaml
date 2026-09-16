@@ -12,6 +12,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:rows="clr-namespace:CDP4Requirements.ViewModels.Rows"
              xmlns:selectors="clr-namespace:CDP4Requirements.Selectors"
              d:DesignHeight="300"
@@ -63,41 +64,40 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <dxb:ToolBarControl Grid.Row="0" Height="30">
-            <dxb:BarButtonItem Command="{Binding CreateVandVItemCommand}"
-                               Content="Create V&amp;V Item"
-                               Glyph="{dx:DXImage Image=Add_16x16.png}"
-                               Hint="Create a V&amp;V item for the selected requirement" />
-            <dxb:BarItemSeparator />
-            <dxb:BarEditItem Content="View: "
-                             EditWidth="130"
-                             EditValue="{Binding SelectedView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Hint="{Binding SelectedView.Description}">
-                <dxb:BarEditItem.EditSettings>
-                    <dxe:ComboBoxEditSettings IsTextEditable="False" ItemsSource="{Binding PossibleViews}" />
-                </dxb:BarEditItem.EditSettings>
-            </dxb:BarEditItem>
-            <dxb:BarEditItem Content="Stage: "
-                             EditWidth="130"
-                             EditValue="{Binding SelectedStage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Hint="Show only the activities planned at one stage gate">
-                <dxb:BarEditItem.EditSettings>
-                    <dxe:ComboBoxEditSettings IsTextEditable="False" ItemsSource="{Binding PossibleStages}" />
-                </dxb:BarEditItem.EditSettings>
-            </dxb:BarEditItem>
-            <dxb:BarItemSeparator />
-            <dxb:BarButtonItem Command="{Binding RunAnalysisCheckCommand}"
-                               Content="Run Analysis Check"
-                               Glyph="{dx:DXImage Image=Recurrence_16x16.png}"
-                               Hint="Evaluate every V&amp;V item's covered parameter against its requirement's parametric constraints" />
-            <dxb:BarButtonItem Command="{Binding ExportWorkbookCommand}"
-                               Content="Export VCD / VCRM"
-                               Glyph="{dx:DXImage Image=ExportToXLSX_16x16.png}"
-                               Hint="Export the VCD, VCRM, execution records and NCRs to Excel" />
-        </dxb:ToolBarControl>
+        <!--  One toolbar: the stock browser icons (create, delete/deprecate, edit, inspect, export, filter, search)
+              come from CommonThingControl; the VCD-specific view / stage pickers and analysis check are appended into
+              the same bar through AdditionalBarItems. Export routes through the stock Export button (see
+              VandVBrowserViewModel.ExecuteExportCommand).  -->
+        <views:CommonThingControl Grid.Row="0" GridView="{Binding ElementName=View}" FilteringMode="ParentBranch" IsExportVisible="True" ExportHint="Export the VCD / VCRM, execution records and NCRs to Excel">
+            <views:CommonThingControl.AdditionalBarItems>
+                <dxb:BarEditItem Content="View: "
+                                 EditWidth="130"
+                                 EditValue="{Binding SelectedView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Hint="{Binding SelectedView.Description}">
+                    <dxb:BarEditItem.EditSettings>
+                        <dxe:ComboBoxEditSettings IsTextEditable="False" ItemsSource="{Binding PossibleViews}" />
+                    </dxb:BarEditItem.EditSettings>
+                </dxb:BarEditItem>
+                <dxb:BarEditItem Content="Stage: "
+                                 EditWidth="130"
+                                 EditValue="{Binding SelectedStage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Hint="Show only the activities planned at one stage gate">
+                    <dxb:BarEditItem.EditSettings>
+                        <dxe:ComboBoxEditSettings IsTextEditable="False" ItemsSource="{Binding PossibleStages}" />
+                    </dxb:BarEditItem.EditSettings>
+                </dxb:BarEditItem>
+                <dxb:BarItemSeparator />
+                <dxb:BarButtonItem Command="{Binding RunAnalysisCheckCommand}"
+                                   Content="Run Analysis Check"
+                                   Glyph="{dx:DXImage Image=Recurrence_16x16.png}"
+                                   Hint="Evaluate every V&amp;V item's covered parameter against its requirement's parametric constraints" />
+            </views:CommonThingControl.AdditionalBarItems>
+        </views:CommonThingControl>
 
         <dxg:TreeListControl Grid.Row="1"
                              ItemsSource="{Binding SpecificationRows}"
+                             FilterString="{Binding FilterString, Mode=TwoWay}"
+                             IsFilterEnabled="{Binding IsFilterEnabled, Mode=TwoWay}"
                              SelectedItem="{Binding SelectedThing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
 
@@ -131,7 +131,8 @@
                                                ShowVerticalLines="False"
                                                TreeDerivationMode="HierarchicalDataTemplate"
                                                TreeLineStyle="Solid"
-                                               VerticalScrollbarVisibility="Auto">
+                                               VerticalScrollbarVisibility="Auto"
+                                               ShowFilterPanelMode="Default">
 
                     <dxg:TreeListView.ContextMenu>
                         <ContextMenu Name="RowContextMenu" />

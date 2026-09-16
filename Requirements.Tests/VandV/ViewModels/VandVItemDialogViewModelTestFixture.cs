@@ -115,6 +115,40 @@ namespace CDP4Requirements.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatInspectModeIsReadOnlyAndHidesTheConfirmButton()
+        {
+            var vandVItem = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "VNV_REQ_1_1", Name = "an item", Owner = this.domain };
+            this.specification.Requirement.Add(vandVItem);
+
+            var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object, vandVItem, VandVItemDialogViewModel.VerifiesLink, isReadOnly: true);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.IsReadOnly, Is.True);
+                Assert.That(vm.IsEditable, Is.False);
+                Assert.That(vm.IsOkVisible, Is.False, "an inspection cannot be saved");
+                Assert.That(vm.Title, Is.EqualTo("Inspect V&V Item"));
+            });
+        }
+
+        [Test]
+        public void VerifyThatEditModeIsEditableAndShowsTheConfirmButton()
+        {
+            var vandVItem = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "VNV_REQ_1_1", Name = "an item", Owner = this.domain };
+            this.specification.Requirement.Add(vandVItem);
+
+            var vm = new VandVItemDialogViewModel(this.requirement, this.session.Object, vandVItem, VandVItemDialogViewModel.VerifiesLink);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.IsReadOnly, Is.False);
+                Assert.That(vm.IsEditable, Is.True);
+                Assert.That(vm.IsOkVisible, Is.True);
+                Assert.That(vm.Title, Is.EqualTo("Edit V&V Item"));
+            });
+        }
+
+        [Test]
         public void VerifyThatASecondItemForTheSameRequirementIsNumbered()
         {
             var first = new VandVItemDialogViewModel(this.requirement, this.session.Object);
