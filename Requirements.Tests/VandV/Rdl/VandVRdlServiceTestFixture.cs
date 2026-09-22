@@ -233,11 +233,17 @@ namespace CDP4Requirements.Tests.Rdl
             var subCategory = operations.Select(o => o.ModifiedThing).OfType<DTO.Category>().Single(c => c.ShortName == "VerificationItem");
             Assert.That(subCategory.SuperCategory, Is.Not.Empty, "the Verification Item sub-category must reference its VnV Item super-category");
 
-            var rule = operations.Select(o => o.ModifiedThing).OfType<DTO.ParameterizedCategoryRule>().Single();
+            var rules = operations.Select(o => o.ModifiedThing).OfType<DTO.ParameterizedCategoryRule>().ToList();
+            var itemRule = rules.Single(x => x.ShortName == "VnVItemAttributesRule");
+            var activityRule = rules.Single(x => x.ShortName == "VnVActivityAttributesRule");
+            var stepRule = rules.Single(x => x.ShortName == "VnVStepAttributesRule");
+
             Assert.Multiple(() =>
             {
-                Assert.That(rule.Category, Is.Not.EqualTo(Guid.Empty), "the rule must reference a category");
-                Assert.That(rule.ParameterType, Has.Count.EqualTo(4), "the rule must make the four mandatory attributes required");
+                Assert.That(itemRule.Category, Is.Not.EqualTo(Guid.Empty), "the rule must reference a category");
+                Assert.That(itemRule.ParameterType, Has.Count.EqualTo(4), "the item rule must make the four mandatory attributes required");
+                Assert.That(activityRule.ParameterType, Has.Count.EqualTo(2), "the activity rule mandates method and stage, exactly what creation always writes");
+                Assert.That(stepRule.ParameterType, Has.Count.EqualTo(1), "the step rule mandates the step number, the only attribute a step always carries");
             });
         }
 

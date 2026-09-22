@@ -625,6 +625,75 @@ namespace CDP4Requirements.Tests
         }
 
         [Test]
+        public void VerifyThatVnVItemInheritsMethodAndStageFromItsActivityInTheExport()
+        {
+            // vnv_method / vnv_stage enumerations, and the vnv_acceptance / vnv_status the item carries itself
+            var methodType = new EnumerationParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "V&V Method", ShortName = "vnv_method" };
+            methodType.ValueDefinition.Add(new EnumerationValueDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Test", ShortName = "Test" });
+
+            var stageType = new EnumerationParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "V&V Stage Gate", ShortName = "vnv_stage" };
+            stageType.ValueDefinition.Add(new EnumerationValueDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "FAT", ShortName = "FAT" });
+
+            var acceptanceType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "V&V Acceptance Criteria", ShortName = "vnv_acceptance" };
+
+            var statusType = new EnumerationParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "V&V Status", ShortName = "vnv_status" };
+            statusType.ValueDefinition.Add(new EnumerationValueDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Planned", ShortName = "Planned" });
+
+            this.srdl.ParameterType.Add(methodType);
+            this.srdl.ParameterType.Add(stageType);
+            this.srdl.ParameterType.Add(acceptanceType);
+            this.srdl.ParameterType.Add(statusType);
+
+            var vnvItemCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "VnV Item", ShortName = "VnVItem" };
+            vnvItemCategory.PermissibleClass.Add(ClassKind.Requirement);
+            var vnvActivityCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "VnV Activity", ShortName = "VnVActivity" };
+            vnvActivityCategory.PermissibleClass.Add(ClassKind.Requirement);
+            var performedByCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "performed by", ShortName = "performedBy" };
+            performedByCategory.PermissibleClass.Add(ClassKind.BinaryRelationship);
+
+            this.srdl.DefinedCategory.Add(vnvItemCategory);
+            this.srdl.DefinedCategory.Add(vnvActivityCategory);
+            this.srdl.DefinedCategory.Add(performedByCategory);
+
+            // the seeded V&V item rule that names method and stage as attributes of the item's type
+            var itemRule = new ParameterizedCategoryRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "V&V Item mandatory attributes", ShortName = "VnVItemAttributesRule", Category = vnvItemCategory };
+            itemRule.ParameterType.Add(methodType);
+            itemRule.ParameterType.Add(stageType);
+            itemRule.ParameterType.Add(acceptanceType);
+            itemRule.ParameterType.Add(statusType);
+            this.srdl.Rule.Add(itemRule);
+
+            // the item states its own acceptance and status, but leaves method and stage to the activity performing it
+            var item = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Verify SYS-REQ1", ShortName = "VNV_SYS_REQ1" };
+            item.Category.Add(vnvItemCategory);
+            item.ParameterValue.Add(new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = acceptanceType, Value = new ValueArray<string>(new[] { "meets spec" }) });
+            item.ParameterValue.Add(new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = statusType, Value = new ValueArray<string>(new[] { "Planned" }) });
+            this.reqSpec.Requirement.Add(item);
+
+            // the activity carries the method and stage the item inherits
+            var activity = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Produce mass budget", ShortName = "ACT_1" };
+            activity.Category.Add(vnvActivityCategory);
+            activity.ParameterValue.Add(new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = methodType, Value = new ValueArray<string>(new[] { "Test" }) });
+            activity.ParameterValue.Add(new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = stageType, Value = new ValueArray<string>(new[] { "FAT" }) });
+            this.reqSpec2.Requirement.Add(activity);
+
+            var performedBy = new BinaryRelationship(Guid.NewGuid(), this.assembler.Cache, this.uri) { Source = item, Target = activity };
+            performedBy.Category.Add(performedByCategory);
+            this.iteration.Relationship.Add(performedBy);
+
+            var reqif = new ReqIFBuilder().BuildReqIF(this.session.Object, this.iteration, true);
+
+            var itemSpecObject = reqif.CoreContent.SpecObjects.Single(so => so.Identifier == item.Iid.ToString());
+            var enumValueNames = itemSpecObject.Values.OfType<AttributeValueEnumeration>().SelectMany(v => v.Values).Select(v => v.LongName).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(enumValueNames, Does.Contain("Test"), "the item shows the method inherited from its activity");
+                Assert.That(enumValueNames, Does.Contain("FAT"), "the item shows the stage inherited from its activity");
+            });
+        }
+
+        [Test]
         public void VerifyThatWhenSessionIsNulArgumentNullExceptionIsThrown()
         {
             var builder = new ReqIFBuilder();

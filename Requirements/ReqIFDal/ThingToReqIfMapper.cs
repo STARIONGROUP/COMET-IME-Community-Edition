@@ -333,8 +333,13 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         /// <param name="requirement">The <see cref="Requirement"/></param>
         /// <param name="specObjectType">The associated <see cref="SpecObjectType"/></param>
+        /// <param name="inheritedParameterValues">
+        /// Extra <see cref="SimpleParameterValue"/>s to emit as if they were the requirement's own, used for a V&amp;V
+        /// item that leaves <c>vnv_method</c>/<c>vnv_stage</c> to the activity performing it: the effective value is
+        /// still shown on the exported item. Null when nothing is inherited.
+        /// </param>
         /// <returns>The associated <see cref="SpecObject"/></returns>
-        public SpecObject ToReqIfSpecObject(Requirement requirement, SpecObjectType specObjectType)
+        public SpecObject ToReqIfSpecObject(Requirement requirement, SpecObjectType specObjectType, IReadOnlyCollection<SimpleParameterValue> inheritedParameterValues = null)
         {
             if (requirement == null)
             {
@@ -347,7 +352,11 @@ namespace CDP4Requirements.ReqIFDal
 
             this.SetCommonAttributeValues(specObject, requirement);
 
-            foreach (var parameterValue in requirement.ParameterValue)
+            var parameterValues = inheritedParameterValues == null
+                ? (IEnumerable<SimpleParameterValue>)requirement.ParameterValue
+                : requirement.ParameterValue.Concat(inheritedParameterValues);
+
+            foreach (var parameterValue in parameterValues)
             {
                 var attributeDef = specObjectType.SpecAttributes.SingleOrDefault(x => x.DatatypeDefinition.Identifier == parameterValue.ParameterType.Iid.ToString());
 

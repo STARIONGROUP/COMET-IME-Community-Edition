@@ -29,6 +29,9 @@ namespace CDP4Requirements.ReqIFDal
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Requirements.Rdl;
+    using CDP4Requirements.Services;
+
     using CDP4Dal;
 
     using ReqIFSharp;
@@ -106,6 +109,12 @@ namespace CDP4Requirements.ReqIFDal
         private readonly Dictionary<ParameterType, DatatypeDefinition> parameterTypeMap;
 
         /// <summary>
+        /// The <see cref="SimpleParameterValue"/>s a V&amp;V item inherits from the activity performing it (method and
+        /// stage), so the effective value is shown on the exported item even when the item does not state it itself.
+        /// </summary>
+        private readonly Dictionary<Requirement, List<SimpleParameterValue>> inheritedRequirementValues;
+
+        /// <summary>
         /// The <see cref="Cdp4ModelValidationFailureHandler"/>
         /// </summary>
         private readonly Cdp4ModelValidationFailureHandler cdp4ModelValidationFailureHandler;
@@ -167,6 +176,7 @@ namespace CDP4Requirements.ReqIFDal
             this.parameterTypeMap = new Dictionary<ParameterType, DatatypeDefinition>();
             this.specTypeMap = new Dictionary<SpecType, IReadOnlyCollection<Rule>>();
             this.relationGroupMap = new Dictionary<BinaryRelationship, RelationGroup>();
+            this.inheritedRequirementValues = new Dictionary<Requirement, List<SimpleParameterValue>>();
         }
 
         /// <summary>
@@ -196,6 +206,7 @@ namespace CDP4Requirements.ReqIFDal
             this.mapper.Profile = profile;
 
             this.SetIterationProperties(exportedIteration, includeDeprecated, requirementsSpecifications);
+            this.ResolveInheritedRequirementValues();
 
             this.reqIFBuilt = new ReqIF { Lang = this.language };
             this.SetHeader();
@@ -266,6 +277,49 @@ namespace CDP4Requirements.ReqIFDal
                 .ToArray();
 
             this.toBeExportedRequirementGroups = this.toBeExportedRequirementsSpecifications.SelectMany(x => x.GetAllContainedGroups()).ToArray();
+        }
+
+        /// <summary>
+        /// Resolves, for every exported V&amp;V item that leaves <c>vnv_method</c>/<c>vnv_stage</c> to the activity
+        /// performing it, the activity's <see cref="SimpleParameterValue"/> for those attributes, so the effective
+        /// value is shown on the exported item. An item that states its own value, or has no performing activity, is
+        /// left untouched.
+        /// </summary>
+        private void ResolveInheritedRequirementValues()
+        {
+            var activityByItem = VandVActivityQuery.QueryActivityMap(this.toBeExportedIteration);
+
+            foreach (var requirement in this.toBeExportedRequirements)
+            {
+                if (!VandVCoverageQuery.IsVnVItem(requirement) || !activityByItem.TryGetValue(requirement.Iid, out var activity) || activity == null)
+                {
+                    continue;
+                }
+
+                var inherited = new List<SimpleParameterValue>();
+
+                foreach (var parameterShortName in new[] { VandVParameter.Method, VandVParameter.Stage })
+                {
+                    var own = requirement.ParameterValue.FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == parameterShortName);
+
+                    if (own != null && !string.IsNullOrWhiteSpace(own.Value.FirstOrDefault()))
+                    {
+                        continue;
+                    }
+
+                    var activityValue = activity.ParameterValue.FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == parameterShortName);
+
+                    if (activityValue != null && !string.IsNullOrWhiteSpace(activityValue.Value.FirstOrDefault()))
+                    {
+                        inherited.Add(activityValue);
+                    }
+                }
+
+                if (inherited.Any())
+                {
+                    this.inheritedRequirementValues.Add(requirement, inherited);
+                }
+            }
         }
 
         /// <summary>
@@ -368,6 +422,9 @@ namespace CDP4Requirements.ReqIFDal
                 this.toBeExportedRequirements
                     .SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
 
+            parameterTypes.AddRange(
+                this.inheritedRequirementValues.Values.SelectMany(values => values.Select(pv => pv.ParameterType)));
+
             foreach (var parameterType in parameterTypes.Where(p => p != null).Distinct())
             {
                 this.parameterTypeMap.Add(parameterType, this.mapper.ToReqIfDatatypeDefinition(parameterType));
@@ -456,7 +513,9 @@ namespace CDP4Requirements.ReqIFDal
         {
             foreach (var requirement in this.toBeExportedRequirements)
             {
-                this.requirementMap.Add(requirement, this.mapper.ToReqIfSpecObject(requirement, (SpecObjectType)this.specType[requirement]));
+                var inherited = this.inheritedRequirementValues.TryGetValue(requirement, out var values) ? values : null;
+
+                this.requirementMap.Add(requirement, this.mapper.ToReqIfSpecObject(requirement, (SpecObjectType)this.specType[requirement], inherited));
             }
         }
 
