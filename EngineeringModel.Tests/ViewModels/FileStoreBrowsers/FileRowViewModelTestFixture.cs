@@ -27,7 +27,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Reactive.Concurrency;
     using System.Reflection;
     using System.Threading;
 
@@ -35,6 +37,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -44,6 +48,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="FileRowViewModel"/>
@@ -148,6 +154,44 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             Assert.AreEqual(this.fileRevision2.Name, viewModel.Name);
             Assert.AreEqual(this.fileRevision2.Creator.Person.Name, viewModel.CreatorValue);
             this.fileStoreFileAndFolderHandler.Verify(x => x.UpdateFileRowPosition(this.file, It.IsAny<FileRevision>()), Times.Once);
+        }
+
+        [Test]
+        public void VerifyThatCreatingARelationshipRefreshesTheRelationshipOverlayIcon()
+        {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            var domainFileStoreRowViewModel = new DomainFileStoreRowViewModel(this.store, this.session.Object, null);
+
+            this.file.FileRevision.Add(this.fileRevision1);
+
+            var viewModel = new FileRowViewModel(this.file, this.session.Object, domainFileStoreRowViewModel, this.fileStoreFileAndFolderHandler.Object);
+
+            Assert.IsFalse(viewModel.ThingStatus.HasRelationship);
+
+            var hasRelationshipRaised = false;
+
+            viewModel.ThingStatus.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(ThingStatus.HasRelationship))
+                {
+                    hasRelationshipRaised = true;
+                }
+            };
+
+            var relationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = this.file, Target = this.store };
+
+            // simulate the referenced-thing back-reference that the Assembler wires up on relationship resolution
+            var relationships = (List<Relationship>)typeof(Thing).GetProperty("Relationships", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(this.file);
+            relationships.Add(relationship);
+
+            this.messageBus.SendObjectChangeEvent(relationship, EventKind.Added);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(viewModel.ThingStatus.HasRelationship);
+                Assert.IsTrue(hasRelationshipRaised, "ThingStatus.HasRelationship must raise a change notification so the icon overlay refreshes without reopening the browser.");
+            });
         }
     }
 }

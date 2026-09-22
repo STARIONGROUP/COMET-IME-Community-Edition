@@ -158,7 +158,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>The name of the <see cref="Thing"/>, or its <see cref="ClassKind"/> when it is not an <see cref="INamedThing"/></returns>
         private string GetThingName(Thing thing)
         {
-            return thing is INamedThing namedThing ? namedThing.Name : thing.ClassKind.ToString();
+            switch (thing)
+            {
+                case File file:
+                    return file.CurrentFileRevision?.Name;
+                case INamedThing namedThing:
+                    return namedThing.Name;
+                default:
+                    return thing.ClassKind.ToString();
+            }
         }
 
         /// <summary>

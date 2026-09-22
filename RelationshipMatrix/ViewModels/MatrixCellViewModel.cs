@@ -229,10 +229,10 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             this.Tooltip = this.RelationshipDirection == RelationshipDirectionKind.RowThingToColumnThing
-                ? $"{this.SourceY.UserFriendlyName} --({this.Rule.ForwardRelationshipName})--> {this.SourceX.UserFriendlyName}"
+                ? $"{this.SourceY.QueryDisplayName()} --({this.Rule.ForwardRelationshipName})--> {this.SourceX.QueryDisplayName()}"
                 : this.RelationshipDirection == RelationshipDirectionKind.ColumnThingToRowThing
-                    ? $"{this.SourceY.UserFriendlyName} <--({this.Rule.ForwardRelationshipName})-- {this.SourceX.UserFriendlyName}"
-                    : $"{this.SourceY.UserFriendlyName} <--({this.Rule.ForwardRelationshipName})--> {this.SourceX.UserFriendlyName}";
+                    ? $"{this.SourceY.QueryDisplayName()} <--({this.Rule.ForwardRelationshipName})-- {this.SourceX.QueryDisplayName()}"
+                    : $"{this.SourceY.QueryDisplayName()} <--({this.Rule.ForwardRelationshipName})--> {this.SourceX.QueryDisplayName()}";
         }
     }
 }

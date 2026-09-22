@@ -251,6 +251,51 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatFileRelatedThingShowsItsCurrentFileRevisionNameInsteadOfClassKind()
+        {
+            var file = new File(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.cache, this.uri) { Name = "specification.pdf", CreatedOn = DateTime.UtcNow };
+            file.FileRevision.Add(fileRevision);
+
+            var viewmodel = new MultiRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var relationship = new MultiRelationship(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, ModifiedOn = DateTime.Now };
+            relationship.RelatedThing.Add(file);
+            relationship.RelatedThing.Add(this.elementDefinition1);
+            this.iteration.Relationship.Add(relationship);
+
+            this.revision.SetValue(this.iteration, 1);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+
+            var row = (MultiRelationshipRowViewModel)viewmodel.Relationships[0];
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.RelatedThings, Does.Contain("specification.pdf"));
+                Assert.That(row.RelatedThings, Does.Not.Contain(ClassKind.File.ToString()));
+                Assert.That(row.Name, Does.Contain("specification.pdf"));
+            });
+        }
+
+        [Test]
+        public void VerifyThatFileRelatedThingRowDenominationShowsCurrentFileRevisionName()
+        {
+            var file = new File(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.cache, this.uri) { Name = "specification.pdf", CreatedOn = DateTime.UtcNow };
+            file.FileRevision.Add(fileRevision);
+
+            var row = new RelatedThingRowViewModel(file, this.messageBus, _ => { });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Denomination, Does.Contain("specification.pdf"));
+                Assert.That(row.Denomination, Does.Not.Contain("not implemented"));
+            });
+
+            row.Dispose();
+        }
+
+        [Test]
         public void VerifyThatBrowserIsCreated()
         {
             var viewmodel = new MultiRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);

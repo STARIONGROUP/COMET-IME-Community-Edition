@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelatedThingRowViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -32,6 +32,7 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Common.CommonData;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -127,7 +128,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void SetProperties()
         {
-            this.Denomination = this.Thing.UserFriendlyName;
+            this.Denomination = this.Thing.QueryName();
             this.ClassKind = this.Thing.ClassKind.ToString();
         }
     }

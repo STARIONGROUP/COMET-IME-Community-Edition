@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelatedThingViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -34,6 +34,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Extensions;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -145,12 +146,23 @@ namespace CDP4EngineeringModel.ViewModels
             this.Dispose();
 
             this.RelatedThing = thing;
-            this.RelatedThingDenomination = string.Format("({0}) {1}", thing.ClassKind, thing.UserFriendlyName);
+            this.RelatedThingDenomination = GetDenomination(thing);
 
             this.subscription = this.messageBus.Listen<ObjectChangedEvent>(this.RelatedThing)
                 .Where(msg => msg.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.RelatedThingDenomination = string.Format("({0}) {1}", thing.ClassKind, thing.UserFriendlyName));
+                .Subscribe(_ => this.RelatedThingDenomination = GetDenomination(thing));
+        }
+
+        /// <summary>
+        /// Gets the human-readable denomination for the <paramref name="thing" />. For a <see cref="File" /> the name of its
+        /// current <see cref="FileRevision" /> is used, as a <see cref="File" /> does not carry a name of its own.
+        /// </summary>
+        /// <param name="thing">The related <see cref="Thing" />.</param>
+        /// <returns>The denomination string.</returns>
+        private static string GetDenomination(Thing thing)
+        {
+            return string.Format("({0}) {1}", thing.ClassKind, thing.QueryName());
         }
 
         /// <summary>

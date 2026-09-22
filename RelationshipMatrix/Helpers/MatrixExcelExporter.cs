@@ -251,8 +251,8 @@ namespace CDP4RelationshipMatrix.Helpers
                 .SelectMany(cell => cell.Relationships)
                 .GroupBy(relationship => relationship.Iid)
                 .Select(group => group.First())
-                .OrderBy(relationship => relationship.Source?.UserFriendlyName)
-                .ThenBy(relationship => relationship.Target?.UserFriendlyName)
+                .OrderBy(relationship => relationship.Source.QueryDisplayName())
+                .ThenBy(relationship => relationship.Target.QueryDisplayName())
                 .ToList();
 
             var forwardRelationshipName = this.RelationshipConfiguration.SelectedRule?.ForwardRelationshipName ?? string.Empty;
@@ -262,9 +262,9 @@ namespace CDP4RelationshipMatrix.Helpers
                 var relationship = relationships[i];
                 var row = i + 2;
 
-                worksheet.Cell(row, 1).Value = relationship.Source?.UserFriendlyName ?? string.Empty;
+                worksheet.Cell(row, 1).Value = relationship.Source.QueryDisplayName() ?? string.Empty;
                 worksheet.Cell(row, 2).Value = forwardRelationshipName;
-                worksheet.Cell(row, 3).Value = relationship.Target?.UserFriendlyName ?? string.Empty;
+                worksheet.Cell(row, 3).Value = relationship.Target.QueryDisplayName() ?? string.Empty;
                 worksheet.Cell(row, 4).Value = string.Join(", ", relationship.Category.Select(category => category.Name));
                 worksheet.Cell(row, 5).Value = relationship.Owner?.Name ?? string.Empty;
             }
