@@ -300,14 +300,13 @@ namespace CDP4Requirements.ReqIFDal
 
                 foreach (var parameterShortName in new[] { VandVParameter.Method, VandVParameter.Stage })
                 {
-                    var own = requirement.ParameterValue.FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == parameterShortName);
-
+                    var own = requirement.ParameterValue.FirstOrDefault(x => x.ParameterType.ShortName == parameterShortName);
                     if (own != null && !string.IsNullOrWhiteSpace(own.Value.FirstOrDefault()))
                     {
                         continue;
                     }
 
-                    var activityValue = activity.ParameterValue.FirstOrDefault(x => x.ParameterType != null && x.ParameterType.ShortName == parameterShortName);
+                    var activityValue = activity.ParameterValue.FirstOrDefault(x => x.ParameterType.ShortName == parameterShortName);
 
                     if (activityValue != null && !string.IsNullOrWhiteSpace(activityValue.Value.FirstOrDefault()))
                     {
