@@ -272,6 +272,11 @@ namespace CDP4EngineeringModel.ViewModels
                 return parametricConstraint.GetDisplayName();
             }
 
+            if (thing is File file)
+            {
+                return file.CurrentFileRevision?.Name;
+            }
+
             return thing is INamedThing namedThing
                 ? namedThing.Name
                 : thing.GetType().GetProperty(nameof(CDP4Common.CommonData.Thing.UserFriendlyName))?.DeclaringType == typeof(Thing)

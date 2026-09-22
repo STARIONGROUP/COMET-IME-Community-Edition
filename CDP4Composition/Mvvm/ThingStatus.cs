@@ -53,6 +53,11 @@ namespace CDP4Composition.Mvvm
         private bool isFavorite = false;
 
         /// <summary>
+        /// Backing field for <see cref="HasRelationship"/>
+        /// </summary>
+        private bool hasRelationship = false;
+
+        /// <summary>
         /// Initializes a new instace of the <see cref="ThingStatus"/> class
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/></param>
@@ -104,7 +109,11 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets a value indicating whether the thing has associated relationships
         /// </summary>
-        public bool HasRelationship { get; private set; }
+        public bool HasRelationship
+        {
+            get => this.hasRelationship;
+            private set => this.RaiseAndSetIfChanged(ref this.hasRelationship, value);
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the thing is marked as a user's favorite

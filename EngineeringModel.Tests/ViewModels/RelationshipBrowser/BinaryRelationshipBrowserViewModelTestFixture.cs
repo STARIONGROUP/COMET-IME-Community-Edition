@@ -362,6 +362,47 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatFileSourceShowsItsCurrentFileRevisionNameInsteadOfClassKind()
+        {
+            var file = new File(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.cache, this.uri) { Name = "specification.pdf", CreatedOn = DateTime.UtcNow };
+            file.FileRevision.Add(fileRevision);
+
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var relationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = file, Target = this.elementDefinition1, Owner = this.domain };
+            this.iteration.Relationship.Add(relationship);
+
+            this.revision.SetValue(this.iteration, 1);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+
+            var row = (BinaryRelationshipRowViewModel)viewmodel.Relationships[0];
+
+            Assert.That(row.SourceName, Does.Contain("specification.pdf"));
+            Assert.That(row.SourceName, Does.Not.Contain(ClassKind.File.ToString()));
+            Assert.That(row.Name, Does.Contain("specification.pdf"));
+        }
+
+        [Test]
+        public async Task VerifyThatFileRelatedThingDenominationShowsCurrentFileRevisionName()
+        {
+            var file = new File(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.cache, this.uri) { Name = "specification.pdf", CreatedOn = DateTime.UtcNow };
+            file.FileRevision.Add(fileRevision);
+
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var creator = viewmodel.RelationshipCreator.BinaryRelationshipCreator;
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(file);
+
+            await creator.SourceViewModel.Drop(dropinfo.Object);
+
+            Assert.That(creator.SourceViewModel.RelatedThingDenomination, Does.Contain("specification.pdf"));
+            Assert.That(creator.SourceViewModel.RelatedThingDenomination, Does.Not.Contain("not implemented"));
+        }
+
+        [Test]
         public void VerifyThatBrowserIsCreated()
         {
             var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
