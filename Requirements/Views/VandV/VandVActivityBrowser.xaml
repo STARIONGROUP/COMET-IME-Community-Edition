@@ -49,7 +49,7 @@
 
         <!--  the stock browser toolbar and header, exactly as the Requirements browser uses them: the Create split
               button fills itself from the context menu's Create entries, so nothing is duplicated here  -->
-        <views:CommonThingControl GridView="{Binding ElementName=View}" FilteringMode="ParentBranch" IsExportVisible="True" />
+        <views:CommonThingControl GridView="{Binding ElementName=View}" FilteringMode="ParentBranch" IsExportVisible="True" ExportHint="Export the selected report to Excel" />
 
         <views:BrowserHeader Grid.Row="1" />
 

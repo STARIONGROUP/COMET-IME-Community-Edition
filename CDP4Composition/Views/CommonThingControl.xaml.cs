@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CommonThingControl.xaml.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2023 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -25,8 +25,9 @@
 
 namespace CDP4Composition.Views
 {
-    using DevExpress.Xpf.Grid;
-
+    using System.Collections;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Windows;
 
     using CDP4Composition.Navigation;
@@ -34,6 +35,7 @@ namespace CDP4Composition.Views
     using CDP4Composition.ViewModels;
 
     using DevExpress.Xpf.Bars;
+    using DevExpress.Xpf.Grid;
 
     using NLog;
 
@@ -70,18 +72,51 @@ namespace CDP4Composition.Views
         private static readonly DependencyProperty IsExportVisibleProperty = DependencyProperty.Register("IsExportVisible", typeof(bool), typeof(CommonThingControl));
 
         /// <summary>
+        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="ExportHint"/> setter method.
+        /// </summary>
+        private static readonly DependencyProperty ExportHintProperty = DependencyProperty.Register("ExportHint", typeof(string), typeof(CommonThingControl));
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CommonThingControl"/> class.
         /// </summary>
         public CommonThingControl()
         {
             this.InitializeComponent();
             this.IsFavoriteToggleVisible = false;
+            this.AdditionalBarItems.CollectionChanged += this.OnAdditionalBarItemsChanged;
         }
+
+        /// <summary>
+        /// Gets the extra bar items a consuming browser appends to the standard toolbar, so a browser that needs its own
+        /// buttons (view pickers, an analysis check, ...) keeps them in the single shared toolbar rather than a toolbar
+        /// of its own. Declared in the consumer's XAML as the content of this property.
+        /// </summary>
+        public ObservableCollection<object> AdditionalBarItems { get; } = new ObservableCollection<object>();
 
         /// <summary>
         /// Gets the <see cref="IDialogNavigationService"/> used to navigate to a <see cref="IDialogViewModel"/>
         /// </summary>
         public IDialogNavigationService DialogNavigationService { get; private set; }
+
+        /// <summary>
+        /// Appends bar items added to <see cref="AdditionalBarItems"/> to the shared toolbar, in the order they are
+        /// declared, after the standard buttons.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/>.</param>
+        private void OnAdditionalBarItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems == null)
+            {
+                return;
+            }
+
+            foreach (var item in e.NewItems)
+            {
+                // Items is a non-generic bar-item collection; the IList cast lets an object-typed bar item be appended.
+                ((IList)this.BarControl.Items).Add(item);
+            }
+        }
 
         /// <summary>
         /// The <see cref="FilteringMode"/> this <see cref="CommonThingControl"/> is associated with
@@ -119,6 +154,17 @@ namespace CDP4Composition.Views
         {
             get => this.GetValue(IsExportVisibleProperty) is bool && (bool) this.GetValue(IsExportVisibleProperty);
             set => this.SetValue(IsExportVisibleProperty, value);
+        }
+
+        /// <summary>
+        /// The tooltip shown on the export button. A browser that opts into the export button (see
+        /// <see cref="IsExportVisible"/>) sets the wording that describes what it exports, e.g. "Export the VCD to
+        /// Excel".
+        /// </summary>
+        public string ExportHint
+        {
+            get => (string) this.GetValue(ExportHintProperty);
+            set => this.SetValue(ExportHintProperty, value);
         }
         
         /// <summary>

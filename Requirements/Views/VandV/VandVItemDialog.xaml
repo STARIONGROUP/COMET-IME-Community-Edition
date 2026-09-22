@@ -20,6 +20,18 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type dxe:TextEdit}">
+                <Setter Property="IsReadOnly" Value="{Binding IsReadOnly}" />
+            </Style>
+            <Style TargetType="{x:Type dxe:ComboBoxEdit}">
+                <Setter Property="IsReadOnly" Value="{Binding IsReadOnly}" />
+            </Style>
+            <Style TargetType="{x:Type dxe:DateEdit}">
+                <Setter Property="IsReadOnly" Value="{Binding IsReadOnly}" />
+            </Style>
+            <Style TargetType="{x:Type dxe:CheckEdit}">
+                <Setter Property="IsReadOnly" Value="{Binding IsReadOnly}" />
+            </Style>
         </ResourceDictionary>
     </dx:DXWindow.Resources>
 
@@ -128,6 +140,7 @@
                                         Margin="4,0,0,0"
                                         Padding="8,0"
                                         Command="{Binding UseParametricConstraintCommand}"
+                                        IsEnabled="{Binding IsEditable}"
                                         Content="Use" />
                             </Grid>
                         </Grid>
@@ -199,6 +212,7 @@
                                         Margin="4,0,0,0"
                                         Padding="8,0"
                                         Command="{Binding UseParametricConstraintCommand}"
+                                        IsEnabled="{Binding IsEditable}"
                                         Content="Use" />
                             </Grid>
                         </Grid>
@@ -321,7 +335,8 @@
                                     </dxg:GridColumn>
                                 </dxg:GridControl.Columns>
                                 <dxg:GridControl.View>
-                                    <dxg:TableView AutoWidth="True"
+                                    <dxg:TableView AllowEditing="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=dxg:GridControl}}"
+                                                   AutoWidth="True"
                                                    NavigationStyle="Cell"
                                                    RowMinHeight="24"
                                                    ShowGroupPanel="False"
@@ -330,7 +345,7 @@
                                 </dxg:GridControl.View>
                             </dxg:GridControl>
 
-                            <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                            <StackPanel Grid.Column="1" Margin="6,0,0,0" IsEnabled="{Binding IsEditable}">
                                 <Button Margin="0,0,0,4" MinWidth="66" Padding="6,3" Command="{Binding AddStepCommand}" Content="Add" />
                                 <Button Margin="0,0,0,4" MinWidth="66" Padding="6,3" Command="{Binding RemoveStepCommand}" Content="Remove" />
                                 <Button Margin="0,0,0,4" MinWidth="66" Padding="6,3" Command="{Binding MoveStepUpCommand}" Content="Up" />
@@ -445,6 +460,7 @@
                                    Visibility="{Binding IsParameterOptionDependent, Converter={dx:BooleanToVisibilityConverter}}">
                         <ListBox Height="80"
                                  BorderThickness="1"
+                                 IsEnabled="{Binding IsEditable}"
                                  ItemsSource="{Binding PossibleOptions}"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListBox.ItemTemplate>
@@ -459,6 +475,7 @@
                                    Visibility="{Binding IsParameterStateDependent, Converter={dx:BooleanToVisibilityConverter}}">
                         <ListBox Height="80"
                                  BorderThickness="1"
+                                 IsEnabled="{Binding IsEditable}"
                                  ItemsSource="{Binding PossibleStates}"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListBox.ItemTemplate>
@@ -483,6 +500,7 @@
                     Margin="4,0"
                     Command="{Binding OkCommand}"
                     Content="{Binding OkButtonCaption}"
+                    Visibility="{Binding IsOkVisible, Converter={dx:BooleanToVisibilityConverter}}"
                     IsDefault="True" />
             <Button Width="90"
                     Height="26"

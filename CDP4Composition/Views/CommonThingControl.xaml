@@ -23,7 +23,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <dxb:ToolBarControl Height="30">
+    <dxb:ToolBarControl x:Name="BarControl" Height="30">
         <dxb:BarSplitButtonItem Command="{Binding CreateCommand}"
                                 Glyph="{dx:DXImage Image=Add_16x16.png}" 
                                 Hint="Create an Item."
@@ -57,8 +57,7 @@
         <dxb:BarButtonItem Command="{Binding ExportCommand}"
                            IsVisible="{Binding IsExportVisible, ElementName=Toolbar}"
                                Glyph="{dx:DXImage Image=Export_16x16.png}"
-                               Hint="{Binding SelectedThingClassKindString,
-            Converter={dx:FormatStringConverter FormatString={}Export {0}}}" />
+                               Hint="{Binding ExportHint, ElementName=Toolbar}" />
 
         <dxb:BarItemSeparator />
 
