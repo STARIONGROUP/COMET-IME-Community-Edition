@@ -773,12 +773,18 @@ namespace CDP4Requirements.Rdl
 
         /// <summary>
         /// Gets the <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule"/>s the V&amp;V capability needs.
-        /// A single rule makes <c>vnv_method</c>, <c>vnv_stage</c>, <c>vnv_acceptance</c> and <c>vnv_status</c> mandatory
-        /// on every <c>VnV Item</c>, so incomplete items surface in the existing Rule Verification browser with no code.
+        /// One rule per V&amp;V requirement kind, so incomplete things surface in the existing Rule Verification browser
+        /// with no code: <c>vnv_method</c>, <c>vnv_stage</c>, <c>vnv_acceptance</c> and <c>vnv_status</c> on every
+        /// <c>VnV Item</c>; <c>vnv_method</c> and <c>vnv_stage</c> on every <c>VnV Activity</c>; <c>vnv_step_no</c> on
+        /// every <c>VnV Procedure Step</c>. Each rule mandates exactly what its creation path always writes, and each
+        /// gives its kind its own <c>SpecObjectType</c> on ReqIF export instead of collapsing activities and steps into
+        /// the plain requirement type.
         /// </summary>
         public static IReadOnlyList<VandVParameterizedCategoryRuleDefinition> ParameterizedCategoryRules { get; } = new[]
         {
-            new VandVParameterizedCategoryRuleDefinition("VnVItemAttributesRule", "V&V Item mandatory attributes", VandVCategory.VnVItem, VandVParameter.Method, VandVParameter.Stage, VandVParameter.AcceptanceCriteria, VandVParameter.Status)
+            new VandVParameterizedCategoryRuleDefinition("VnVItemAttributesRule", "V&V Item mandatory attributes", VandVCategory.VnVItem, VandVParameter.Method, VandVParameter.Stage, VandVParameter.AcceptanceCriteria, VandVParameter.Status),
+            new VandVParameterizedCategoryRuleDefinition("VnVActivityAttributesRule", "V&V Activity mandatory attributes", VandVCategory.VnVActivity, VandVParameter.Method, VandVParameter.Stage),
+            new VandVParameterizedCategoryRuleDefinition("VnVStepAttributesRule", "V&V Procedure Step mandatory attributes", VandVCategory.VnVStep, VandVParameter.StepNumber)
         };
 
         /// <summary>

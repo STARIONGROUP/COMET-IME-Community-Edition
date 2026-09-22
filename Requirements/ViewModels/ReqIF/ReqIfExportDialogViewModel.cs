@@ -44,7 +44,9 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Dal;
 
+    using CDP4Requirements.Rdl;
     using CDP4Requirements.ReqIFDal;
+    using CDP4Requirements.Services;
 
     using DevExpress.Mvvm;
 
@@ -488,6 +490,13 @@ namespace CDP4Requirements.ViewModels
         /// Check the validity of the model
         /// </summary>
         /// <returns>True if no violations related to the exported data were found</returns>
+        /// <remarks>
+        /// Only the <see cref="RequirementsSpecification"/>s that are actually being exported are checked: a violation
+        /// in a specification the user did not select is none of this export's business. A V&amp;V item that leaves
+        /// <c>vnv_method</c>/<c>vnv_stage</c> to the activity performing it is complete, but the stock
+        /// <see cref="ParameterizedCategoryRule"/> cannot see that inheritance and reports it; such violations are
+        /// dropped so the register's inheritance and the export agree.
+        /// </remarks>
         private async Task<bool> CheckModelValidity()
         {
             var iteration = this.SelectedIteration.Iteration;
@@ -498,15 +507,34 @@ namespace CDP4Requirements.ViewModels
                 return false;
             }
 
+            var selectedSpecifications = this.RequirementsSpecifications
+                .Where(x => x.IsSelected)
+                .Select(x => x.RequirementsSpecification)
+                .ToList();
+
             var rules = model.RequiredRdls.SelectMany(x => x.Rule).OfType<ParameterizedCategoryRule>();
             var violations = new List<RuleViolation>();
 
             var thingsToCheck = new List<Guid>();
-            await this.AddThingsToCheck(iteration, thingsToCheck);
+            await this.AddThingsToCheck(iteration, selectedSpecifications, thingsToCheck);
+
+            var thingsToCheckSet = new HashSet<Guid>(thingsToCheck);
+            var requirementsByIid = selectedSpecifications.SelectMany(x => x.Requirement).ToDictionary(x => x.Iid);
+            var activityByItem = VandVActivityQuery.QueryActivityMap(iteration);
 
             foreach (var parameterizedCategoryRule in rules)
             {
-                violations.AddRange(parameterizedCategoryRule.Verify(iteration).Where(v => v.ViolatingThing.Intersect(thingsToCheck).Any()));
+                var isVnVItemRule = parameterizedCategoryRule.Category != null && parameterizedCategoryRule.Category.ShortName == VandVCategory.VnVItem;
+
+                foreach (var violation in parameterizedCategoryRule.Verify(iteration).Where(v => v.ViolatingThing.Intersect(thingsToCheckSet).Any()))
+                {
+                    if (isVnVItemRule && IsSatisfiedByInheritance(parameterizedCategoryRule, violation, requirementsByIid, activityByItem))
+                    {
+                        continue;
+                    }
+
+                    violations.Add(violation);
+                }
             }
 
             this.ErrorDetailMessage = string.Join(Environment.NewLine, violations.Select(v => v.Description));
@@ -515,20 +543,56 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Populate the <paramref name="thingsToCheck"/>
+        /// Asserts whether a <c>VnV Item</c> rule violation is really satisfied through inheritance: every violating
+        /// thing is a V&amp;V item whose only genuinely-missing mandatory attributes are <c>vnv_method</c>/
+        /// <c>vnv_stage</c>, and the activity performing it supplies them.
+        /// </summary>
+        /// <param name="rule">The <see cref="ParameterizedCategoryRule"/> that produced the violation.</param>
+        /// <param name="violation">The <see cref="RuleViolation"/>.</param>
+        /// <param name="requirementsByIid">The exported requirements, keyed by <see cref="Thing.Iid"/>.</param>
+        /// <param name="activityByItem">The item-to-performing-activity map.</param>
+        /// <returns>True when the violation is covered by inheritance and must not block the export.</returns>
+        private static bool IsSatisfiedByInheritance(ParameterizedCategoryRule rule, RuleViolation violation, IReadOnlyDictionary<Guid, Requirement> requirementsByIid, IReadOnlyDictionary<Guid, Requirement> activityByItem)
+        {
+            foreach (var iid in violation.ViolatingThing)
+            {
+                if (!requirementsByIid.TryGetValue(iid, out var requirement))
+                {
+                    return false;
+                }
+
+                var activity = activityByItem.TryGetValue(iid, out var performingActivity) ? performingActivity : null;
+
+                foreach (var parameterType in rule.ParameterType)
+                {
+                    if (!string.IsNullOrWhiteSpace(VandVCoverageQuery.Attribute(requirement, parameterType.ShortName)))
+                    {
+                        continue;
+                    }
+
+                    var inheritable = parameterType.ShortName == VandVParameter.Method || parameterType.ShortName == VandVParameter.Stage;
+
+                    if (inheritable && activity != null && !string.IsNullOrWhiteSpace(VandVCoverageQuery.Attribute(activity, parameterType.ShortName)))
+                    {
+                        continue;
+                    }
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Populate the <paramref name="thingsToCheck"/> from the specifications actually being exported.
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/></param>
+        /// <param name="specifications">The <see cref="RequirementsSpecification"/>s selected for export</param>
         /// <param name="thingsToCheck">The collection of <see cref="Guid"/></param>
-        private async Task AddThingsToCheck(Iteration iteration, List<Guid> thingsToCheck)
+        private async Task AddThingsToCheck(Iteration iteration, IReadOnlyList<RequirementsSpecification> specifications, List<Guid> thingsToCheck)
         {
-            var relationships = iteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(
-                    x =>
-                        (x.Source.ClassKind == ClassKind.Requirement || x.Source.ClassKind == ClassKind.RequirementsSpecification || x.Source.ClassKind == ClassKind.RequirementsGroup) &&
-                        (x.Target.ClassKind == ClassKind.Requirement || x.Target.ClassKind == ClassKind.RequirementsSpecification || x.Target.ClassKind == ClassKind.RequirementsGroup));
-
-            foreach (var requirementsSpecification in iteration.RequirementsSpecification)
+            foreach (var requirementsSpecification in specifications)
             {
                 thingsToCheck.Add(requirementsSpecification.Iid);
                 await this.AddThingsToVerify(requirementsSpecification, thingsToCheck);
@@ -538,6 +602,16 @@ namespace CDP4Requirements.ViewModels
                     thingsToCheck.Add(requirement.Iid);
                 }
             }
+
+            var checkSet = new HashSet<Guid>(thingsToCheck);
+
+            var relationships = iteration.Relationship
+                .OfType<BinaryRelationship>()
+                .Where(
+                    x =>
+                        (x.Source.ClassKind == ClassKind.Requirement || x.Source.ClassKind == ClassKind.RequirementsSpecification || x.Source.ClassKind == ClassKind.RequirementsGroup) &&
+                        (x.Target.ClassKind == ClassKind.Requirement || x.Target.ClassKind == ClassKind.RequirementsSpecification || x.Target.ClassKind == ClassKind.RequirementsGroup) &&
+                        checkSet.Contains(x.Source.Iid) && checkSet.Contains(x.Target.Iid));
 
             thingsToCheck.AddRange(relationships.Select(x => x.Iid));
         }
