@@ -34,6 +34,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Extensions;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -161,8 +162,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>The denomination string.</returns>
         private static string GetDenomination(Thing thing)
         {
-            var name = thing is File file ? file.CurrentFileRevision?.Name : thing.UserFriendlyName;
-            return string.Format("({0}) {1}", thing.ClassKind, name);
+            return string.Format("({0}) {1}", thing.ClassKind, thing.QueryName());
         }
 
         /// <summary>

@@ -378,9 +378,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             var row = (BinaryRelationshipRowViewModel)viewmodel.Relationships[0];
 
-            Assert.That(row.SourceName, Does.Contain("specification.pdf"));
-            Assert.That(row.SourceName, Does.Not.Contain(ClassKind.File.ToString()));
-            Assert.That(row.Name, Does.Contain("specification.pdf"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.SourceName, Does.Contain("specification.pdf"));
+                Assert.That(row.SourceName, Does.Not.Contain(ClassKind.File.ToString()));
+                Assert.That(row.Name, Does.Contain("specification.pdf"));
+            });
         }
 
         [Test]
@@ -398,8 +401,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             await creator.SourceViewModel.Drop(dropinfo.Object);
 
-            Assert.That(creator.SourceViewModel.RelatedThingDenomination, Does.Contain("specification.pdf"));
-            Assert.That(creator.SourceViewModel.RelatedThingDenomination, Does.Not.Contain("not implemented"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(creator.SourceViewModel.RelatedThingDenomination, Does.Contain("specification.pdf"));
+                Assert.That(creator.SourceViewModel.RelatedThingDenomination, Does.Not.Contain("not implemented"));
+            });
         }
 
         [Test]

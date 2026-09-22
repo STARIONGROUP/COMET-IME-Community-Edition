@@ -31,8 +31,8 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -128,7 +128,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void SetProperties()
         {
-            this.Denomination = this.Thing is File file ? file.CurrentFileRevision?.Name : this.Thing.UserFriendlyName;
+            this.Denomination = this.Thing.QueryName();
             this.ClassKind = this.Thing.ClassKind.ToString();
         }
     }

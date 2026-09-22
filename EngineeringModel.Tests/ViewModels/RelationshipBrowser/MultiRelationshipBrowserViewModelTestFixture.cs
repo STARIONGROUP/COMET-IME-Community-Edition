@@ -269,9 +269,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             var row = (MultiRelationshipRowViewModel)viewmodel.Relationships[0];
 
-            Assert.That(row.RelatedThings, Does.Contain("specification.pdf"));
-            Assert.That(row.RelatedThings, Does.Not.Contain(ClassKind.File.ToString()));
-            Assert.That(row.Name, Does.Contain("specification.pdf"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.RelatedThings, Does.Contain("specification.pdf"));
+                Assert.That(row.RelatedThings, Does.Not.Contain(ClassKind.File.ToString()));
+                Assert.That(row.Name, Does.Contain("specification.pdf"));
+            });
         }
 
         [Test]
@@ -283,8 +286,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             var row = new RelatedThingRowViewModel(file, this.messageBus, _ => { });
 
-            Assert.That(row.Denomination, Does.Contain("specification.pdf"));
-            Assert.That(row.Denomination, Does.Not.Contain("not implemented"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(row.Denomination, Does.Contain("specification.pdf"));
+                Assert.That(row.Denomination, Does.Not.Contain("not implemented"));
+            });
 
             row.Dispose();
         }

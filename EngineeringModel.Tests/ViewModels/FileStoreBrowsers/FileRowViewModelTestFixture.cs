@@ -187,8 +187,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
 
             this.messageBus.SendObjectChangeEvent(relationship, EventKind.Added);
 
-            Assert.IsTrue(viewModel.ThingStatus.HasRelationship);
-            Assert.IsTrue(hasRelationshipRaised, "ThingStatus.HasRelationship must raise a change notification so the icon overlay refreshes without reopening the browser.");
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(viewModel.ThingStatus.HasRelationship);
+                Assert.IsTrue(hasRelationshipRaised, "ThingStatus.HasRelationship must raise a change notification so the icon overlay refreshes without reopening the browser.");
+            });
         }
     }
 }
