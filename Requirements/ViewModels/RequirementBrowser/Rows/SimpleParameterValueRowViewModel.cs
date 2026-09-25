@@ -35,6 +35,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.ViewModels;
 
@@ -122,7 +123,7 @@ namespace CDP4Requirements.ViewModels
                     return false;
                 }
 
-                enumPt = cpt.Component[0].ParameterType as EnumerationParameterType;
+                enumPt = cpt.QueryComponent(0)?.ParameterType as EnumerationParameterType;
 
                 if (enumPt == null)
                 {

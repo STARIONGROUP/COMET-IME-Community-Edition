@@ -149,5 +149,34 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.messageBus.SendObjectChangeEvent(this.option, EventKind.Updated);
             Assert.That(row.Name, Is.EqualTo(this.option.Name));
         }
+
+        [Test]
+        public void VerifyThatARowOfACompoundParameterTypeWithoutComponentDoesNotThrow()
+        {
+            // a CompoundParameterType without components is what the CDP4-COMET-SDK yields when the ParameterType
+            // of a Parameter cannot be resolved from the cache, see issue #1457
+            var unresolvedParameterType = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri) { ShortName = "unresolved" };
+
+            this.elementDefinition.ShortName = "ED";
+            this.option.ShortName = "OPT";
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = unresolvedParameterType,
+                Owner = this.activeDomain,
+                IsOptionDependent = true
+            };
+
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri) { ActualOption = this.option };
+
+            parameter.ValueSet.Add(valueSet);
+            this.elementDefinition.Parameter.Add(parameter);
+
+            var row = new ParameterOptionRowViewModel(parameter, this.option, this.session.Object, null, false);
+
+            Assert.DoesNotThrow(() => row.UpdateModelCode());
+            Assert.DoesNotThrow(() => { var _ = row.IsMultiSelect; });
+            Assert.DoesNotThrow(() => { var _ = row.EnumerationValueDefinition; });
+        }
     }
 }
