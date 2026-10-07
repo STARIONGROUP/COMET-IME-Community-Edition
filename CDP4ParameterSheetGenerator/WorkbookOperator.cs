@@ -157,7 +157,11 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="participant">
         /// The active <see cref="Participant"/> for which the workbook is being rebuilt.
         /// </param>
-        public async Task Rebuild(ISession session, Iteration iteration, Participant participant)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether the <see cref="CDP4Common.EngineeringModelData.Parameter"/>s that are owned by another
+        /// <see cref="CDP4Common.SiteDirectoryData.DomainOfExpertise"/>, and that are not subscribed to, are to be written as read-only rows.
+        /// </param>
+        public async Task Rebuild(ISession session, Iteration iteration, Participant participant, bool includeAllParameters = false)
         {
             this.application.StatusBar = string.Empty;
 
@@ -204,7 +208,7 @@ namespace CDP4ParameterSheetGenerator
 
                 await this.RefreshSessionData(session);
 
-                this.WriteParameterSheet(session, iteration, participant, processedValueSets);
+                this.WriteParameterSheet(session, iteration, participant, processedValueSets, includeAllParameters);
                 this.WriteOptionSheets(session, iteration, participant);
 
                 this.WriteSessionInfoToWorkbook(session, iteration, participant);
@@ -665,10 +669,14 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="processedValueSets">
         /// The <see cref="Thing"/>s that have been changed on the Parameter sheet that need to be kept
         /// </param>
-        private void WriteParameterSheet(ISession session, Iteration iteration, Participant participant, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether the <see cref="CDP4Common.EngineeringModelData.Parameter"/>s that are owned by another
+        /// <see cref="CDP4Common.SiteDirectoryData.DomainOfExpertise"/>, and that are not subscribed to, are to be written as read-only rows.
+        /// </param>
+        private void WriteParameterSheet(ISession session, Iteration iteration, Participant participant, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters)
         {
             var parameterSheetGenerator = new ParameterSheetGenerator(session, iteration, participant);
-            parameterSheetGenerator.Rebuild(this.application, this.workbook, processedValueSets);
+            parameterSheetGenerator.Rebuild(this.application, this.workbook, processedValueSets, includeAllParameters);
         }
 
         /// <summary>

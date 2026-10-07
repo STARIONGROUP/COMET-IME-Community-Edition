@@ -66,6 +66,12 @@ namespace CDP4ParameterSheetGenerator
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        /// The suffix that is appended to the tag of a Rebuild control to indicate that the <see cref="Parameter"/>s owned by
+        /// other <see cref="CDP4Common.SiteDirectoryData.DomainOfExpertise"/>s are to be included as read-only rows.
+        /// </summary>
+        private const string AllParametersTagSuffix = "|all";
+
+        /// <summary>
         /// The <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application
         /// </summary>
         private readonly IOfficeApplicationWrapper officeApplicationWrapper;
@@ -285,6 +291,9 @@ namespace CDP4ParameterSheetGenerator
 
                     var menuContent = string.Format("<button id=\"Rebuild_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />", iteration.Iid, label);
                     sb.Append(menuContent);
+
+                    var allParametersMenuContent = string.Format("<button id=\"Rebuild_{0}_all\" label=\"{1} - all parameters\" onAction=\"OnAction\" tag=\"{0}{2}\" />", iteration.Iid, label, AllParametersTagSuffix);
+                    sb.Append(allParametersMenuContent);
                 }
 
                 sb.Append(@"</menu>");
@@ -469,6 +478,13 @@ namespace CDP4ParameterSheetGenerator
         {
             var application = this.officeApplicationWrapper.Excel;
 
+            var includeAllParameters = iterationId.EndsWith(AllParametersTagSuffix);
+
+            if (includeAllParameters)
+            {
+                iterationId = iterationId.Substring(0, iterationId.Length - AllParametersTagSuffix.Length);
+            }
+
             if (iterationId == string.Empty)
             {
                 logger.Debug("The workbook cannot be rebuilt: the iteration id is empty");
@@ -516,7 +532,7 @@ namespace CDP4ParameterSheetGenerator
                 try
                 {
                     var workbookOperator = new WorkbookOperator(application, workbook, this.DialogNavigationService, this.CDPMessageBus, this.sessionCreator);
-                    await workbookOperator.Rebuild(this.Session, iteration, activeParticipant);
+                    await workbookOperator.Rebuild(this.Session, iteration, activeParticipant, includeAllParameters);
                 }
                 catch (Exception ex)
                 {

@@ -190,7 +190,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="clones">
         /// The <see cref="Thing"/>s that have been changed on the Parameter sheet that need to be kept
         /// </param>
-        public void Rebuild(Application application, Workbook workbook, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether the <see cref="CDP4Common.EngineeringModelData.Parameter"/>s that are owned by another
+        /// <see cref="DomainOfExpertise"/>, and that are not subscribed to, are to be written as read-only rows.
+        /// </param>
+        public void Rebuild(Application application, Workbook workbook, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters = false)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -222,7 +226,7 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
 
                 ParameterSheetUtilities.ApplyLocking(this.parameterSheet, false);
 
-                this.PopulateSheetArrays(processedValueSets);
+                this.PopulateSheetArrays(processedValueSets, includeAllParameters);
                 this.WriteParameterSheet();
                 this.ApplySheetSettings();
 
@@ -339,12 +343,16 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="clones">
         /// The <see cref="Thing"/>s that have been changed on the Parameter sheet that need to be kept
         /// </param>
-        private void PopulateSheetArrays(IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether the <see cref="CDP4Common.EngineeringModelData.Parameter"/>s that are owned by another
+        /// <see cref="DomainOfExpertise"/>, and that are not subscribed to, are to be assembled as read-only rows.
+        /// </param>
+        private void PopulateSheetArrays(IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters)
         {
             var selectedDomainOfExpertise = this.session.QuerySelectedDomainOfExpertise(this.iteration);
-            
+
             // Instantiate the different rows
-            var assembler = new ParameterSheetRowAssembler(this.iteration, selectedDomainOfExpertise);
+            var assembler = new ParameterSheetRowAssembler(this.iteration, selectedDomainOfExpertise, includeAllParameters);
             assembler.Assemble(processedValueSets);
             this.excelRows = assembler.ExcelRows;
 
@@ -665,6 +673,20 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
             
             foreach (var excelRow in this.excelRows)
             {
+                // A read-only row of another domain carries nothing but a published value: it has no editable switch, manual,
+                // computed or reference cell. Applying the switch validation or the actual-value formula would not only be
+                // pointless, it would overwrite that published value with a formula over empty cells.
+                // ponytail: these rows are skipped entirely rather than only partially, because every call in this loop is an
+                // individual COM call - and EntireRow.OutlineLevel is the most expensive of them. Including all domains can add
+                // thousands of rows, so leaving them out of this loop is what keeps a rebuild from taking minutes. The price is
+                // that they do not take part in the collapsible outline; they stay indented through their Name instead. If they
+                // need to fold away too, batch the OutlineLevel assignment over contiguous ranges rather than per row.
+                if (excelRow is ReadOnlyParameterExcelRow)
+                {
+                    row++;
+                    continue;
+                }
+
                 this.ApplyRowValidation(excelRow, row);
                 this.ApplyRowGrouping(excelRow, row);
                 this.ApplyActualValueFormula(excelRow, row);

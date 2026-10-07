@@ -126,6 +126,16 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         internal const string PG = "PG";
 
         /// <summary>
+        /// The name of the read-only <see cref="Parameter"/> row type, used for a <see cref="Parameter"/> that is owned by
+        /// another <see cref="CDP4Common.SiteDirectoryData.DomainOfExpertise"/> and that the current domain does not subscribe to.
+        /// </summary>
+        /// <remarks>
+        /// Rows of this type are informative only: they are not processed by the <see cref="ParameterSheetProcessor"/> and
+        /// their value cells are locked.
+        /// </remarks>
+        internal const string RO = "RO";
+
+        /// <summary>
         /// The name of the <see cref="ParameterValueSet"/> row type
         /// </summary>
         internal const string PVS = "PVS";
