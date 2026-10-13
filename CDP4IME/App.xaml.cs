@@ -23,6 +23,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using CDP4Composition;
+using CDP4Composition.ErrorReporting.Views;
+using COMET;
+using COMET.Modularity;
+using COMET.Views;
+using DevExpress.Xpf.Core;
+using DevExpress.XtraReports.Security;
+
+using NLog;
+
+using ReactiveUI;
+
+using Splat;
+using Splat.NLog;
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -31,21 +46,6 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-
-using CDP4Composition;
-using CDP4Composition.ErrorReporting.Views;
-
-using COMET;
-using COMET.Modularity;
-using COMET.Views;
-
-using DevExpress.Xpf.Core;
-
-using NLog;
-
-using ReactiveUI;
-using Splat;
-using Splat.NLog;
 
 namespace CDP4IME
 {
@@ -67,6 +67,9 @@ namespace CDP4IME
         /// </param>
         protected override void OnStartup(StartupEventArgs e)
         {
+            //Set the report scripting possibilities to Unresticted, as we already allow a lot in the DataSource editor compilation
+            ScriptPermissionManager.GlobalInstance = new ScriptPermissionManager(ExecutionMode.Unrestricted);
+
             // Set the Theme of the application
             ApplicationThemeHelper.ApplicationThemeName = Theme.SevenName;
             AppliedTheme.ThemeName = Theme.SevenName;
