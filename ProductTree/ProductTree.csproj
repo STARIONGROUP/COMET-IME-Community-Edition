@@ -12,8 +12,8 @@
     <Description>CDP4-COMET Product Tree Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
     <LangVersion>latest</LangVersion>
-    <AssemblyVersion>11.1.0.6</AssemblyVersion>
-    <FileVersion>11.1.0.6</FileVersion>
+    <AssemblyVersion>11.1.1.1</AssemblyVersion>
+    <FileVersion>11.1.1.1</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
