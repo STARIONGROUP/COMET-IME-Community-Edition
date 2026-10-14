@@ -34,6 +34,8 @@ namespace CDP4CrossViewEditor.Assemblers
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Extensions;
+
     using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
@@ -355,7 +357,13 @@ namespace CDP4CrossViewEditor.Assemblers
                     {
                         for (var i = 0; i < compoundParameterType.NumberOfValues; ++i)
                         {
-                            var component = compoundParameterType.Component[i];
+                            var component = compoundParameterType.QueryComponent(i);
+
+                            if (component == null || parameterValueSetBase.ActualValue.Count <= i)
+                            {
+                                continue;
+                            }
+
                             var value = parameterValueSetBase.ActualValue[i];
 
                             var index = this.GetContentColumnIndex(parameterValueSetBase, component);
