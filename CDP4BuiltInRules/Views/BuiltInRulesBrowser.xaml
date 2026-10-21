@@ -36,6 +36,7 @@
             <dxb:BarButtonItem />
 
             <dxb:BarButtonItem Command="{Binding HelpCommand}"
+                               IsVisible="False"
                                Glyph="{dx:DXImage Image=Info_16x16.png}"
                                Hint="Show Help" />
 

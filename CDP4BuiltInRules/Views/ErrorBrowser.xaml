@@ -33,10 +33,11 @@
         <dxb:ToolBarControl Height="30">
             <dxb:BarButtonItem Command="{Binding RefreshCommand}"
                                Glyph="{dx:DXImage Image=Refresh2_16x16.png}"
-                               Hint="Show Help" />
+                               Hint="Refresh the errors" />
 
             <dxb:BarButtonItem />
             <dxb:BarButtonItem Command="{Binding HelpCommand}"
+                               IsVisible="False"
                                Glyph="{dx:DXImage Image=Info_16x16.png}"
                                Hint="Show Help" />
 
