@@ -360,7 +360,7 @@ namespace ProductTree.Tests.ProductTreeRows
             dropinfo.SetupProperty(x => x.Effects);
             await vm.Drop(dropinfo.Object);
 
-            this.thingCreator.Verify(x => x.CreateElementUsage(It.IsAny<ElementDefinition>(), It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>()));
+            this.thingCreator.Verify(x => x.CreateElementUsage(It.IsAny<ElementDefinition>(), It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>(), It.IsAny<IEnumerable<Option>>()));
         }
 
         [Test]

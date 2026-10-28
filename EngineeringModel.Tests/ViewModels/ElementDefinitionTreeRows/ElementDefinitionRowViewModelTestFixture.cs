@@ -609,6 +609,19 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         /// <summary>
+        /// Create a new <see cref="ElementUsage"/> that is excluded from the specified <see cref="Option"/>s
+        /// </summary>
+        public Task CreateElementUsage(
+            ElementDefinition container,
+            ElementDefinition referencedDefinition,
+            DomainOfExpertise owner,
+            ISession session,
+            IEnumerable<Option> excludedOptions)
+        {
+            throw new Exception("The Element Usage could not be created");
+        }
+
+        /// <summary>
         /// Moves an existing <see cref="ElementUsage"/> into another <see cref="ElementDefinition"/>
         /// </summary>
         /// <param name="elementUsage">The <see cref="ElementUsage"/> that is to be moved.</param>

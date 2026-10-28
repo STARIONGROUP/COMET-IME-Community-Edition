@@ -26,6 +26,7 @@
 namespace CDP4ProductTree.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Reactive;
@@ -113,6 +114,11 @@ namespace CDP4ProductTree.ViewModels
         /// Backing field for <see cref="CanCreateOverride"/>
         /// </summary>
         private bool canCreateOverride;
+
+        /// <summary>
+        /// Backing field for <see cref="DropElementDefinitionToAllOptions"/>
+        /// </summary>
+        private bool dropElementDefinitionToAllOptions = true;
 
         /// <summary>
         /// The Panel Caption
@@ -291,6 +297,15 @@ namespace CDP4ProductTree.ViewModels
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
+        /// Gets or sets a value indicating whether a dropped <see cref="ElementDefinition"/> is used in all <see cref="Option"/>s instead of only the current one
+        /// </summary>
+        public bool DropElementDefinitionToAllOptions
+        {
+            get => this.dropElementDefinitionToAllOptions;
+            set => this.RaiseAndSetIfChanged(ref this.dropElementDefinitionToAllOptions, value);
+        }
+
+        /// <summary>
         /// Updates the current drag state.
         /// </summary>
         /// <param name="dropInfo">
@@ -351,6 +366,15 @@ namespace CDP4ProductTree.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the <see cref="Option"/>s an <see cref="ElementUsage"/> created by a drop is excluded from
+        /// </summary>
+        /// <returns>None when <see cref="DropElementDefinitionToAllOptions"/> is set, otherwise every <see cref="Option"/> except the current one</returns>
+        public IEnumerable<Option> GetExcludedOptionsForDrop() =>
+            this.DropElementDefinitionToAllOptions
+                ? Enumerable.Empty<Option>()
+                : ((Iteration)this.Thing.Container).Option.Where(x => x != this.Thing).ToList();
 
         /// <summary>
         /// Initialize the <see cref="ReactiveCommandCreator"/>

@@ -10,6 +10,7 @@ namespace CDP4EngineeringModel.Tests.Utilities
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Linq;
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -189,6 +190,16 @@ namespace CDP4EngineeringModel.Tests.Utilities
             await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, domainOfExpertise, this.session.Object);
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
+
+            var excludedOption = new Option(Guid.NewGuid(), this.cache, null);
+            iteration.Option.Add(excludedOption);
+            OperationContainer writtenContainer = null;
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Callback<OperationContainer>(x => writtenContainer = x).Returns(Task.CompletedTask);
+
+            await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, domainOfExpertise, this.session.Object, new[] { excludedOption });
+
+            var createdUsage = writtenContainer.Operations.Select(x => x.ModifiedThing).OfType<CDP4Common.DTO.ElementUsage>().Single();
+            Assert.That(createdUsage.ExcludeOption, Is.EquivalentTo(new[] { excludedOption.Iid }));
         }
         
         [Test]

@@ -196,6 +196,20 @@ namespace ProductTree.Tests
         }
 
         [Test]
+        public void VerifyGetExcludedOptionsForDrop()
+        {
+            var otherOption = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.iteration.Option.Add(otherOption);
+
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            Assert.That(vm.GetExcludedOptionsForDrop(), Is.EquivalentTo(new[] { otherOption }));
+
+            vm.DropElementDefinitionToAllOptions = true;
+            Assert.That(vm.GetExcludedOptionsForDrop(), Is.Empty);
+        }
+
+        [Test]
         public async Task VerifyThatUpdateOptionEventWorks()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
