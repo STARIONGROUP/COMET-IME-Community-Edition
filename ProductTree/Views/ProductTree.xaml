@@ -202,7 +202,8 @@
                       Margin="4,0,0,0" 
                       VerticalAlignment="Center" 
                       FontSize="10"
-                      Content="Add Element Definition To All Options"  
+                      Content="Add Element Definition To All Options"
+                      ToolTip="When unticked, a dropped Element Definition is used in the current Option only and excluded from all other Options."
                       IsChecked="{
                         Binding DropElementDefinitionToAllOptions,
                         Mode=TwoWay,
