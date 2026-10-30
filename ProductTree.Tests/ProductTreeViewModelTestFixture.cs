@@ -203,10 +203,10 @@ namespace ProductTree.Tests
 
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
-            Assert.That(vm.GetExcludedOptionsForDrop(), Is.EquivalentTo(new[] { otherOption }));
-
-            vm.DropElementDefinitionToAllOptions = true;
             Assert.That(vm.GetExcludedOptionsForDrop(), Is.Empty);
+
+            vm.DropElementDefinitionToAllOptions = false;
+            Assert.That(vm.GetExcludedOptionsForDrop(), Is.EquivalentTo(new[] { otherOption }));
         }
 
         [Test]
