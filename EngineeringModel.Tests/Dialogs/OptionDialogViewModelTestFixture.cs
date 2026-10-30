@@ -27,7 +27,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -124,6 +128,76 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             Assert.AreEqual(1, vm.PossibleCategory.Count);
             Assert.AreEqual(true, vm.IsDefault);
+        }
+
+        [Test]
+        public async Task VerifyUpdateTransaction()
+        {
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, null) { Name = "ed" };
+            var keptUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "kept" };
+            var droppedUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "dropped" };
+            var lockedUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "locked" };
+            var restoredUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "restored" };
+            restoredUsage.ExcludeOption.Add(this.option);
+            elementDefinition.ContainedElement.AddRange(new[] { keptUsage, droppedUsage, lockedUsage, restoredUsage });
+            this.iteration.Element.Add(elementDefinition);
+
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(lockedUsage)).Returns(false);
+
+            OperationContainer writtenContainer = null;
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Callback<OperationContainer>(x => writtenContainer = x).Returns(Task.CompletedTask);
+
+            var iterationClone = this.iteration.Clone(false);
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.iteration), iterationClone);
+            var newOption = new Option(Guid.NewGuid(), this.cache, null) { Name = "new", ShortName = "new" };
+
+            var vm = new OptionDialogViewModel(newOption, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, iterationClone);
+
+            Assert.That(vm.ElementUsageRows.Select(x => x.Name), Is.EqualTo(new[] { "kept", "dropped", "locked", "restored" }));
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.All.True);
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsEditable), Is.EqualTo(new[] { true, true, false, true }));
+
+            await vm.UncheckAllElementUsagesCommand.Execute();
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { false, false, true, false }));
+
+            await vm.CheckAllElementUsagesCommand.Execute();
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.All.True);
+
+            vm.ElementUsageRows.Single(x => x.Thing == droppedUsage).IsIncluded = false;
+            await vm.OkCommand.Execute();
+
+            var updatedUsages = writtenContainer.Operations
+                .Select(x => x.ModifiedThing)
+                .OfType<CDP4Common.DTO.ElementUsage>()
+                .ToList();
+
+            Assert.That(updatedUsages.Select(x => x.Iid), Is.EqualTo(new[] { droppedUsage.Iid }));
+            Assert.That(updatedUsages[0].ExcludeOption, Is.EqualTo(new[] { newOption.Iid }));
+
+            iterationClone = this.iteration.Clone(false);
+            transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.iteration), iterationClone);
+
+            vm = new OptionDialogViewModel(this.option.Clone(false), transaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, iterationClone);
+
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, true, true, false }));
+
+            vm.ElementUsageRows.Single(x => x.Thing == restoredUsage).IsIncluded = true;
+            await vm.OkCommand.Execute();
+
+            updatedUsages = writtenContainer.Operations
+                .Select(x => x.ModifiedThing)
+                .OfType<CDP4Common.DTO.ElementUsage>()
+                .ToList();
+
+            Assert.That(updatedUsages.Select(x => x.Iid), Is.EqualTo(new[] { restoredUsage.Iid }));
+            Assert.That(updatedUsages[0].ExcludeOption, Is.Empty);
+
+            vm = new OptionDialogViewModel(this.option, null, this.session.Object, true, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, this.iteration);
+
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsEditable), Is.All.False);
+            Assert.That(((ICommand)vm.UncheckAllElementUsagesCommand).CanExecute(null), Is.False);
         }
 
         [Test]

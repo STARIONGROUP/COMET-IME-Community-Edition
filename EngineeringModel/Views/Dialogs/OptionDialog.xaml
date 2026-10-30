@@ -8,6 +8,7 @@
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              Height="317"
              d:DesignWidth="300"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -33,6 +34,54 @@
                 </lc:LayoutItem>
                 <items:AliasDisplayLayoutItem />
                 <items:DefinitionDisplayLayoutItem />
+            </lc:LayoutGroup>
+            <lc:LayoutGroup Header="Element Usages" Orientation="Vertical">
+                <lc:LayoutItem>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Margin="0,0,5,0"
+                                Padding="3"
+                                Command="{Binding CheckAllElementUsagesCommand}"
+                                Content="Check All" />
+                        <Button Padding="3"
+                                Command="{Binding UncheckAllElementUsagesCommand}"
+                                Content="Uncheck All" />
+                    </StackPanel>
+                </lc:LayoutItem>
+                <lc:LayoutItem>
+                    <dxg:GridControl Height="250"
+                                     MaxWidth="700"
+                                     AutoExpandAllGroups="True"
+                                     ItemsSource="{Binding ElementUsageRows}">
+                        <dxg:GridControl.View>
+                            <dxg:TableView AllowEditing="True"
+                                           AutoWidth="True"
+                                           NavigationStyle="Cell"
+                                           ShowGroupPanel="False"
+                                           ShowIndicator="False" />
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn FieldName="ElementDefinitionName" Header="Element Definition" GroupIndex="0" ReadOnly="True" />
+                            <dxg:GridColumn Header="Included"
+                                            Width="60"
+                                            FixedWidth="True"
+                                            AllowAutoFilter="False"
+                                            AllowColumnFiltering="False"
+                                            AllowSorting="False">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dxe:CheckEdit HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       IsChecked="{Binding RowData.Row.IsIncluded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                       IsEnabled="{Binding RowData.Row.IsEditable}" />
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
+                            <dxg:GridColumn FieldName="Name" ReadOnly="True" />
+                            <dxg:GridColumn FieldName="ShortName" Header="Short Name" ReadOnly="True" />
+                            <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" ReadOnly="True" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </lc:LayoutItem>
             </lc:LayoutGroup>
             <items:CategoryLayoutGroup />
             <items:AliasLayoutGroup/>

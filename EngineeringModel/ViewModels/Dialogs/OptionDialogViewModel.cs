@@ -28,6 +28,7 @@ namespace CDP4EngineeringModel.ViewModels
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -39,6 +40,8 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Operations;
+
+    using CDP4EngineeringModel.ViewModels.Dialogs.Rows;
 
     using ReactiveUI;
 
@@ -101,6 +104,48 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets the rows that set which <see cref="ElementUsage"/>s of the <see cref="Iteration"/> are included in the <see cref="Option"/>
+        /// </summary>
+        public List<OptionElementUsageRowViewModel> ElementUsageRows { get; private set; }
+
+        /// <summary>
+        /// Gets the command that includes every editable <see cref="ElementUsage"/> in the <see cref="Option"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CheckAllElementUsagesCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that excludes every editable <see cref="ElementUsage"/> from the <see cref="Option"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> UncheckAllElementUsagesCommand { get; private set; }
+
+        /// <summary>
+        /// Initializes the dialog
+        /// </summary>
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            var iteration = (Iteration)this.Container;
+
+            this.ElementUsageRows = iteration.Element
+                .SelectMany(x => x.ContainedElement)
+                .Select(x => new OptionElementUsageRowViewModel(x, this.Thing, !this.IsReadOnly && this.PermissionService.CanWrite(x)))
+                .ToList();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="ReactiveCommand"/>s of this dialog
+        /// </summary>
+        protected override void InitializeCommands()
+        {
+            base.InitializeCommands();
+
+            var canExecute = this.WhenAnyValue(vm => vm.IsReadOnly, x => !x);
+            this.CheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(true), canExecute);
+            this.UncheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(false), canExecute);
+        }
+
+        /// <summary>
         /// Populate the <see cref="OptionDialogViewModel.PossibleCategory"/> and <see cref="OptionDialogViewModel.Category"/>
         /// </summary>
         protected override void PopulateCategory()
@@ -131,6 +176,34 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var iteration = (Iteration)this.Container;
                 iteration.DefaultOption = this.IsDefault ? this.Thing : null;
+            }
+
+            foreach (var row in this.ElementUsageRows.Where(x => x.IsIncluded != x.WasIncluded))
+            {
+                var clone = row.Thing.Clone(false);
+
+                if (row.IsIncluded)
+                {
+                    clone.ExcludeOption.RemoveAll(x => x.Iid == this.Thing.Iid);
+                }
+                else
+                {
+                    clone.ExcludeOption.Add(this.Thing);
+                }
+
+                this.transaction.CreateOrUpdate(clone);
+            }
+        }
+
+        /// <summary>
+        /// Sets <see cref="OptionElementUsageRowViewModel.IsIncluded"/> on every editable row of <see cref="ElementUsageRows"/>
+        /// </summary>
+        /// <param name="isIncluded">Whether the <see cref="ElementUsage"/>s are included in the <see cref="Option"/></param>
+        private void SetEditableElementUsagesIncluded(bool isIncluded)
+        {
+            foreach (var row in this.ElementUsageRows.Where(x => x.IsEditable))
+            {
+                row.IsIncluded = isIncluded;
             }
         }
 
