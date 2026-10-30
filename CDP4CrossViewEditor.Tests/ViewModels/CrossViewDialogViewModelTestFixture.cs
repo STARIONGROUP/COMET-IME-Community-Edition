@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossViewDialogViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -340,6 +340,29 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             application.Quit();
             application.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatOptionsAreOfferedAndNoneIsSelectedByDefault()
+        {
+            var option = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri) { ShortName = "opt_a", Name = "Option A" };
+            this.iteration.Option.Add(option);
+            this.iteration.DefaultOption = option;
+
+            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
+
+            Assert.That(viewModel.PossibleOptions, Is.EqualTo(new[] { option }));
+
+            // a workbook that was never built with this dialog keeps showing every option on one sheet, as it did until now
+            Assert.That(viewModel.SelectedOptions, Is.Empty);
+
+            viewModel.SelectedOptions = new List<object> { option };
+
+            Assert.DoesNotThrowAsync(async () => await viewModel.OkCommand.Execute());
+
+            var result = viewModel.DialogResult as WorkbookSelectionDialogResult;
+
+            Assert.That(result.Options, Is.EqualTo(new[] { option }));
         }
 
         [Test]

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossviewArrayAssembler.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
@@ -61,6 +61,11 @@ namespace CDP4CrossViewEditor.Assemblers
         private readonly IEnumerable<Guid> parameterTypes;
 
         /// <summary>
+        /// The unique ids of the selected <see cref="Option"/>s; empty when every option is shown.
+        /// </summary>
+        private readonly HashSet<Guid> selectedOptions;
+
+        /// <summary>
         /// The header structure mapping parameter layer short names to indices:
         /// ParameterType -> ParameterTypeComponent -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState -> index
         /// </summary>
@@ -114,10 +119,15 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <param name="parameterTypes">
         /// The selected <see cref="ParameterType"/> <see cref="Thing.Iid"/>s.
         /// </param>
-        public CrossviewArrayAssembler(IEnumerable<IExcelRow<Thing>> excelRows, IEnumerable<Guid> parameterTypes)
+        /// <param name="options">
+        /// The unique ids of the selected <see cref="Option"/>s, which limit the option dependent columns; null or empty shows
+        /// every option.
+        /// </param>
+        public CrossviewArrayAssembler(IEnumerable<IExcelRow<Thing>> excelRows, IEnumerable<Guid> parameterTypes, IEnumerable<Guid> options = null)
         {
             this.excelRows = excelRows;
             this.parameterTypes = parameterTypes;
+            this.selectedOptions = new HashSet<Guid>(options ?? Enumerable.Empty<Guid>());
 
             this.InitializeArrays();
             this.PopulateContentArray();
@@ -224,20 +234,18 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </summary>
         private void InitializeHeaderStructure()
         {
-            foreach (var parameterTypeIid in this.parameterTypes)
+            // Every row that carries values has to contribute its columns here, not just the ElementDefinition rows. In a
+            // product tree only the top element is represented by its ElementDefinition and all the other nodes are
+            // ElementUsages, so looking at the ElementDefinition rows alone would leave the columns of those usages out of the
+            // header. GetContentColumnIndex would then not find them while the content is written, and throw.
+            // The same resolution as PopulateContentRow is used, so that the header and the content cannot disagree.
+            foreach (var excelRow in this.excelRows)
             {
-                foreach (var elementDefinition in this.excelRows
-                    .Where(row => row.Thing is ElementDefinition)
-                    .Select(row => row.Thing as ElementDefinition))
+                var parameters = this.QueryParameters(excelRow);
+
+                foreach (var parameterOrOverrideBase in parameters)
                 {
-                    var parameter = elementDefinition.Parameter.FirstOrDefault(p => p.ParameterType.Iid == parameterTypeIid);
-
-                    if (parameter == null)
-                    {
-                        continue;
-                    }
-
-                    foreach (var valueSet in parameter.ValueSet)
+                    foreach (var valueSet in parameterOrOverrideBase.ValueSets.Cast<ParameterValueSetBase>().Where(valueSet => this.IsOptionSelected(valueSet.ActualOption)))
                     {
                         this.SetContentColumnIndex(valueSet);
                     }
@@ -323,33 +331,16 @@ namespace CDP4CrossViewEditor.Assemblers
             contentRow[3] = excelRow.Owner;
             contentRow[4] = excelRow.Categories;
 
-            List<ParameterOrOverrideBase> parameters;
+            var parameters = this.QueryParameters(excelRow);
 
-            switch (excelRow.Thing)
+            if (parameters.Count == 0 && !(excelRow.Thing is ElementDefinition) && !(excelRow.Thing is ElementUsage))
             {
-                case ElementUsage elementUsage:
-                    parameters = this.parameterTypes
-                        .Select(pt => GetParameterOrOverrideBase(elementUsage, pt))
-                        .Where(p => p != null)
-                        .ToList();
-
-                    break;
-
-                case ElementDefinition elementDefinition:
-                    parameters = this.parameterTypes
-                        .Select(pt => GetParameterOrOverrideBase(elementDefinition, pt))
-                        .Where(p => p != null)
-                        .ToList();
-
-                    break;
-
-                default:
-                    return (contentRow, namesRow);
+                return (contentRow, namesRow);
             }
 
             foreach (var parameterOrOverrideBase in parameters)
             {
-                foreach (var parameterValueSetBase in parameterOrOverrideBase.ValueSets.Cast<ParameterValueSetBase>())
+                foreach (var parameterValueSetBase in parameterOrOverrideBase.ValueSets.Cast<ParameterValueSetBase>().Where(valueSet => this.IsOptionSelected(valueSet.ActualOption)))
                 {
                     if (parameterOrOverrideBase.ParameterType is CompoundParameterType compoundParameterType)
                     {
@@ -444,6 +435,41 @@ namespace CDP4CrossViewEditor.Assemblers
         }
 
         /// <summary>
+        /// Queries the <see cref="ParameterOrOverrideBase"/>s of the selected parameter types that are carried by the
+        /// <see cref="Thing"/> of the given <paramref name="excelRow"/>.
+        /// </summary>
+        /// <param name="excelRow">
+        /// The <see cref="IExcelRow{T}"/> whose parameters are queried
+        /// </param>
+        /// <returns>
+        /// The <see cref="ParameterOrOverrideBase"/>s of the row, an empty list when the row carries no values.
+        /// </returns>
+        /// <remarks>
+        /// Both the header structure and the content of the sheet are built from this, so that a value can never be written for
+        /// a column that the header does not know about.
+        /// </remarks>
+        private List<ParameterOrOverrideBase> QueryParameters(IExcelRow<Thing> excelRow)
+        {
+            switch (excelRow.Thing)
+            {
+                case ElementUsage elementUsage:
+                    return this.parameterTypes
+                        .Select(pt => GetParameterOrOverrideBase(elementUsage, pt))
+                        .Where(p => p != null)
+                        .ToList();
+
+                case ElementDefinition elementDefinition:
+                    return this.parameterTypes
+                        .Select(pt => GetParameterOrOverrideBase(elementDefinition, pt))
+                        .Where(p => p != null)
+                        .ToList();
+
+                default:
+                    return new List<ParameterOrOverrideBase>();
+            }
+        }
+
+        /// <summary>
         /// Initializes the column index associated to the given <paramref name="parameterValueSet"/>
         /// </summary>
         /// <param name="parameterValueSet">
@@ -451,7 +477,9 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </param>
         private void SetContentColumnIndex(ParameterValueSetBase parameterValueSet)
         {
-            var parameter = (Parameter)parameterValueSet.Container;
+            // a ParameterOverrideValueSet is contained by a ParameterOverride, not by a Parameter, so the container may only be
+            // treated as the common base of the two
+            var parameter = (ParameterOrOverrideBase)parameterValueSet.Container;
 
             if (parameter.ParameterType is CompoundParameterType compoundParameterType)
             {
@@ -542,6 +570,18 @@ namespace CDP4CrossViewEditor.Assemblers
 
             afsDictionary[actualFiniteStateShortName] = index;
         }
+
+        /// <summary>
+        /// Queries whether the values of an <see cref="Option"/> are shown.
+        /// </summary>
+        /// <param name="option">
+        /// The <see cref="Option"/> of a value set, null for a value set that does not depend on the option
+        /// </param>
+        /// <returns>
+        /// True when the value set does not depend on the option, no option is selected, or the option is selected
+        /// </returns>
+        internal bool IsOptionSelected(Option option) =>
+            option == null || this.selectedOptions.Count == 0 || this.selectedOptions.Contains(option.Iid);
 
         /// <summary>
         /// Gets the column index associated to the given <paramref name="parameterValueSetBase"/>
