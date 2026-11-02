@@ -196,19 +196,17 @@
         </dxg:TreeListControl>
 
         <views:SelectedThingGroupControl Grid.Row="3"/>
-        
+
         <StackPanel Grid.Row="4" Orientation="Horizontal" >
-            <CheckBox Name="AddElementDefinitionToAllOptions" 
-                      Margin="4,0,0,0" 
-                      VerticalAlignment="Center" 
+            <CheckBox Name="AddElementDefinitionToAllOptions"
+                      Margin="4,0,0,0"
+                      VerticalAlignment="Center"
                       FontSize="10"
                       Content="Add Element Definition To All Options"
                       ToolTip="When unticked, a dropped Element Definition is used in the current Option only and excluded from all other Options."
-                      IsChecked="{
-                        Binding DropElementDefinitionToAllOptions,
-                        Mode=TwoWay,
-                        UpdateSourceTrigger=PropertyChanged
-                        }" />
+                      IsChecked="{Binding DropElementDefinitionToAllOptions,
+                                          Mode=TwoWay,
+                                          UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
         <views:LoadingControl Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
     </Grid>

@@ -852,7 +852,7 @@ namespace CDP4ProductTree.ViewModels
 
                 if (elementDefinition.TopContainer == this.Thing.TopContainer)
                 {
-                    var excludedOptions = (this.TopContainerViewModel as ProductTreeViewModel)?.GetExcludedOptionsForDrop() ?? Enumerable.Empty<Option>();
+                    var excludedOptions = (this.TopContainerViewModel as ProductTreeViewModel)?.GetExcludedOptionsForDrop();
                     await this.ThingCreator.CreateElementUsage(this.Thing.ElementDefinition, elementDefinition, currentDomain, this.Session, excludedOptions);
                 }
             }

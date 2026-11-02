@@ -245,7 +245,7 @@ namespace CDP4Composition.Services
         /// <param name="excludedOptions">
         /// The <see cref="Option"/>s the <see cref="ElementUsage"/> is excluded from
         /// </param>
-        public async Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session, IEnumerable<Option> excludedOptions )
+        public async Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session, IEnumerable<Option> excludedOptions)
         {
             if (container == null)
             {
