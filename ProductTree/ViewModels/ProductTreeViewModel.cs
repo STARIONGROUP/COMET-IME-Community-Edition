@@ -482,7 +482,20 @@ namespace CDP4ProductTree.ViewModels
 
             if (this.SelectedThing is ElementUsageRowViewModel)
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Edit Element Definition", "", this.EditElementDefinitionCommand, MenuItemKind.Edit, ClassKind.ElementDefinition));
+                var editMenu = new ContextMenuItemViewModel("Edit", "", null, MenuItemKind.Edit);
+                editMenu.SubMenu.Add(new ContextMenuItemViewModel("Element Usage", "", this.UpdateCommand, MenuItemKind.Edit, ClassKind.ElementUsage));
+                editMenu.SubMenu.Add(new ContextMenuItemViewModel("Element Definition", "", this.EditElementDefinitionCommand, MenuItemKind.Edit, ClassKind.ElementDefinition));
+
+                var genericEditMenuItem = this.ContextMenu.FirstOrDefault(x => x.Header == "Edit" && (x.SubMenu == null || x.SubMenu.Count == 0));
+
+                if (genericEditMenuItem != null)
+                {
+                    this.ContextMenu[this.ContextMenu.IndexOf(genericEditMenuItem)] = editMenu;
+                }
+                else
+                {
+                    this.ContextMenu.Insert(0, editMenu);
+                }
             }
 
             if (this.SelectedThing is IHavePath)

@@ -41,6 +41,7 @@ namespace ProductTree.Tests
     using CDP4Common.Types;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services.NestedElementTreeService;
@@ -531,7 +532,14 @@ namespace ProductTree.Tests
             Assert.IsTrue(((ICommand)vm.EditElementDefinitionCommand).CanExecute(null));
 
             vm.PopulateContextMenu();
-            Assert.That(vm.ContextMenu.Select(x => x.Header), Contains.Item("Edit Element Definition"));
+
+            var editMenus = vm.ContextMenu.Where(x => x.Header == "Edit").ToList();
+            Assert.That(editMenus, Has.Count.EqualTo(1));
+
+            var editMenu = editMenus.Single();
+            Assert.That(editMenu.SubMenu.Select(x => x.Header), Is.EqualTo(new[] { "Element Usage", "Element Definition" }));
+            Assert.That(editMenu.SubMenu.Single(x => x.Header == "Element Definition").MenuCommand, Is.SameAs(vm.EditElementDefinitionCommand));
+            Assert.That(editMenu.SubMenu.Single(x => x.Header == "Element Usage").MenuCommand, Is.SameAs(vm.UpdateCommand));
 
             await vm.EditElementDefinitionCommand.Execute();
 
@@ -558,7 +566,7 @@ namespace ProductTree.Tests
             vm.PopulateContextMenu();
 
             Assert.IsFalse(vm.CanEditElementDefinition);
-            Assert.That(vm.ContextMenu.Select(x => x.Header), Has.No.Member("Edit Element Definition"));
+            Assert.That(vm.ContextMenu.SelectMany(x => x.SubMenu ?? new List<ContextMenuItemViewModel>()).Select(x => x.Header), Has.No.Member("Element Definition"));
 
             var usedDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
 
