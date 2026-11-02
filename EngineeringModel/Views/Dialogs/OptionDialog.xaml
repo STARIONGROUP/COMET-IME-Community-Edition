@@ -38,13 +38,29 @@
             <lc:LayoutGroup Header="Element Usages" Orientation="Vertical">
                 <lc:LayoutItem>
                     <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0,0,5,0"
+                                   VerticalAlignment="Center"
+                                   Text="Baseline:" />
+                        <dxe:ComboBoxEdit Width="200"
+                                          Margin="0,0,5,0"
+                                          DisplayMember="Name"
+                                          EditValue="{Binding SelectedBaselineOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          IsReadOnly="{Binding IsReadOnly}"
+                                          IsTextEditable="False"
+                                          ItemsSource="{Binding PossibleBaselineOption}"
+                                          ToolTip="Fill the element usages as per this option." />
                         <Button Margin="0,0,5,0"
                                 Padding="3"
                                 Command="{Binding CheckAllElementUsagesCommand}"
                                 Content="Check All" />
-                        <Button Padding="3"
+                        <Button Margin="0,0,5,0"
+                                Padding="3"
                                 Command="{Binding UncheckAllElementUsagesCommand}"
                                 Content="Uncheck All" />
+                        <Button Padding="3"
+                                Command="{Binding ResetElementUsagesCommand}"
+                                Content="Reset"
+                                ToolTip="Restore the element usages to their state when this dialog was opened." />
                     </StackPanel>
                 </lc:LayoutItem>
                 <lc:LayoutItem>

@@ -201,6 +201,46 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
+        public async Task VerifySelectedBaselineOption()
+        {
+            var baseline = new Option(Guid.NewGuid(), this.cache, null) { Name = "baseline" };
+            this.iteration.Option.Add(baseline);
+
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, null) { Name = "ed" };
+            var includedUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "included" };
+            includedUsage.ExcludeOption.Add(this.option);
+            var excludedUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "excluded" };
+            excludedUsage.ExcludeOption.Add(baseline);
+            var lockedUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "locked" };
+            lockedUsage.ExcludeOption.Add(baseline);
+            elementDefinition.ContainedElement.AddRange(new[] { includedUsage, excludedUsage, lockedUsage });
+            this.iteration.Element.Add(elementDefinition);
+
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(lockedUsage)).Returns(false);
+
+            var clone = this.iteration.Clone(false);
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.iteration), clone);
+            var vm = new OptionDialogViewModel(this.option.Clone(false), transaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, clone);
+
+            Assert.That(vm.PossibleBaselineOption, Is.EqualTo(new[] { baseline }));
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { false, true, true }));
+
+            vm.SelectedBaselineOption = baseline;
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, false, true }));
+
+            vm.ElementUsageRows[1].IsIncluded = true;
+            vm.SelectedBaselineOption = null;
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, true, true }));
+
+            vm.SelectedBaselineOption = baseline;
+            await vm.ResetElementUsagesCommand.Execute();
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { false, true, true }));
+            Assert.That(vm.SelectedBaselineOption, Is.Null);
+        }
+
+        [Test]
         public void VerifyThatParameterlessContructorExists()
         {
             Assert.DoesNotThrow(() => new OptionDialogViewModel());

@@ -26,9 +26,11 @@
 
 namespace CDP4EngineeringModel.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
+    using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -52,6 +54,11 @@ namespace CDP4EngineeringModel.ViewModels
     public class OptionDialogViewModel : CDP4CommonView.OptionDialogViewModel, IThingDialogViewModel
     {
         private bool isDefault;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedBaselineOption"/>
+        /// </summary>
+        private Option selectedBaselineOption;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionDialogViewModel"/> class.
@@ -109,6 +116,20 @@ namespace CDP4EngineeringModel.ViewModels
         public List<OptionElementUsageRowViewModel> ElementUsageRows { get; private set; }
 
         /// <summary>
+        /// Gets the other <see cref="Option"/>s of the <see cref="Iteration"/> that <see cref="ElementUsageRows"/> can be filled from
+        /// </summary>
+        public List<Option> PossibleBaselineOption { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Option"/> whose inclusions are copied to the editable <see cref="ElementUsageRows"/> when selected
+        /// </summary>
+        public Option SelectedBaselineOption
+        {
+            get => this.selectedBaselineOption;
+            set => this.RaiseAndSetIfChanged(ref this.selectedBaselineOption, value);
+        }
+
+        /// <summary>
         /// Gets the command that includes every editable <see cref="ElementUsage"/> in the <see cref="Option"/>
         /// </summary>
         public ReactiveCommand<Unit, Unit> CheckAllElementUsagesCommand { get; private set; }
@@ -117,6 +138,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the command that excludes every editable <see cref="ElementUsage"/> from the <see cref="Option"/>
         /// </summary>
         public ReactiveCommand<Unit, Unit> UncheckAllElementUsagesCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that restores <see cref="ElementUsageRows"/> to the state they were in when the dialog opened
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> ResetElementUsagesCommand { get; private set; }
 
         /// <summary>
         /// Initializes the dialog
@@ -131,6 +157,8 @@ namespace CDP4EngineeringModel.ViewModels
                 .SelectMany(x => x.ContainedElement)
                 .Select(x => new OptionElementUsageRowViewModel(x, this.Thing, !this.IsReadOnly && this.PermissionService.CanWrite(x)))
                 .ToList();
+
+            this.PossibleBaselineOption = iteration.Option.Where(x => x.Iid != this.Thing.Iid).ToList();
         }
 
         /// <summary>
@@ -143,6 +171,9 @@ namespace CDP4EngineeringModel.ViewModels
             var canExecute = this.WhenAnyValue(vm => vm.IsReadOnly, x => !x);
             this.CheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(true), canExecute);
             this.UncheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(false), canExecute);
+            this.ResetElementUsagesCommand = ReactiveCommandCreator.Create(this.ResetElementUsages, canExecute);
+
+            this.WhenAnyValue(vm => vm.SelectedBaselineOption).Where(x => x != null).Subscribe(this.ApplyBaselineOption);
         }
 
         /// <summary>
@@ -192,6 +223,31 @@ namespace CDP4EngineeringModel.ViewModels
                 }
 
                 this.transaction.CreateOrUpdate(clone);
+            }
+        }
+
+        /// <summary>
+        /// Fills every editable row of <see cref="ElementUsageRows"/> as per the given <see cref="Option"/>
+        /// </summary>
+        /// <param name="baseline">The <see cref="Option"/> to copy the inclusions from</param>
+        private void ApplyBaselineOption(Option baseline)
+        {
+            foreach (var row in this.ElementUsageRows.Where(x => x.IsEditable))
+            {
+                row.IsIncluded = row.IsIncludedIn(baseline);
+            }
+        }
+
+        /// <summary>
+        /// Restores every row of <see cref="ElementUsageRows"/> to its persisted state and clears <see cref="SelectedBaselineOption"/>
+        /// </summary>
+        private void ResetElementUsages()
+        {
+            this.SelectedBaselineOption = null;
+
+            foreach (var row in this.ElementUsageRows)
+            {
+                row.IsIncluded = row.WasIncluded;
             }
         }
 
