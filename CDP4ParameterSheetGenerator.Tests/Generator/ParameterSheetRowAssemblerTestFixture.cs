@@ -27,6 +27,7 @@ namespace CDP4ParameterSheetGenerator.Tests.Generator
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -205,6 +206,33 @@ namespace CDP4ParameterSheetGenerator.Tests.Generator
             var parameterB1 = new Parameter(Guid.NewGuid(), null, null) { ParameterType = xcoord, Owner = this.owner };
             elementDefinitionB.Parameter.Add(parameterB1);
 
+            // a Parameter that is owned by another DomainOfExpertise and that this.owner does not subscribe to
+            var parameterB2 = new Parameter(Guid.NewGuid(), null, null) { ParameterType = ycoord, Owner = this.otherOwner };
+            elementDefinitionB.Parameter.Add(parameterB2);
+
+            var parameterValueSetB2 = new ParameterValueSet(Guid.NewGuid(), null, null);
+            var valueArrayB2 = new ValueArray<string>(new List<string>() { "y" });
+            parameterValueSetB2.Manual = valueArrayB2;
+            parameterValueSetB2.Reference = valueArrayB2;
+            parameterValueSetB2.Computed = valueArrayB2;
+            parameterValueSetB2.Formula = valueArrayB2;
+            parameterB2.ValueSet.Add(parameterValueSetB2);
+
+            // a Parameter of another domain that lives inside a ParameterGroup
+            var parameterGroupB = new ParameterGroup(Guid.NewGuid(), null, null) { Name = "group B" };
+            elementDefinitionB.ParameterGroup.Add(parameterGroupB);
+
+            var parameterB3 = new Parameter(Guid.NewGuid(), null, null) { ParameterType = zcoord, Owner = this.otherOwner, Group = parameterGroupB };
+            elementDefinitionB.Parameter.Add(parameterB3);
+
+            var parameterValueSetB3 = new ParameterValueSet(Guid.NewGuid(), null, null);
+            var valueArrayB3 = new ValueArray<string>(new List<string>() { "z" });
+            parameterValueSetB3.Manual = valueArrayB3;
+            parameterValueSetB3.Reference = valueArrayB3;
+            parameterValueSetB3.Computed = valueArrayB3;
+            parameterValueSetB3.Formula = valueArrayB3;
+            parameterB3.ValueSet.Add(parameterValueSetB3);
+
             // element usage
             var elementUsageOfA1 = new ElementUsage(Guid.NewGuid(), null, null) { ShortName = "usageofA1", Name = "usage of A 2", Owner = this.owner};
             elementDefinitionB.ContainedElement.Add(elementUsageOfA1);
@@ -231,6 +259,25 @@ namespace CDP4ParameterSheetGenerator.Tests.Generator
             parameterOverrideValueSetA1.Formula = overrideValueArrayA;
             parameterOverrideA1.ValueSet.Add(parameterOverrideValueSetA1);
             elementUsageOfA2.ParameterOverride.Add(parameterOverrideA1);
+
+            // a ParameterOverride that is owned by another DomainOfExpertise and that this.owner does not subscribe to
+            var parameterOverrideOther = new ParameterOverride()
+                                             {
+                                                 Parameter = parameterA1,
+                                                 Container = elementUsageOfA2,
+                                                 Owner = this.otherOwner
+                                             };
+            parameterOverrideOther.Iid = Guid.NewGuid();
+
+            var parameterOverrideValueSetOther = new ParameterOverrideValueSet();
+            parameterOverrideValueSetOther.Iid = Guid.NewGuid();
+            var overrideValueArrayOther = new ValueArray<string>(new List<string>() { "x" });
+            parameterOverrideValueSetOther.Manual = overrideValueArrayOther;
+            parameterOverrideValueSetOther.Computed = overrideValueArrayOther;
+            parameterOverrideValueSetOther.Reference = overrideValueArrayOther;
+            parameterOverrideValueSetOther.Formula = overrideValueArrayOther;
+            parameterOverrideOther.ValueSet.Add(parameterOverrideValueSetOther);
+            elementUsageOfA2.ParameterOverride.Add(parameterOverrideOther);
 
             var parameterOverrideA2 = new ParameterOverride()
             {
@@ -305,6 +352,64 @@ namespace CDP4ParameterSheetGenerator.Tests.Generator
             foreach (var excelRow in assembler.ExcelRows)
             {
                 System.Console.WriteLine(string.Format("{0} - {1} - {2}", excelRow.Type, excelRow.Name, excelRow.Thing.Iid));
+            }
+        }
+
+        [Test]
+        public void VerifyThatParametersOfOtherDomainsAreOnlyAssembledWhenAllParametersAreIncluded()
+        {
+            var defaultAssembler = new ParameterSheetRowAssembler(this.iteration, this.owner);
+            defaultAssembler.Assemble(new Dictionary<Guid, ProcessedValueSet>());
+
+            CollectionAssert.IsEmpty(
+                defaultAssembler.ExcelRows.Where(row => row.Type == ParameterSheetConstants.RO).ToList(),
+                "by default a Parameter owned by another domain and without a subscription may not be assembled");
+
+            var allParametersAssembler = new ParameterSheetRowAssembler(this.iteration, this.owner, true);
+            allParametersAssembler.Assemble(new Dictionary<Guid, ProcessedValueSet>());
+
+            var readOnlyRows = allParametersAssembler.ExcelRows.Where(row => row.Type == ParameterSheetConstants.RO).ToList();
+
+            CollectionAssert.IsNotEmpty(readOnlyRows, "the Parameters owned by another domain are expected to be assembled as read-only rows");
+
+            foreach (var readOnlyRow in readOnlyRows)
+            {
+                Assert.That(readOnlyRow.Owner, Is.EqualTo(this.otherOwner.ShortName), "a read-only row is expected to be owned by the other domain");
+                Assert.That(readOnlyRow.ModelCode, Is.Not.Null.And.Not.Empty, "a read-only row is expected to carry a ModelCode so that it can be referenced");
+            }
+
+            // all three emitting paths must be covered: an ungrouped Parameter, a Parameter in a ParameterGroup and a ParameterOverride
+            var readOnlyThings = readOnlyRows.Select(row => row.Thing).ToList();
+
+            Assert.That(
+                readOnlyThings.OfType<Parameter>().Any(p => p.Group == null),
+                Is.True,
+                "an ungrouped Parameter of another domain is expected to be assembled");
+
+            Assert.That(
+                readOnlyThings.OfType<Parameter>().Any(p => p.Group != null),
+                Is.True,
+                "a Parameter of another domain that is contained in a ParameterGroup is expected to be assembled");
+
+            Assert.That(
+                readOnlyThings.OfType<ParameterOverride>().Any(),
+                Is.True,
+                "a ParameterOverride of another domain is expected to be assembled");
+        }
+
+        [Test]
+        public void VerifyThatComponentRowsOfAParameterOverrideHaveAModelCode()
+        {
+            var assembler = new ParameterSheetRowAssembler(this.iteration, this.owner);
+            assembler.Assemble(new Dictionary<Guid, ProcessedValueSet>());
+
+            var componentRows = assembler.ExcelRows.Where(row => row.Type == ParameterSheetConstants.POVSCT).ToList();
+
+            CollectionAssert.IsNotEmpty(componentRows, "the assembled rows are expected to contain ParameterOverride component rows");
+
+            foreach (var componentRow in componentRows)
+            {
+                Assert.That(componentRow.ModelCode, Is.Not.Null.And.Not.Empty, "the ModelCode of a ParameterOverride component row may not be empty");
             }
         }
     }

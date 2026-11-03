@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeSelectorViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2023 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -60,6 +60,12 @@ namespace CDP4CrossViewEditor.ViewModels
             get { return this.powerParametersEnabled; }
             set { this.RaiseAndSetIfChanged(ref this.powerParametersEnabled, value); }
         }
+
+        /// <summary>
+        /// Gets or sets the unique ids of the parameter types whose columns were summed the previous time, which are ticked again
+        /// when the selection is restored
+        /// </summary>
+        public List<Guid> PreservedSummedIids { get; set; }
 
         /// <summary>
         /// Gets or sets source parameter list
@@ -164,6 +170,11 @@ namespace CDP4CrossViewEditor.ViewModels
                 .Where(row => row != null));
 
             this.ExecuteMoveToTarget();
+
+            foreach (var row in this.ParameterTypeTargetList.Where(row => this.PreservedSummedIids?.Contains(row.Thing.Iid) == true))
+            {
+                row.IsSummed = true;
+            }
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionSelectorViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
 //
@@ -28,6 +28,7 @@ namespace CDP4CrossViewEditor.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common;
     using CDP4Common.CommonData;
@@ -36,6 +37,7 @@ namespace CDP4CrossViewEditor.ViewModels
 
     using CDP4Composition.Mvvm;
 
+    using CDP4CrossViewEditor.Assemblers;
     using CDP4CrossViewEditor.RowModels;
 
     using CDP4Dal;
@@ -70,6 +72,11 @@ namespace CDP4CrossViewEditor.ViewModels
         public List<Category> Categories { private set; get; }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> that selects the whole product tree of the <see cref="Iteration"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> SelectProductTree { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionSelectorViewModel"/> class.
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
@@ -87,6 +94,8 @@ namespace CDP4CrossViewEditor.ViewModels
             this.SelectedTargetList = new ReactiveList<ElementDefinitionRowViewModel>();
 
             this.Categories = new List<Category>();
+
+            this.SelectProductTree = ReactiveCommandCreator.Create(this.ExecuteSelectProductTree);
         }
 
         /// <summary>
@@ -154,6 +163,30 @@ namespace CDP4CrossViewEditor.ViewModels
         {
             this.SelectedTargetList = this.ElementDefinitionTargetList;
             this.ExecuteMoveToSource();
+        }
+
+        /// <summary>
+        /// Executes the <see cref="SelectProductTree"/> command: selects the <see cref="ElementDefinition"/>s that make up the
+        /// product tree of the <see cref="Iteration"/>, that is the <see cref="Iteration.TopElement"/> and every
+        /// <see cref="ElementDefinition"/> that is used by it, at any depth.
+        /// </summary>
+        protected internal void ExecuteSelectProductTree()
+        {
+            var productTreeElementDefinitions = CrossviewSheetRowAssembler.QueryProductTree(this.Iteration);
+
+            if (productTreeElementDefinitions.Count == 0)
+            {
+                return;
+            }
+
+            var rows = this.ElementDefinitionSourceList
+                .Where(row => productTreeElementDefinitions.Contains(row.Thing))
+                .ToList();
+
+            this.SelectedSourceList.Clear();
+            this.SelectedSourceList.AddRange(rows);
+
+            this.ExecuteMoveToTarget();
         }
     }
 }

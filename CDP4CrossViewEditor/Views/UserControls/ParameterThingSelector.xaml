@@ -48,7 +48,8 @@
                                            AutoWidth="true"
                                            ShowFilterPanelMode="Never"
                                            ShowGroupPanel="False"
-                                           ShowSearchPanelMode="Default">
+                                           SearchPanelNullText="Search a parameter type by name or type"
+                                           ShowSearchPanelMode="Always">
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
@@ -96,6 +97,22 @@
                         <dxg:GridControl.Columns>
                             <dxg:GridColumn AllowColumnFiltering="False" FieldName="Name" Header="Name" />
                             <dxg:GridColumn FieldName="Type" Header="Type" />
+                            <dxg:GridColumn Header="Sum"
+                                            Width="40"
+                                            FixedWidth="True"
+                                            AllowEditing="True"
+                                            AllowAutoFilter="False"
+                                            AllowColumnFiltering="False"
+                                            AllowSorting="False"
+                                            HeaderToolTip="On the calculation sheet, a row with rows below it gets the sum of those rows in this column where it has no value of its own. Leave unticked to keep those cells empty for your own formulas.">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dxe:CheckEdit HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       IsChecked="{Binding RowData.Row.IsSummed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                     <Button Margin="0 5 0 0"

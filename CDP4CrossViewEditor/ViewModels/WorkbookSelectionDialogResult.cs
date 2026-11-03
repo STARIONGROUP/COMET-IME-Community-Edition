@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="WorkbookSelectionDialogResult.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
@@ -26,6 +26,7 @@
 namespace CDP4CrossViewEditor.ViewModels
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -60,20 +61,40 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="persistValues">
         /// Flag that indicate if values should be saved as workbook metadata.
         /// </param>
+        /// <param name="generateCalculationSheet">
+        /// Flag that indicates whether the calculation sheet is to be written as well.
+        /// </param>
+        /// <param name="summedParameterTypes">
+        /// The parameter types whose columns on the calculation sheet sum the rows below a row without a value of its own.
+        /// </param>
+        /// <param name="options">
+        /// The selected <see cref="Option"/>s; none for every option on a single calculation sheet.
+        /// </param>
+        /// <param name="followProductTree">
+        /// Flag that indicates the selection covered the whole product tree, which later rebuilds then follow.
+        /// </param>
         public WorkbookSelectionDialogResult(
             bool? res,
             Workbook workbook,
             IEnumerable<ElementDefinition> savedElementsDefinitions,
             IEnumerable<ParameterType> savedParameterTypes,
             Dictionary<string, string> savedChangedValues,
-            bool persistValues)
+            bool persistValues,
+            bool generateCalculationSheet = false,
+            IEnumerable<ParameterType> summedParameterTypes = null,
+            IEnumerable<Option> options = null,
+            bool followProductTree = false)
             : base(res)
         {
+            this.FollowProductTree = followProductTree;
+            this.Options = options?.ToList() ?? new List<Option>();
             this.Workbook = workbook;
             this.WorkbookElements = savedElementsDefinitions;
             this.WorkbookParameterType = savedParameterTypes;
             this.WorkbookChangedValues = savedChangedValues;
             this.PersistValues = persistValues;
+            this.GenerateCalculationSheet = generateCalculationSheet;
+            this.SummedParameterTypes = summedParameterTypes?.ToList() ?? new List<ParameterType>();
         }
 
         /// <summary>
@@ -100,5 +121,25 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Gets or sets workbook metadata persistence between sessions.
         /// </summary>
         public bool PersistValues { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the calculation sheet is to be written as well.
+        /// </summary>
+        public bool GenerateCalculationSheet { get; private set; }
+
+        /// <summary>
+        /// Gets the parameter types whose columns on the calculation sheet sum the rows below a row without a value of its own.
+        /// </summary>
+        public IReadOnlyList<ParameterType> SummedParameterTypes { get; private set; }
+
+        /// <summary>
+        /// Gets the selected <see cref="Option"/>s; empty for every option on a single calculation sheet.
+        /// </summary>
+        public IReadOnlyList<Option> Options { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the selection covered the whole product tree, which later rebuilds then follow.
+        /// </summary>
+        public bool FollowProductTree { get; private set; }
     }
 }

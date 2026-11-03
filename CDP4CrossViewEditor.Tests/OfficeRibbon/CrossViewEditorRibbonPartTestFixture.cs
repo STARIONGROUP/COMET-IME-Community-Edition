@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossViewEditorRibbonPartTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -63,6 +63,9 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         /// The current ribbon button label
         /// </summary>
         private const string RibbonButtonId = "Editor";
+
+        // the id is prefixed because Office merges the ribbon parts into one document, in which an id may occur once
+        private const string RebuildButtonId = "CrossViewRebuild";
 
         /// <summary>
         /// The current session associated <see cref="Assembler"></see>
@@ -156,7 +159,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             this.officeApplicationWrapper.Setup(x => x.Excel).Returns(It.IsAny<Application>);
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
-            this.amountOfRibbonControls = 2;
+            this.amountOfRibbonControls = 3;
             this.order = 1000;
 
             this.ribbonPart = new CrossViewEditorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object, this.officeApplicationWrapper.Object, this.messageBus);
@@ -301,6 +304,34 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
             this.messageBus.SendMessage(closeSessionEvent);
+        }
+
+        [Test]
+        public void VerifyThatTheRebuildControlIsOfferedAlongsideTheEditor()
+        {
+            var fluentRibbonManager = new FluentRibbonManager { IsActive = true };
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+
+            var iteration = this.CreateIteration();
+            this.messageBus.SendObjectChangeEvent(iteration, EventKind.Added);
+
+            Assert.That(this.ribbonPart.GetLabel(RebuildButtonId), Is.EqualTo("Rebuild"));
+            Assert.That(this.ribbonPart.GetLabel("Something"), Is.Empty);
+            Assert.That(this.ribbonPart.GetEnabled(RebuildButtonId), Is.True, "the rebuild is offered whenever the editor is");
+
+            // the menu of the rebuild lists the same iterations as the editor, under its own control ids
+            var content = this.ribbonPart.GetContent(RebuildButtonId);
+
+            Assert.That(content, Does.Contain($"{RebuildButtonId}_{iteration.Iid}"));
+            Assert.That(this.ribbonPart.GetContent(RibbonButtonId), Does.Contain($"Editor_{iteration.Iid}"));
+            Assert.That(this.ribbonPart.GetContent("Something"), Is.Empty);
+
+            // without an Excel application there is nothing to rebuild, which may not throw at the ribbon
+            Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"{RebuildButtonId}_{iteration.Iid}", iteration.Iid.ToString()));
+
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
         }
 
         [Test]

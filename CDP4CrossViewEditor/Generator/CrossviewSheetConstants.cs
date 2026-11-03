@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossviewSheetConstants.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
@@ -57,6 +57,16 @@ namespace CDP4CrossViewEditor.Generator
         /// The name of the worksheet that contains the parameter and value-set rows.
         /// </summary>
         internal const string CrossviewSheetName = "Crossview";
+
+        /// <summary>
+        /// The name of the worksheet on which the user does their own calculations against the values of the Crossview sheet.
+        /// </summary>
+        internal const string CalculationSheetName = "Calculation";
+
+        /// <summary>
+        /// The row of the nested column header that holds the short name of the option, counting from zero.
+        /// </summary>
+        internal const int OptionHeaderRow = 3;
 
         /// <summary>
         /// The name of the <see cref="ElementDefinition"/> row type

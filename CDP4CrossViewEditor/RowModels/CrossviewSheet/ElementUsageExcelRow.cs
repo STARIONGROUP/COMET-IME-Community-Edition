@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageExcelRow.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
@@ -38,32 +38,37 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
     public class ElementUsageExcelRow : ExcelRow<ElementUsage>
     {
         /// <summary>
-        /// The level offset of the current row.
+        /// The default level of an <see cref="ElementUsage"/> row, used when no depth is supplied.
         /// </summary>
-        /// <remarks>
-        /// <see cref="ElementUsage"/>s are always at level 1.
-        /// </remarks>
         private const int LevelOffset = 1;
 
         /// <summary>Initializes a new instance of the <see cref="ElementUsageExcelRow"/> class</summary>
         /// <param name="elementUsage">The <see cref="ElementUsage"/> that is represented by the current row</param>
-        public ElementUsageExcelRow(ElementUsage elementUsage)
+        /// <param name="level">
+        /// The depth of the <see cref="ElementUsage"/> in the product tree, which determines the indentation of the row.
+        /// </param>
+        public ElementUsageExcelRow(ElementUsage elementUsage, int level = LevelOffset)
             : base(elementUsage)
         {
-            this.UpdateProperties();
+            this.UpdateProperties(level);
         }
 
         /// <summary>
         /// Update the properties of the <see cref="ExcelRow{T}"/>
         /// </summary>
-        private void UpdateProperties()
+        /// <param name="level">
+        /// The depth of the <see cref="ElementUsage"/> in the product tree
+        /// </param>
+        private void UpdateProperties(int level)
         {
+            var indentation = new string(' ', 3 * level);
+
             this.Id = this.Thing.Iid.ToString();
-            this.Name = $"{new string(' ', 3)}{(this.Thing.Container as ElementDefinition)?.Name} : {this.Thing.Name}";
-            this.ShortName = $"{new string(' ', 3)}{(this.Thing.Container as ElementDefinition)?.ShortName} : {this.Thing.ShortName}";
+            this.Name = $"{indentation}{(this.Thing.Container as ElementDefinition)?.Name} : {this.Thing.Name}";
+            this.ShortName = $"{indentation}{(this.Thing.Container as ElementDefinition)?.ShortName} : {this.Thing.ShortName}";
             this.Type = CrossviewSheetConstants.EU;
             this.Owner = this.Thing.Owner.ShortName;
-            this.Level = LevelOffset;
+            this.Level = level;
             this.ModelCode = this.Thing.ModelCode();
 
             var categories = this.Thing.ElementDefinition.GetAllCategories().ToList();

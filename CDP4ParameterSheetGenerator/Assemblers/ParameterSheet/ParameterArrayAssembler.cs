@@ -168,8 +168,9 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                 }
 
                 // ManualValue
-                this.LockArray[i, 3] = excelRow.Type == ParameterSheetConstants.ED || excelRow.Type == ParameterSheetConstants.PG 
-                    || excelRow.Type == ParameterSheetConstants.PVSCD  ||  excelRow.Type == ParameterSheetConstants.POVSCD  || excelRow.Type == ParameterSheetConstants.PSVSCD;
+                this.LockArray[i, 3] = excelRow.Type == ParameterSheetConstants.ED || excelRow.Type == ParameterSheetConstants.PG
+                    || excelRow.Type == ParameterSheetConstants.PVSCD  ||  excelRow.Type == ParameterSheetConstants.POVSCD  || excelRow.Type == ParameterSheetConstants.PSVSCD
+                    || excelRow.Type == ParameterSheetConstants.RO;
 
                 if (excelRow.Type == ParameterSheetConstants.PVS || excelRow.Type == ParameterSheetConstants.PVSCT || excelRow.Type == ParameterSheetConstants.POVS || excelRow.Type == ParameterSheetConstants.POVSCT)
                 {
