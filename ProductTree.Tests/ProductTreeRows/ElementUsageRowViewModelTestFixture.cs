@@ -421,6 +421,10 @@ namespace ProductTree.Tests.ProductTreeRows
             vm.DragOver(dropinfo.Object);
 
             Assert.AreEqual(DragDropEffects.Copy, dropinfo.Object.Effects);
+
+            this.permissionService.Setup(x => x.CanWrite(ClassKind.ElementUsage, this.elementUsage.ElementDefinition)).Returns(false);
+            vm.DragOver(dropinfo.Object);
+            Assert.That(dropinfo.Object.Effects, Is.EqualTo(DragDropEffects.None));
         }
 
         [Test]
