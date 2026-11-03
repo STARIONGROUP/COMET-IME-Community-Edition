@@ -210,6 +210,19 @@ namespace ProductTree.Tests
         }
 
         [Test]
+        public void VerifyIsDropElementDefinitionToAllOptionsEnabled()
+        {
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            vm.ComputePermission();
+            Assert.That(vm.IsDropElementDefinitionToAllOptionsEnabled, Is.True);
+
+            this.permissionService.Setup(x => x.CanWrite(ClassKind.ElementUsage, this.iteration)).Returns(false);
+            vm.ComputePermission();
+            Assert.That(vm.IsDropElementDefinitionToAllOptionsEnabled, Is.False);
+        }
+
+        [Test]
         public async Task VerifyThatUpdateOptionEventWorks()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);

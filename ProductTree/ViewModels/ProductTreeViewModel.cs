@@ -121,6 +121,11 @@ namespace CDP4ProductTree.ViewModels
         private bool dropElementDefinitionToAllOptions = true;
 
         /// <summary>
+        /// Backing field for <see cref="IsDropElementDefinitionToAllOptionsEnabled"/>
+        /// </summary>
+        private bool isDropElementDefinitionToAllOptionsEnabled;
+
+        /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Product Tree";
@@ -306,6 +311,15 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the current user may create an <see cref="ElementUsage"/>, which enables <see cref="DropElementDefinitionToAllOptions"/>
+        /// </summary>
+        public bool IsDropElementDefinitionToAllOptionsEnabled
+        {
+            get => this.isDropElementDefinitionToAllOptionsEnabled;
+            private set => this.RaiseAndSetIfChanged(ref this.isDropElementDefinitionToAllOptionsEnabled, value);
+        }
+
+        /// <summary>
         /// Updates the current drag state.
         /// </summary>
         /// <param name="dropInfo">
@@ -435,6 +449,7 @@ namespace CDP4ProductTree.ViewModels
             base.ComputePermission();
 
             this.CanCreateParameterGroup = this.PermissionService.CanWrite(ClassKind.ParameterGroup, this.Thing);
+            this.IsDropElementDefinitionToAllOptionsEnabled = this.PermissionService.CanWrite(ClassKind.ElementUsage, this.Thing.Container);
 
             var parameterOrOverrideRow = this.SelectedThing as ParameterOrOverrideBaseRowViewModel;
 
