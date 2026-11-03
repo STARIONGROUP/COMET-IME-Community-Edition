@@ -61,6 +61,12 @@ namespace CDP4EngineeringModel.ViewModels
         private Option selectedBaselineOption;
 
         /// <summary>
+        /// Backing field for <see cref="ElementUsageRows"/>, built on first access so that the permission check of every
+        /// <see cref="ElementUsage"/> is only paid when the Element Usages tab is shown
+        /// </summary>
+        private Lazy<List<OptionElementUsageRowViewModel>> elementUsageRows;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="OptionDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -113,7 +119,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the rows that set which <see cref="ElementUsage"/>s of the <see cref="Iteration"/> are included in the <see cref="Option"/>
         /// </summary>
-        public List<OptionElementUsageRowViewModel> ElementUsageRows { get; private set; }
+        public List<OptionElementUsageRowViewModel> ElementUsageRows => this.elementUsageRows.Value;
 
         /// <summary>
         /// Gets the other <see cref="Option"/>s of the <see cref="Iteration"/> that <see cref="ElementUsageRows"/> can be filled from
@@ -128,6 +134,12 @@ namespace CDP4EngineeringModel.ViewModels
             get => this.selectedBaselineOption;
             set => this.RaiseAndSetIfChanged(ref this.selectedBaselineOption, value);
         }
+
+        /// <summary>
+        /// Gets a value indicating whether <see cref="ElementUsageRows"/> cannot be edited.
+        /// A nested dialog cannot edit them since the parent dialog may still delete the <see cref="Option"/> they would refer to.
+        /// </summary>
+        public bool IsElementUsagesReadOnly => this.IsReadOnly || !this.isRoot;
 
         /// <summary>
         /// Gets the command that includes every editable <see cref="ElementUsage"/> in the <see cref="Option"/>
@@ -153,11 +165,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             var iteration = (Iteration)this.Container;
 
-            this.ElementUsageRows = iteration.Element
-                .SelectMany(x => x.ContainedElement)
-                .Select(x => new OptionElementUsageRowViewModel(x, this.Thing, !this.IsReadOnly && this.PermissionService.CanWrite(x)))
-                .ToList();
-
+            this.elementUsageRows = new Lazy<List<OptionElementUsageRowViewModel>>(this.CreateElementUsageRows);
             this.PossibleBaselineOption = iteration.Option.Where(x => x.Iid != this.Thing.Iid).ToList();
         }
 
@@ -168,12 +176,14 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
 
-            var canExecute = this.WhenAnyValue(vm => vm.IsReadOnly, x => !x);
-            this.CheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(true), canExecute);
-            this.UncheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(false), canExecute);
+            var canExecute = Observable.Return(!this.IsElementUsagesReadOnly);
+            this.CheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(_ => true), canExecute);
+            this.UncheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(_ => false), canExecute);
             this.ResetElementUsagesCommand = ReactiveCommandCreator.Create(this.ResetElementUsages, canExecute);
 
-            this.WhenAnyValue(vm => vm.SelectedBaselineOption).Where(x => x != null).Subscribe(this.ApplyBaselineOption);
+            this.Disposables.Add(this.WhenAnyValue(vm => vm.SelectedBaselineOption)
+                .Where(x => x != null)
+                .Subscribe(baseline => this.SetEditableElementUsagesIncluded(row => row.IsIncludedIn(baseline))));
         }
 
         /// <summary>
@@ -209,15 +219,19 @@ namespace CDP4EngineeringModel.ViewModels
                 iteration.DefaultOption = this.IsDefault ? this.Thing : null;
             }
 
+            if (!this.elementUsageRows.IsValueCreated)
+            {
+                return;
+            }
+
             foreach (var row in this.ElementUsageRows.Where(x => x.IsIncluded != x.WasIncluded))
             {
                 var clone = row.Thing.Clone(false);
 
-                if (row.IsIncluded)
-                {
-                    clone.ExcludeOption.RemoveAll(x => x.Iid == this.Thing.Iid);
-                }
-                else
+                // the live ExcludeOption may have changed since the dialog opened, so always remove before adding
+                clone.ExcludeOption.RemoveAll(x => x.Iid == this.Thing.Iid);
+
+                if (!row.IsIncluded)
                 {
                     clone.ExcludeOption.Add(this.Thing);
                 }
@@ -227,15 +241,23 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Fills every editable row of <see cref="ElementUsageRows"/> as per the given <see cref="Option"/>
+        /// Creates a row for every <see cref="ElementUsage"/> of the <see cref="Iteration"/>
         /// </summary>
-        /// <param name="baseline">The <see cref="Option"/> to copy the inclusions from</param>
-        private void ApplyBaselineOption(Option baseline)
+        /// <returns>The rows of <see cref="ElementUsageRows"/></returns>
+        private List<OptionElementUsageRowViewModel> CreateElementUsageRows()
         {
-            foreach (var row in this.ElementUsageRows.Where(x => x.IsEditable))
-            {
-                row.IsIncluded = row.IsIncludedIn(baseline);
-            }
+            var rows = ((Iteration)this.Container).Element
+                .SelectMany(x => x.ContainedElement)
+                .Select(x => new OptionElementUsageRowViewModel(x, this.Thing, !this.IsElementUsagesReadOnly && this.PermissionService.CanWrite(x)))
+                .ToList();
+
+            // once a row no longer matches the selected baseline, clear the selection so that picking it again re-applies it
+            this.Disposables.Add(rows
+                .Select(row => row.WhenAnyValue(x => x.IsIncluded).Where(isIncluded => this.SelectedBaselineOption != null && isIncluded != row.IsIncludedIn(this.SelectedBaselineOption)))
+                .Merge()
+                .Subscribe(_ => this.SelectedBaselineOption = null));
+
+            return rows;
         }
 
         /// <summary>
@@ -254,12 +276,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Sets <see cref="OptionElementUsageRowViewModel.IsIncluded"/> on every editable row of <see cref="ElementUsageRows"/>
         /// </summary>
-        /// <param name="isIncluded">Whether the <see cref="ElementUsage"/>s are included in the <see cref="Option"/></param>
-        private void SetEditableElementUsagesIncluded(bool isIncluded)
+        /// <param name="isIncluded">Computes whether the <see cref="ElementUsage"/> of a row is included in the <see cref="Option"/></param>
+        private void SetEditableElementUsagesIncluded(Func<OptionElementUsageRowViewModel, bool> isIncluded)
         {
             foreach (var row in this.ElementUsageRows.Where(x => x.IsEditable))
             {
-                row.IsIncluded = isIncluded;
+                row.IsIncluded = isIncluded(row);
             }
         }
 

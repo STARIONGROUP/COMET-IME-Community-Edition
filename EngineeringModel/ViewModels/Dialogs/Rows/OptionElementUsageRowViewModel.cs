@@ -59,9 +59,10 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs.Rows
         public ElementUsage Thing { get; }
 
         /// <summary>
-        /// Gets the name of the <see cref="ElementDefinition"/> that contains the <see cref="ElementUsage"/>.
+        /// Gets the name and short name of the <see cref="ElementDefinition"/> that contains the <see cref="ElementUsage"/>.
+        /// The short name is shown since, unlike the name, it is unique in the <see cref="Iteration"/>.
         /// </summary>
-        public string ElementDefinitionName => ((ElementDefinition)this.Thing.Container).Name;
+        public string ElementDefinitionDisplayName => $"{((ElementDefinition)this.Thing.Container).Name} ({((ElementDefinition)this.Thing.Container).ShortName})";
 
         /// <summary>
         /// Gets the name of the <see cref="ElementUsage"/>.

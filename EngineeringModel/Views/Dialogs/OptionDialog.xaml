@@ -45,7 +45,7 @@
                                           Margin="0,0,5,0"
                                           DisplayMember="Name"
                                           EditValue="{Binding SelectedBaselineOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          IsReadOnly="{Binding IsReadOnly}"
+                                          IsReadOnly="{Binding IsElementUsagesReadOnly, Mode=OneTime}"
                                           IsTextEditable="False"
                                           ItemsSource="{Binding PossibleBaselineOption}"
                                           ToolTip="Fill the element usages as per this option." />
@@ -66,8 +66,16 @@
                 <lc:LayoutItem>
                     <dxg:GridControl Height="250"
                                      MaxWidth="700"
-                                     AutoExpandAllGroups="True"
-                                     ItemsSource="{Binding ElementUsageRows}">
+                                     AutoExpandAllGroups="True">
+                        <dxg:GridControl.Style>
+                            <Style TargetType="dxg:GridControl">
+                                <Style.Triggers>
+                                    <Trigger Property="IsVisible" Value="True">
+                                        <Setter Property="ItemsSource" Value="{Binding ElementUsageRows}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </dxg:GridControl.Style>
                         <dxg:GridControl.View>
                             <dxg:TableView AllowEditing="True"
                                            AutoWidth="True"
@@ -76,7 +84,7 @@
                                            ShowIndicator="False" />
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn FieldName="ElementDefinitionName" Header="Element Definition" GroupIndex="0" ReadOnly="True" />
+                            <dxg:GridColumn FieldName="ElementDefinitionDisplayName" Header="Element Definition" GroupIndex="0" ReadOnly="True" />
                             <dxg:GridColumn Header="Included"
                                             Width="60"
                                             FixedWidth="True"

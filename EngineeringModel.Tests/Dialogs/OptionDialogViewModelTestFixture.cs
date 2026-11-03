@@ -133,7 +133,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [Test]
         public async Task VerifyUpdateTransaction()
         {
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, null) { Name = "ed" };
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, null) { Name = "ed", ShortName = "ED" };
             var keptUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "kept" };
             var droppedUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "dropped" };
             var lockedUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Name = "locked" };
@@ -155,7 +155,9 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             var vm = new OptionDialogViewModel(newOption, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, iterationClone);
 
+            this.permissionService.Verify(x => x.CanWrite(It.IsAny<ElementUsage>()), Times.Never);
             Assert.That(vm.ElementUsageRows.Select(x => x.Name), Is.EqualTo(new[] { "kept", "dropped", "locked", "restored" }));
+            Assert.That(vm.ElementUsageRows.Select(x => x.ElementDefinitionDisplayName), Is.All.EqualTo("ed (ED)"));
             Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.All.True);
             Assert.That(vm.ElementUsageRows.Select(x => x.IsEditable), Is.EqualTo(new[] { true, true, false, true }));
 
@@ -166,6 +168,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.All.True);
 
             vm.ElementUsageRows.Single(x => x.Thing == droppedUsage).IsIncluded = false;
+
+            droppedUsage.ExcludeOption.Add(newOption);
             await vm.OkCommand.Execute();
 
             var updatedUsages = writtenContainer.Operations
@@ -194,8 +198,23 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.That(updatedUsages.Select(x => x.Iid), Is.EqualTo(new[] { restoredUsage.Iid }));
             Assert.That(updatedUsages[0].ExcludeOption, Is.Empty);
 
+            iterationClone = this.iteration.Clone(false);
+            transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.iteration), iterationClone);
+            vm = new OptionDialogViewModel(this.option.Clone(false), transaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, iterationClone);
+            await vm.OkCommand.Execute();
+
+            Assert.That(writtenContainer.Operations.Select(x => x.ModifiedThing).OfType<CDP4Common.DTO.ElementUsage>(), Is.Empty);
+
             vm = new OptionDialogViewModel(this.option, null, this.session.Object, true, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, this.iteration);
 
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsEditable), Is.All.False);
+            Assert.That(((ICommand)vm.UncheckAllElementUsagesCommand).CanExecute(null), Is.False);
+
+            iterationClone = this.iteration.Clone(false);
+            transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.iteration), iterationClone);
+            vm = new OptionDialogViewModel(this.option.Clone(false), transaction, this.session.Object, false, ThingDialogKind.Update, this.thingDialogNavigationService.Object, iterationClone);
+
+            Assert.That(vm.IsElementUsagesReadOnly, Is.True);
             Assert.That(vm.ElementUsageRows.Select(x => x.IsEditable), Is.All.False);
             Assert.That(((ICommand)vm.UncheckAllElementUsagesCommand).CanExecute(null), Is.False);
         }
@@ -231,8 +250,14 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, false, true }));
 
             vm.ElementUsageRows[1].IsIncluded = true;
-            vm.SelectedBaselineOption = null;
+            Assert.That(vm.SelectedBaselineOption, Is.Null);
             Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, true, true }));
+
+            vm.SelectedBaselineOption = baseline;
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, false, true }));
+
+            await vm.UncheckAllElementUsagesCommand.Execute();
+            Assert.That(vm.SelectedBaselineOption, Is.Null);
 
             vm.SelectedBaselineOption = baseline;
             await vm.ResetElementUsagesCommand.Execute();
