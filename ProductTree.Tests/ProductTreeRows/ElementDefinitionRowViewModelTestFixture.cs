@@ -360,7 +360,21 @@ namespace ProductTree.Tests.ProductTreeRows
             dropinfo.SetupProperty(x => x.Effects);
             await vm.Drop(dropinfo.Object);
 
-            this.thingCreator.Verify(x => x.CreateElementUsage(It.IsAny<ElementDefinition>(), It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>(), It.IsAny<IEnumerable<Option>>()));
+            this.thingCreator.Verify(x => x.CreateElementUsage(this.elementDef, this.elementDef2, this.domain, this.session.Object, null), Times.Once);
+
+            var otherOption = new Option(Guid.NewGuid(), this.cache, this.uri);
+            this.iteration.Option.Add(otherOption);
+            var otherOptions = new[] { otherOption };
+
+            var productTree = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
+            var rowInProductTree = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, productTree);
+
+            await rowInProductTree.Drop(dropinfo.Object);
+            this.thingCreator.Verify(x => x.CreateElementUsage(this.elementDef, this.elementDef2, this.domain, this.session.Object, It.Is<IEnumerable<Option>>(options => options != null && !options.Any())), Times.Once);
+
+            productTree.DropElementDefinitionToAllOptions = false;
+            await rowInProductTree.Drop(dropinfo.Object);
+            this.thingCreator.Verify(x => x.CreateElementUsage(this.elementDef, this.elementDef2, this.domain, this.session.Object, It.Is<IEnumerable<Option>>(options => options != null && options.SequenceEqual(otherOptions))), Times.Once);
         }
 
         [Test]
