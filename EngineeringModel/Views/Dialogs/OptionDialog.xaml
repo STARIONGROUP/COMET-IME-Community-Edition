@@ -60,7 +60,7 @@
                         <Button Padding="3"
                                 Command="{Binding ResetElementUsagesCommand}"
                                 Content="Reset"
-                                ToolTip="Restore the element usages to their state when this dialog was opened." />
+                                ToolTip="Restore the element usages to their state when this tab was first shown." />
                     </StackPanel>
                 </lc:LayoutItem>
                 <lc:LayoutItem>

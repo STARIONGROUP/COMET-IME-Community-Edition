@@ -56,6 +56,9 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     [TestFixture]
     internal class OptionDialogViewModelTestFixture
     {
+        private static readonly bool[] BaselineInclusions = new[] { true, false, true };
+        private static readonly bool[] PersistedInclusions = new[] { false, true, true };
+
         private ThingTransaction thingTransaction;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
@@ -244,25 +247,33 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var vm = new OptionDialogViewModel(this.option.Clone(false), transaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, clone);
 
             Assert.That(vm.PossibleBaselineOption, Is.EqualTo(new[] { baseline }));
-            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { false, true, true }));
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(PersistedInclusions));
 
             vm.SelectedBaselineOption = baseline;
-            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, false, true }));
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(BaselineInclusions));
 
             vm.ElementUsageRows[1].IsIncluded = true;
             Assert.That(vm.SelectedBaselineOption, Is.Null);
-            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, true, true }));
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.All.True);
 
             vm.SelectedBaselineOption = baseline;
-            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { true, false, true }));
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(BaselineInclusions));
 
             await vm.UncheckAllElementUsagesCommand.Execute();
             Assert.That(vm.SelectedBaselineOption, Is.Null);
 
             vm.SelectedBaselineOption = baseline;
             await vm.ResetElementUsagesCommand.Execute();
-            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(new[] { false, true, true }));
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(PersistedInclusions));
             Assert.That(vm.SelectedBaselineOption, Is.Null);
+
+            clone = this.iteration.Clone(false);
+            transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.iteration), clone);
+            vm = new OptionDialogViewModel(this.option.Clone(false), transaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, clone);
+
+            vm.SelectedBaselineOption = baseline;
+            Assert.That(vm.SelectedBaselineOption, Is.SameAs(baseline));
+            Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(BaselineInclusions));
         }
 
         [Test]
