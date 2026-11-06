@@ -34,6 +34,7 @@
     
     <dxg:GridControl AllowLiveDataShaping="False"
                          Name="PocoErrorControl"
+                         VerticalAlignment="Stretch"
                          Width="Auto"
                          ItemsSource="{Binding Path=Thing.ValidationErrors, Mode=OneWay}"
                          SelectionMode="Row">

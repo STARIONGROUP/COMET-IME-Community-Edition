@@ -22,6 +22,8 @@
                       ScrollBars="None">
         <lc:LayoutGroup Margin="-10,-7,-10,-5"
                         Orientation="Vertical"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True">
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
@@ -35,7 +37,7 @@
                 <items:AliasDisplayLayoutItem />
                 <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
-            <lc:LayoutGroup Header="Element Usages" Orientation="Vertical">
+            <lc:LayoutGroup Header="Element Usages" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <lc:LayoutItem>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="0,0,5,0"
@@ -63,8 +65,9 @@
                                 ToolTip="Restore the element usages to their state when this tab was first shown." />
                     </StackPanel>
                 </lc:LayoutItem>
-                <lc:LayoutItem>
-                    <dxg:GridControl Height="250"
+                <lc:LayoutItem HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <dxg:GridControl x:Name="ElementUsagesGrid"
+                                     Height="250"
                                      MaxWidth="700"
                                      AutoExpandAllGroups="True">
                         <dxg:GridControl.Style>
