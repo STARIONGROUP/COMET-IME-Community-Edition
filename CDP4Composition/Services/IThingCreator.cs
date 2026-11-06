@@ -6,6 +6,7 @@
 
 namespace CDP4Composition.Services
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -83,6 +84,26 @@ namespace CDP4Composition.Services
         /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
         /// </param>
         Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session);
+
+        /// <summary>
+        /// Create a new <see cref="ElementUsage"/> that is excluded from the specified <see cref="Option"/>s
+        /// </summary>
+        /// <param name="container">
+        /// The container <see cref="ElementDefinition"/> of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="referencedDefinition">
+        /// The referenced <see cref="ElementDefinition"/> of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="owner">
+        /// The <see cref="DomainOfExpertise"/> that is the owner of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
+        /// </param>
+        /// <param name="excludedOptions">
+        /// The <see cref="Option"/>s the <see cref="ElementUsage"/> is excluded from
+        /// </param>
+        Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session, IEnumerable<Option> excludedOptions);
 
         /// <summary>
         /// Moves an existing <see cref="ElementUsage"/> into another <see cref="ElementDefinition"/>, preserving all of its properties

@@ -99,8 +99,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-       <dxlc:LayoutGroup>
+        <dxlc:LayoutGroup>
             <dxb:ToolBarControl Height="30" Width="45" Margin="0,0,-5,0">
                 <dxb:BarButtonItem Command="{Binding ToggleUsageNamesCommand}"
                                Glyph="{dx:DXImageOffice2013 Image=Replace_16x16.png}"
@@ -195,6 +196,20 @@
         </dxg:TreeListControl>
 
         <views:SelectedThingGroupControl Grid.Row="3"/>
-        <views:LoadingControl Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal">
+            <CheckBox Name="DropElementDefinitionToAllOptions"
+                      Margin="4,0,0,0"
+                      VerticalAlignment="Center"
+                      FontSize="10"
+                      Content="Add Element Definition To All Options"
+                      ToolTip="When unticked, a dropped Element Definition is used in the current Option only and excluded from all other Options."
+                      IsEnabled="{Binding IsDropElementDefinitionToAllOptionsEnabled, Mode=OneWay}"
+                      IsChecked="{Binding DropElementDefinitionToAllOptions,
+                          Mode=TwoWay,
+                          UpdateSourceTrigger=PropertyChanged
+                      }" />
+        </StackPanel>
+        <views:LoadingControl Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
     </Grid>
 </UserControl>

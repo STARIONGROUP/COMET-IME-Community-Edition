@@ -7,6 +7,7 @@
 namespace CDP4Composition.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Threading.Tasks;
@@ -223,7 +224,28 @@ namespace CDP4Composition.Services
         /// <param name="session">
         /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
         /// </param>
-        public async Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session)
+        public Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session) =>
+            this.CreateElementUsage(container, referencedDefinition, owner, session, null);
+
+        /// <summary>
+        /// Create a new <see cref="ElementUsage"/> that is excluded from the specified <see cref="Option"/>s
+        /// </summary>
+        /// <param name="container">
+        /// The container <see cref="ElementDefinition"/> of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="referencedDefinition">
+        /// The referenced <see cref="ElementDefinition"/> of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="owner">
+        /// The <see cref="DomainOfExpertise"/> that is the owner of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
+        /// </param>
+        /// <param name="excludedOptions">
+        /// The <see cref="Option"/>s the <see cref="ElementUsage"/> is excluded from, or <c>null</c> for none
+        /// </param>
+        public async Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session, IEnumerable<Option> excludedOptions)
         {
             if (container == null)
             {
@@ -254,6 +276,7 @@ namespace CDP4Composition.Services
                 ElementDefinition = referencedDefinition
             };
 
+            usage.ExcludeOption.AddRange(excludedOptions ?? Enumerable.Empty<Option>());
             clone.ContainedElement.Add(usage);
 
             var transactionContext = TransactionContextResolver.ResolveContext(container);

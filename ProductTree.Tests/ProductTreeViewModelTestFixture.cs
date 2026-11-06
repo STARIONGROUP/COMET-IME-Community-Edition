@@ -196,6 +196,33 @@ namespace ProductTree.Tests
         }
 
         [Test]
+        public void VerifyGetExcludedOptionsForDrop()
+        {
+            var otherOption = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.iteration.Option.Add(otherOption);
+
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            Assert.That(vm.GetExcludedOptionsForDrop(), Is.Empty);
+
+            vm.DropElementDefinitionToAllOptions = false;
+            Assert.That(vm.GetExcludedOptionsForDrop(), Is.EquivalentTo(new[] { otherOption }));
+        }
+
+        [Test]
+        public void VerifyIsDropElementDefinitionToAllOptionsEnabled()
+        {
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            vm.ComputePermission();
+            Assert.That(vm.IsDropElementDefinitionToAllOptionsEnabled, Is.True);
+
+            this.permissionService.Setup(x => x.CanWrite(ClassKind.ElementUsage, this.iteration)).Returns(false);
+            vm.ComputePermission();
+            Assert.That(vm.IsDropElementDefinitionToAllOptionsEnabled, Is.False);
+        }
+
+        [Test]
         public async Task VerifyThatUpdateOptionEventWorks()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);

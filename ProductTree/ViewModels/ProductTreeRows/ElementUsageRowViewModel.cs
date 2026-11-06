@@ -820,7 +820,7 @@ namespace CDP4ProductTree.ViewModels
         /// <param name="elementDefinition">The <see cref="ElementDefinition"/> in the payload</param>
         private void DragOver(IDropInfo dropinfo, ElementDefinition elementDefinition)
         {
-            if (!this.PermissionService.CanWrite(ClassKind.ElementUsage, this.Thing.Container))
+            if (!this.PermissionService.CanWrite(ClassKind.ElementUsage, this.Thing.ElementDefinition))
             {
                 dropinfo.Effects = DragDropEffects.None;
                 return;
@@ -852,7 +852,8 @@ namespace CDP4ProductTree.ViewModels
 
                 if (elementDefinition.TopContainer == this.Thing.TopContainer)
                 {
-                    await this.ThingCreator.CreateElementUsage(this.Thing.ElementDefinition, elementDefinition, currentDomain, this.Session);
+                    var excludedOptions = (this.TopContainerViewModel as ProductTreeViewModel)?.GetExcludedOptionsForDrop();
+                    await this.ThingCreator.CreateElementUsage(this.Thing.ElementDefinition, elementDefinition, currentDomain, this.Session, excludedOptions);
                 }
             }
             catch (Exception ex)
