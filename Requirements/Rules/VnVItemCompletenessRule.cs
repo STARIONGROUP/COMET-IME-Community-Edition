@@ -36,6 +36,7 @@ namespace CDP4Requirements.Rules
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
 
+    using CDP4Composition.Annotations;
     using CDP4Composition.Services;
 
     /// <summary>
@@ -132,7 +133,7 @@ namespace CDP4Requirements.Rules
                         defects.Add($"it is closed out as '{VandVCloseOut.QueryCompliance(item)}' without an accepted waiver or deviation");
                     }
 
-                    if (AnnotationQuery.QueryFor(iteration, item).Any(AnnotationQuery.IsOpen))
+                    if (AnnotationQuery.QueryReviewRequestsFor(item).Any(AnnotationQuery.IsOpen))
                     {
                         defects.Add("it is closed out while a review request against it is still open");
                     }

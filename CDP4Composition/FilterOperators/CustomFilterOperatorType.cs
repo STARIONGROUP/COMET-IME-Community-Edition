@@ -30,6 +30,8 @@ namespace CDP4Composition.FilterOperators
     /// </summary>
     public enum CustomFilterOperatorType
     {
-        Category
+        Category,
+
+        Annotation
     }
 }

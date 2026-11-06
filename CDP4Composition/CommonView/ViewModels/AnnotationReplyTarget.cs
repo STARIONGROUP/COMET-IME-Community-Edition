@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AnnotationDialog.xaml.cs" company="Starion Group S.A.">
+// <copyright file="AnnotationReplyTarget.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
@@ -23,37 +23,36 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements.Views
+namespace CDP4CommonView.ViewModels
 {
-    using CDP4Composition.Attributes;
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Common.ReportingData;
+
+    using CDP4Composition.Annotations;
 
     /// <summary>
-    /// Interaction logic for the Create Review Annotation dialog.
+    /// One annotation a reply can be aimed at on a shared discussion board, that is, the change request itself or
+    /// one of the change proposals answering it.
     /// </summary>
-    [DialogViewExport("AnnotationDialog", "The dialog used to raise a RID, request for deviation or request for waiver")]
-    public partial class AnnotationDialog : IDialogView
+    public class AnnotationReplyTarget
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnnotationDialog"/> class.
+        /// Initializes a new instance of the <see cref="AnnotationReplyTarget"/> class.
         /// </summary>
-        public AnnotationDialog()
+        /// <param name="annotation">The annotation the reply would be posted on.</param>
+        public AnnotationReplyTarget(EngineeringModelDataAnnotation annotation)
         {
+            this.Annotation = annotation;
+            this.Caption = $"{AnnotationKind.QueryShortName(annotation)} ({AnnotationKind.Describe(annotation)})";
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnnotationDialog"/> class.
+        /// Gets the annotation the reply is posted on.
         /// </summary>
-        /// <param name="initializeComponent">
-        /// a value indicating whether the contained components shall be loaded. This constructor is called by the
-        /// navigation service.
-        /// </param>
-        public AnnotationDialog(bool initializeComponent)
-        {
-            if (initializeComponent)
-            {
-                this.InitializeComponent();
-            }
-        }
+        public EngineeringModelDataAnnotation Annotation { get; }
+
+        /// <summary>
+        /// Gets the caption shown in the picker.
+        /// </summary>
+        public string Caption { get; }
     }
 }

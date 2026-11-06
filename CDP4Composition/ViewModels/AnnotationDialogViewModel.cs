@@ -23,29 +23,29 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements.ViewModels
+namespace CDP4Composition.ViewModels
 {
     using System.ComponentModel;
     using System.Reactive;
     using System.Reactive.Linq;
 
-    using CDP4Requirements.Services;
-
     using CDP4Common.CommonData;
     using CDP4Common.ReportingData;
 
+    using CDP4Composition.Annotations;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
     using ReactiveUI;
 
     /// <summary>
-    /// The dialog for raising a review annotation, a Review Item Discrepancy (the ECSS non-conformance mechanism), a
-    /// Request for Deviation or a Request for Waiver, against the thing selected in the V&amp;V browser.
+    /// The dialog that collects an ECSS-E-TM-10-25 annotation, a Review Item Discrepancy, a Request for Deviation, a
+    /// Request for Waiver, a Change Request or a Model Note, raised against the thing selected in a browser, or a
+    /// reply onto one that already exists.
     /// </summary>
     /// <remarks>
     /// The IME registers no <c>ThingDialog</c> for these classes, so the stock create-annotation commands cannot open
-    /// anything; this dialog plus <see cref="Services.AnnotationCreator"/> replace that dead path.
+    /// anything; this dialog plus <see cref="AnnotationService"/> replace that dead path.
     /// </remarks>
     public class AnnotationDialogViewModel : DialogViewModelBase, IDataErrorInfo
     {
@@ -76,45 +76,49 @@ namespace CDP4Requirements.ViewModels
         /// <param name="annotatedThing">The <see cref="Thing"/> the annotation is raised against.</param>
         public AnnotationDialogViewModel(AnnotationKind kind, Thing annotatedThing)
         {
+            this.KindName = kind.Name;
             this.HasIdentification = kind.HasIdentification;
             this.DialogTitle = $"Create {kind.Name}";
             this.AnnotatedThingCaption = $"{annotatedThing.UserFriendlyShortName}: {annotatedThing.UserFriendlyName}";
+            this.shortName = kind.HasIdentification ? AnnotationQuery.SuggestShortName(annotatedThing, kind) : null;
 
             var canOk = this.WhenAnyValue(
                 x => x.Title,
                 x => x.ShortName,
                 x => x.Content,
-                (dialogTitle, name, body) =>
+                (annotationTitle, name, body) =>
                     !string.IsNullOrWhiteSpace(body)
                     && (!this.HasIdentification
-                        || (!string.IsNullOrWhiteSpace(dialogTitle) && !string.IsNullOrWhiteSpace(name))));
+                        || (!string.IsNullOrWhiteSpace(annotationTitle) && !string.IsNullOrWhiteSpace(name))));
 
-            this.OkCommand = ReactiveCommandCreator.Create(() => { this.DialogResult = new BaseDialogResult(true); }, canOk);
-            this.CancelCommand = ReactiveCommandCreator.Create(() => { this.DialogResult = new BaseDialogResult(false); });
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOk, canOk);
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AnnotationDialogViewModel"/> class in reply mode, where
         /// only the message body is asked for.
         /// </summary>
-        /// <param name="annotation">The review request being replied to.</param>
+        /// <param name="annotation">The annotation being replied to.</param>
         public AnnotationDialogViewModel(EngineeringModelDataAnnotation annotation)
         {
             this.IsReply = true;
             this.HasIdentification = false;
+            this.KindName = AnnotationKind.Describe(annotation);
+
             var identifier = AnnotationKind.QueryShortName(annotation);
 
             this.DialogTitle = $"Reply to {identifier}";
-            this.AnnotatedThingCaption = $"{identifier}: {AnnotationKind.Describe(annotation)}";
+            this.AnnotatedThingCaption = $"{identifier}: {this.KindName}";
 
             var canOk = this.WhenAnyValue(x => x.Content).Select(body => !string.IsNullOrWhiteSpace(body));
 
-            this.OkCommand = ReactiveCommandCreator.Create(() => { this.DialogResult = new BaseDialogResult(true); }, canOk);
-            this.CancelCommand = ReactiveCommandCreator.Create(() => { this.DialogResult = new BaseDialogResult(false); });
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOk, canOk);
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
         }
 
         /// <summary>
-        /// Gets a value indicating whether the dialog is collecting a reply rather than a new review request. In reply
+        /// Gets a value indicating whether the dialog is collecting a reply rather than a new annotation. In reply
         /// mode the identification fields are hidden: a reply only has a body.
         /// </summary>
         public bool IsReply { get; }
@@ -124,6 +128,11 @@ namespace CDP4Requirements.ViewModels
         /// no short-name, title or classification, and a reply has none either.
         /// </summary>
         public bool HasIdentification { get; }
+
+        /// <summary>
+        /// Gets the human-readable name of the kind being raised or replied to.
+        /// </summary>
+        public string KindName { get; }
 
         /// <summary>
         /// Gets the window title.
@@ -216,6 +225,22 @@ namespace CDP4Requirements.ViewModels
                         return null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Accepts the dialog.
+        /// </summary>
+        private void ExecuteOk()
+        {
+            this.DialogResult = new BaseDialogResult(true);
+        }
+
+        /// <summary>
+        /// Dismisses the dialog.
+        /// </summary>
+        private void ExecuteCancel()
+        {
+            this.DialogResult = new BaseDialogResult(false);
         }
     }
 }

@@ -26,9 +26,12 @@
 namespace CDP4Common.Helpers
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
     using System.Drawing.Drawing2D;
+    using System.Drawing.Imaging;
     using System.IO;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media;
@@ -72,6 +75,11 @@ namespace CDP4Common.Helpers
         /// The <see cref="Uri"/> to the hidden image overlay.
         /// </summary>
         public static readonly Uri HiddenOverlayUri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/hidden_16x16.png");
+
+        /// <summary>
+        /// The <see cref="Uri"/> to the annotation image overlay.
+        /// </summary>
+        public static readonly Uri AnnotationOverlayUri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/Log/Info_16x16.png");
 
         public static ImageSource ToImageSource(this Icon icon)
         {
@@ -203,13 +211,33 @@ namespace CDP4Common.Helpers
         /// </returns>
         public static BitmapSource WithOverlay(Uri iconUri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopRight)
         {
+            return WithOverlays(iconUri, new[] { (overlayUri, overlayPosition, false) });
+        }
+
+        /// <summary>
+        /// The bitmap source with the image and every supplied overlay drawn onto it.
+        /// </summary>
+        /// <param name="iconUri">
+        /// The icon <see cref="Uri"/>
+        /// </param>
+        /// <param name="overlays">
+        /// The overlays to draw, each with the corner it goes in. Corners are not checked for collision: two overlays
+        /// given the same <see cref="OverlayPositionKind"/> draw on top of each other.
+        /// </param>
+        /// <returns>
+        /// The <see cref="BitmapSource"/>.
+        /// </returns>
+        /// <remarks>
+        /// Takes a list rather than a single overlay so that independent facts about a row, that it carries a
+        /// relationship and that it carries an annotation, can show at the same time instead of the first one winning.
+        /// </remarks>
+        public static BitmapSource WithOverlays(Uri iconUri, IReadOnlyList<(Uri OverlayUri, OverlayPositionKind Position, bool Desaturated)> overlays)
+        {
             try
             {
                 var source = new BitmapImage(iconUri);
-                var overlay = new BitmapImage(overlayUri);
 
                 var thingBitMapImage = BitmapImage2Bitmap(source);
-                var overlayBitMapImage = BitmapImage2Bitmap(overlay, (int)Math.Floor(thingBitMapImage.Width * 0.75D), (int)Math.Floor(thingBitMapImage.Height * 0.75D));
 
                 var img = new Bitmap(
                         (int)Math.Floor(thingBitMapImage.Width * 1.4D),
@@ -220,7 +248,25 @@ namespace CDP4Common.Helpers
                 {
                     gr.CompositingMode = CompositingMode.SourceOver;
                     gr.DrawImage(thingBitMapImage, GetMainImagePoint(img, thingBitMapImage));
-                    gr.DrawImage(overlayBitMapImage, GetOverlayPoint(overlayPosition, img, overlayBitMapImage));
+
+                    foreach (var overlay in overlays.Where(x => x.OverlayUri != null))
+                    {
+                        var overlayBitMapImage = BitmapImage2Bitmap(
+                            new BitmapImage(overlay.OverlayUri),
+                            (int)Math.Floor(thingBitMapImage.Width * 0.75D),
+                            (int)Math.Floor(thingBitMapImage.Height * 0.75D));
+
+                        var point = GetOverlayPoint(overlay.Position, img, overlayBitMapImage);
+
+                        if (overlay.Desaturated)
+                        {
+                            DrawDesaturated(gr, overlayBitMapImage, point);
+                        }
+                        else
+                        {
+                            gr.DrawImage(overlayBitMapImage, point);
+                        }
+                    }
                 }
 
                 return Bitmap2BitmapSource(img);
@@ -231,6 +277,42 @@ namespace CDP4Common.Helpers
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Draws an overlay in greyscale, so a state that no longer needs attention reads as muted rather than
+        /// needing a second, hand-drawn grey copy of every overlay asset.
+        /// </summary>
+        /// <param name="graphics">The <see cref="Graphics"/> to draw on.</param>
+        /// <param name="overlay">The overlay <see cref="Image"/>.</param>
+        /// <param name="point">The <see cref="Point"/> to draw it at.</param>
+        private static void DrawDesaturated(Graphics graphics, Image overlay, Point point)
+        {
+            // the standard luminance weights; the alpha row is left alone so the overlay keeps its transparency
+            var greyscale = new ColorMatrix(
+                new[]
+                {
+                    new[] { 0.299f, 0.299f, 0.299f, 0f, 0f },
+                    new[] { 0.587f, 0.587f, 0.587f, 0f, 0f },
+                    new[] { 0.114f, 0.114f, 0.114f, 0f, 0f },
+                    new[] { 0f, 0f, 0f, 1f, 0f },
+                    new[] { 0f, 0f, 0f, 0f, 1f }
+                });
+
+            using (var attributes = new ImageAttributes())
+            {
+                attributes.SetColorMatrix(greyscale);
+
+                graphics.DrawImage(
+                    overlay,
+                    new Rectangle(point.X, point.Y, overlay.Width, overlay.Height),
+                    0,
+                    0,
+                    overlay.Width,
+                    overlay.Height,
+                    GraphicsUnit.Pixel,
+                    attributes);
+            }
         }
 
         /// <summary>
@@ -252,6 +334,9 @@ namespace CDP4Common.Helpers
 
                 case OverlayPositionKind.TopRight:
                     return new Point(rightXpos, 0);
+
+                case OverlayPositionKind.BottomLeft:
+                    return new Point(0, bottomYpos);
 
                 default:
                     return new Point(0, 0);

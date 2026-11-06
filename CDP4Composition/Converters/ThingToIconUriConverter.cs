@@ -26,6 +26,7 @@
 namespace CDP4Composition
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
     using System.Globalization;
     using System.Linq;
@@ -35,6 +36,7 @@ namespace CDP4Composition
     using CDP4Common.CommonData;
     using CDP4Common.Helpers;
 
+    using CDP4Composition.Annotations;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
@@ -111,27 +113,41 @@ namespace CDP4Composition
                 return this.QueryIIconCacheService().QueryErrorOverlayBitmapSource(uri);
             }
 
+            // the annotation dot sits in its own corner so it is additional to whatever the top-right corner already
+            // says: a requirement that carries both a verification relationship and a RID must show both
+            var overlays = new List<(Uri, OverlayPositionKind, bool)>();
+
             if (thingStatus.IsLocked)
             {
-                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.LockedOverlayUri, OverlayPositionKind.TopRight);
+                overlays.Add((IconUtilities.LockedOverlayUri, OverlayPositionKind.TopRight, false));
             }
-
-            if (thingStatus.IsHidden)
+            else if (thingStatus.IsHidden)
             {
-                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.HiddenOverlayUri, OverlayPositionKind.TopRight);
+                overlays.Add((IconUtilities.HiddenOverlayUri, OverlayPositionKind.TopRight, false));
             }
-
-            if (thingStatus.HasRelationship)
+            else if (thingStatus.HasRelationship)
             {
-                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.RelationshipOverlayUri, OverlayPositionKind.TopRight);
+                overlays.Add((IconUtilities.RelationshipOverlayUri, OverlayPositionKind.TopRight, false));
             }
 
             if (thingStatus.IsFavorite)
             {
-                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.FavoriteOverlayUri, OverlayPositionKind.BottomRight);
+                overlays.Add((IconUtilities.FavoriteOverlayUri, OverlayPositionKind.BottomRight, false));
             }
 
-            return this.QueryIIconCacheService().QueryBitmapImage(uri);
+            if (thingStatus.AnnotationState != AnnotationState.None)
+            {
+                // greyed out once everything raised against the thing is closed out, so an open annotation still
+                // draws the eye and a historical one does not
+                overlays.Add((IconUtilities.AnnotationOverlayUri, OverlayPositionKind.BottomLeft, thingStatus.AnnotationState == AnnotationState.Resolved));
+            }
+
+            if (overlays.Count == 0)
+            {
+                return this.QueryIIconCacheService().QueryBitmapImage(uri);
+            }
+
+            return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, overlays);
         }
 
         /// <summary>

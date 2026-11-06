@@ -13,6 +13,7 @@
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4Requirements.Converters"
+             xmlns:compositionConverters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              xmlns:behaviors="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              xmlns:userControls="clr-namespace:CDP4Requirements.Views.UserControls"
              xmlns:rows="clr-namespace:CDP4Requirements.ViewModels.RequirementBrowser.Rows"
@@ -29,6 +30,7 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ValueSetTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+            <compositionConverters:AnnotationStateToBrushConverter x:Key="AnnotationStateToBrushConverter" />
             <converters:RequirementStateOfComplianceColorConverter x:Key="RequirementStateOfComplianceColorConverter"></converters:RequirementStateOfComplianceColorConverter>
             <converters:RequirementStateOfComplianceToVisibilityConverter x:Key="RequirementStateOfComplianceToVisibilityConverter"></converters:RequirementStateOfComplianceToVisibilityConverter>
             <selectors:RequirementsTreeListNodeImageSelector x:Key="RequirementsTreeListNodeSelector" />
@@ -281,6 +283,31 @@
                     <dxmvvm:Interaction.Behaviors>
                         <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding ReqSpecificationRows}"/>
                     </dxmvvm:Interaction.Behaviors>
+                </dxg:TreeListColumn>
+
+                <!--  hidden, filter-only: lets the document be narrowed to the items carrying a kind of annotation  -->
+                <dxg:TreeListColumn FieldName="AnnotationList" Header="Annotation" Visible="False" ShowInColumnChooser="False">
+                    <dxmvvm:Interaction.Behaviors>
+                        <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Annotation" ItemsSource="{Binding ReqSpecificationRows}"/>
+                    </dxmvvm:Interaction.Behaviors>
+                </dxg:TreeListColumn>
+
+                <!--  last column: the row icon carries the dot, this spells out what was raised  -->
+                <dxg:TreeListColumn FieldName="AnnotationIndicator"
+                                    Header="Annotations"
+                                    Width="110"
+                                    Visible="False"
+                                    ShowInColumnChooser="True"
+                                    AllowEditing="False">
+                    <dxg:TreeListColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Margin="2,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{Binding RowData.Row.AnnotationState, Converter={StaticResource AnnotationStateToBrushConverter}}"
+                                       Text="{Binding RowData.Row.AnnotationIndicator}"
+                                       ToolTip="{Binding RowData.Row.AnnotationSummary}" />
+                        </DataTemplate>
+                    </dxg:TreeListColumn.CellTemplate>
                 </dxg:TreeListColumn>
 
             </dxg:TreeListControl.Columns>

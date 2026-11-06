@@ -42,11 +42,13 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Annotations;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -647,20 +649,20 @@ namespace CDP4EngineeringModel.Tests
 
             vm.PopulateContextMenu();
 
-            Assert.AreEqual(2, vm.ContextMenu.Count);
+            Assert.AreEqual(3, vm.ContextMenu.Count);
 
             var defRow = vm.ElementDefinitionRowViewModels.Last();
 
             vm.SelectedThing = defRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(17, vm.ContextMenu.Count);
+            Assert.AreEqual(18, vm.ContextMenu.Count);
             vm.SelectedThing = defRow.ContainedRows[0];
             vm.PopulateContextMenu();
-            Assert.AreEqual(12, vm.ContextMenu.Count);
+            Assert.AreEqual(13, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[1];
             vm.PopulateContextMenu();
-            Assert.AreEqual(11, vm.ContextMenu.Count);
+            Assert.AreEqual(12, vm.ContextMenu.Count);
 
             var usageRow = defRow.ContainedRows[2];
             var usage2Row = defRow.ContainedRows[3];
@@ -671,11 +673,11 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = usageRow.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(12, vm.ContextMenu.Count);
+            Assert.AreEqual(13, vm.ContextMenu.Count);
 
             vm.SelectedThing = usage2Row.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(10, vm.ContextMenu.Count);
+            Assert.AreEqual(11, vm.ContextMenu.Count);
 
             vm.Dispose();
         }
@@ -830,14 +832,27 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public async Task VerifyThatCreateChangeRequestWorks()
         {
+            // this used to assert a Navigate to a ThingDialog for ChangeRequest. The IME registers no such dialog, so
+            // in the running application the command threw "not registered with the Application" and did nothing; only
+            // the mock made it look like it worked. The annotation dialog plus AnnotationService replace that path.
             this.iteration.Element.Add(this.elementDef);
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, null, null, null, null, null);
+
+            this.dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>()))
+                .Returns(new BaseDialogResult(false));
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, null, this.dialogNavigationService.Object, null, null, null);
             await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             vm.SelectedThing = vm.ElementDefinitionRowViewModels.First();
 
-            await vm.CreateChangeRequestCommand.Execute();
-            this.thingDialogNavigationService.Verify(x => x.Navigate(It.Is<ChangeRequest>(cr => cr.Author == this.participant && cr.RelatedThing.Count == 1), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<EngineeringModel>(), null));
+            var changeRequest = AnnotationKind.All.Single(kind => kind.ClassKind == ClassKind.ChangeRequest);
+
+            Assert.That(((ICommand)vm.CreateAnnotationCommands[changeRequest]).CanExecute(null), Is.True);
+
+            await vm.CreateAnnotationCommands[changeRequest].Execute();
+
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<AnnotationDialogViewModel>()), Times.Once);
         }
 
         [Test]
@@ -882,7 +897,7 @@ namespace CDP4EngineeringModel.Tests
             vm.PopulateContextMenu();
             await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
-            Assert.AreEqual(2, vm.ContextMenu.Count);
+            Assert.AreEqual(3, vm.ContextMenu.Count);
 
             var defRow = vm.ElementDefinitionRowViewModels.Last();
             var usageRow = defRow.ContainedRows[2];
@@ -907,7 +922,7 @@ namespace CDP4EngineeringModel.Tests
 
             vm.PopulateContextMenu();
 
-            Assert.AreEqual(2, vm.ContextMenu.Count);
+            Assert.AreEqual(3, vm.ContextMenu.Count);
 
             await vm.BatchCreateSubscriptionCommand.Execute();
 
@@ -939,7 +954,7 @@ namespace CDP4EngineeringModel.Tests
 
             vm.PopulateContextMenu();
 
-            Assert.AreEqual(2, vm.ContextMenu.Count);
+            Assert.AreEqual(3, vm.ContextMenu.Count);
 
             await vm.BatchDeleteSubscriptionCommand.Execute();
 

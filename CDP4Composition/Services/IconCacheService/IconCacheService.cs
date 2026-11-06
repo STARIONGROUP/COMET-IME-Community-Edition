@@ -28,6 +28,7 @@ namespace CDP4Composition.Services
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Linq;
     using System.Windows.Media.Imaging;
 
     using CDP4Common.Helpers;
@@ -54,6 +55,11 @@ namespace CDP4Composition.Services
         /// The cache of any other overlay icon than error overlay <see cref="BitmapSource"/>s
         /// </summary>
         private readonly Dictionary<(Uri, Uri, OverlayPositionKind), BitmapSource> bitmapWithOverlay;
+
+        /// <summary>
+        /// The cache of icons composed with more than one overlay, keyed by the icon and the overlays it carries.
+        /// </summary>
+        private readonly Dictionary<string, BitmapSource> bitmapWithOverlays = new Dictionary<string, BitmapSource>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IconCacheService"/> class.
@@ -136,6 +142,42 @@ namespace CDP4Composition.Services
                 {
                     bitmapSource = IconUtilities.WithOverlay(uri, overlayUri, overlayPosition);
                     this.bitmapWithOverlay.Add(key, bitmapSource);
+                }
+
+                return bitmapSource;
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Queries the <see cref="BitmapSource"/> of an icon carrying every supplied overlay at once.
+        /// </summary>
+        /// <param name="uri">
+        /// The uri of the icon <see cref="BitmapSource"/>
+        /// </param>
+        /// <param name="overlays">
+        /// The overlays to draw, each with the corner it goes in.
+        /// </param>
+        /// <returns>
+        /// An instance of <see cref="BitmapSource"/>
+        /// </returns>
+        public BitmapSource QueryOverlayBitmapSource(Uri uri, IReadOnlyList<(Uri OverlayUri, OverlayPositionKind Position, bool Desaturated)> overlays)
+        {
+            try
+            {
+                var key = string.Join("|", new[] { uri.ToString() }.Concat(overlays.Select(x => $"{x.OverlayUri}@{x.Position}@{x.Desaturated}")));
+
+                this.bitmapWithOverlays.TryGetValue(key, out var bitmapSource);
+
+                if (bitmapSource == null)
+                {
+                    bitmapSource = IconUtilities.WithOverlays(uri, overlays);
+                    this.bitmapWithOverlays.Add(key, bitmapSource);
                 }
 
                 return bitmapSource;

@@ -62,25 +62,4 @@ namespace CDP4Requirements.Services
         /// </summary>
         public Requirement Requirement { get; }
     }
-
-    /// <summary>
-    /// The review-request state of a V&amp;V item, shown as a distinct icon in the browser.
-    /// </summary>
-    public enum AnnotationState
-    {
-        /// <summary>
-        /// No review request has been raised against the item.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// At least one review request is still open and needs action.
-        /// </summary>
-        Open,
-
-        /// <summary>
-        /// Every review request raised against the item has been closed out.
-        /// </summary>
-        Resolved
-    }
 }

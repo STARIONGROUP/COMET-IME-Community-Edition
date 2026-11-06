@@ -33,6 +33,8 @@ namespace CDP4Requirements.Services
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
 
+    using CDP4Composition.Annotations;
+
     /// <summary>
     /// The close-out vocabulary of the V&amp;V register, kept in one place so the browser, the roll-up, the built-in
     /// rules and the workbook cannot drift apart on what "compliant" or "closed" means.
@@ -137,18 +139,17 @@ namespace CDP4Requirements.Services
 
             var iteration = item.GetContainerOfType<Iteration>();
 
-            return iteration != null && !HasAcceptedConcession(iteration, item);
+            return iteration != null && !HasAcceptedConcession(item);
         }
 
         /// <summary>
         /// Asserts whether a closed Request for Waiver or Request for Deviation has been raised against the item.
         /// </summary>
-        /// <param name="iteration">The iteration the annotations are searched in.</param>
         /// <param name="item">The V&amp;V item.</param>
         /// <returns>true when an accepted concession exists.</returns>
-        public static bool HasAcceptedConcession(Iteration iteration, Requirement item)
+        public static bool HasAcceptedConcession(Requirement item)
         {
-            return AnnotationQuery.QueryFor(iteration, item)
+            return AnnotationQuery.QueryReviewRequestsFor(item)
                 .Any(annotation =>
                     (annotation is RequestForWaiver || annotation is RequestForDeviation)
                     && !AnnotationQuery.IsOpen(annotation));

@@ -35,6 +35,7 @@ namespace CDP4Requirements.ViewModels.Rows
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.Annotations;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
 
@@ -125,9 +126,9 @@ namespace CDP4Requirements.ViewModels.Rows
         private string owner;
 
         /// <summary>
-        /// Backing field for <see cref="AnnotationState"/>
+        /// Backing field for <see cref="ReviewRequestState"/>
         /// </summary>
-        private AnnotationState annotationState;
+        private AnnotationState reviewRequestState;
 
         /// <summary>
         /// Backing field for <see cref="Compliance"/>
@@ -383,13 +384,18 @@ namespace CDP4Requirements.ViewModels.Rows
         }
 
         /// <summary>
-        /// Gets the review-request state of this item, none raised, at least one still open, or all closed out. The
+        /// Gets the concession state of this item, none raised, at least one still open, or all closed out. The
         /// browser renders this as a distinct icon so a blocked item is visible without opening any menu.
         /// </summary>
-        public AnnotationState AnnotationState
+        /// <remarks>
+        /// Narrower than the inherited <see cref="RowViewModelBase{T}.AnnotationState"/>, which counts every kind:
+        /// the V&amp;V icons track the non-conformance flow only, so a change request or a model note raised on a
+        /// V&amp;V item must not make it look like a blocked one.
+        /// </remarks>
+        public AnnotationState ReviewRequestState
         {
-            get => this.annotationState;
-            private set => this.RaiseAndSetIfChanged(ref this.annotationState, value);
+            get => this.reviewRequestState;
+            private set => this.RaiseAndSetIfChanged(ref this.reviewRequestState, value);
         }
 
         /// <summary>
@@ -440,15 +446,14 @@ namespace CDP4Requirements.ViewModels.Rows
         }
 
         /// <summary>
-        /// Re-reads the review requests raised against this item.
+        /// Re-reads the annotations raised against this item, both the inherited badge that counts every kind and
+        /// the narrower concession state the icons are driven by.
         /// </summary>
-        public void RefreshAnnotationState()
+        public override void RefreshAnnotationState()
         {
-            var iteration = this.Thing.GetContainerOfType<Iteration>();
+            base.RefreshAnnotationState();
 
-            this.AnnotationState = iteration == null
-                ? AnnotationState.None
-                : AnnotationQuery.SummarizeState(AnnotationQuery.QueryFor(iteration, this.Thing));
+            this.ReviewRequestState = AnnotationQuery.SummarizeState(AnnotationQuery.QueryReviewRequestsFor(this.Thing));
         }
 
         /// <summary>

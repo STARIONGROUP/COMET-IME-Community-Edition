@@ -102,11 +102,6 @@ namespace CDP4Requirements.ViewModels
         private readonly VandVProcedureWriter procedureWriter = new VandVProcedureWriter();
 
         /// <summary>
-        /// Writes RIDs, requests for deviation and requests for waiver.
-        /// </summary>
-        private readonly AnnotationCreator annotationCreator = new AnnotationCreator();
-
-        /// <summary>
         /// Writes the shared V&amp;V activities, their report groups, the <c>performedBy</c> links and the bulk item
         /// operations.
         /// </summary>
@@ -137,11 +132,6 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="CanCreateVandVItem"/>
         /// </summary>
         private bool canCreateVandVItem;
-
-        /// <summary>
-        /// Backing field for <see cref="CreatableAnnotationKinds"/>
-        /// </summary>
-        private IReadOnlyCollection<ClassKind> creatableAnnotationKinds = new HashSet<ClassKind>();
 
         /// <summary>
         /// The V&amp;V items covering each parameter, rebuilt only when a relationship changes. Recomputing it per
@@ -186,12 +176,6 @@ namespace CDP4Requirements.ViewModels
                 this.WhenAnyValue(x => x.SelectedThing, x => x.CanCreateVandVItem, (row, canCreate) => canCreate && row is VandVItemRowViewModel));
 
             this.RunAnalysisCheckCommand = ReactiveCommandCreator.Create(this.ExecuteRunAnalysisCheck);
-
-            this.CreateAnnotationCommands = AnnotationKind.All.ToDictionary(
-                kind => kind,
-                kind => ReactiveCommandCreator.CreateAsyncTask(
-                    () => this.ExecuteCreateAnnotation(kind),
-                    this.WhenAnyValue(x => x.SelectedThing, x => x.CreatableAnnotationKinds, (row, kinds) => row != null && kinds.Contains(kind.ClassKind))));
 
             var coverage = VandVCoverageQuery.Build(this.Thing);
 
@@ -247,6 +231,12 @@ namespace CDP4Requirements.ViewModels
         public DisposableReactiveList<VandVSpecificationRowViewModel> SpecificationRows { get; private set; }
 
         /// <summary>
+        /// Gets the top-level rows of this browser, so the inherited expand / collapse-all commands and the
+        /// annotation refresh reach the whole tree.
+        /// </summary>
+        protected override IEnumerable<IRowViewModelBase<Thing>> RootRowViewModels => this.SpecificationRows;
+
+        /// <summary>
         /// Gets every requirement row in the tree, flattened.
         /// </summary>
         public IReadOnlyList<RequirementCoverageRowViewModel> RequirementRows => this.requirementRows;
@@ -267,11 +257,6 @@ namespace CDP4Requirements.ViewModels
         public ReactiveCommand<Unit, Unit> RunAnalysisCheckCommand { get; }
 
         /// <summary>
-        /// Gets the command that raises each kind of annotation against the selected thing, keyed by kind.
-        /// </summary>
-        public IReadOnlyDictionary<AnnotationKind, ReactiveCommand<Unit, Unit>> CreateAnnotationCommands { get; }
-
-        /// <summary>
         /// Gets or sets the name of the layout group the panel docks into.
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
@@ -283,15 +268,6 @@ namespace CDP4Requirements.ViewModels
         {
             get => this.canCreateVandVItem;
             private set => this.RaiseAndSetIfChanged(ref this.canCreateVandVItem, value);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="ClassKind"/>s of the review requests the current participant may raise in this model.
-        /// </summary>
-        public IReadOnlyCollection<ClassKind> CreatableAnnotationKinds
-        {
-            get => this.creatableAnnotationKinds;
-            private set => this.RaiseAndSetIfChanged(ref this.creatableAnnotationKinds, value);
         }
 
         /// <summary>
@@ -308,11 +284,6 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.CanCreateVandVItem = this.PermissionService.CanWrite(ClassKind.Requirement, this.Thing);
-
-            this.CreatableAnnotationKinds = new HashSet<ClassKind>(
-                AnnotationKind.All
-                    .Select(kind => kind.ClassKind)
-                    .Where(classKind => this.PermissionService.CanWrite(classKind, this.Thing.TopContainer)));
         }
 
         /// <summary>
@@ -367,17 +338,6 @@ namespace CDP4Requirements.ViewModels
                     this.ExportCommand,
                     MenuItemKind.Export,
                     ClassKind.NotThing));
-
-            foreach (var kind in AnnotationKind.All)
-            {
-                this.ContextMenu.Add(
-                    new ContextMenuItemViewModel(
-                        $"Create a {kind.Name}",
-                        "",
-                        this.CreateAnnotationCommands[kind],
-                        MenuItemKind.Create,
-                        kind.ClassKind));
-            }
         }
 
         /// <summary>
@@ -691,52 +651,6 @@ namespace CDP4Requirements.ViewModels
                 dialogViewModel.SelectedElementDefinition,
                 dialogViewModel.SelectedOptions.ToList(),
                 dialogViewModel.SelectedStates.ToList());
-        }
-
-        /// <summary>
-        /// Opens the annotation dialog for the selected thing and, on OK, writes the annotation.
-        /// </summary>
-        /// <param name="kind">The kind of annotation to raise.</param>
-        /// <returns>A <see cref="Task"/>.</returns>
-        private async Task ExecuteCreateAnnotation(AnnotationKind kind)
-        {
-            var selected = this.SelectedThing?.Thing;
-
-            if (selected == null)
-            {
-                return;
-            }
-
-            var dialogViewModel = new AnnotationDialogViewModel(kind, selected);
-            var result = this.DialogNavigationService.NavigateModal(dialogViewModel);
-
-            if (result == null || result.Result != true)
-            {
-                return;
-            }
-
-            if (!this.Session.OpenIterations.TryGetValue(this.Thing, out var participantAndDomain) || participantAndDomain == null)
-            {
-                return;
-            }
-
-            try
-            {
-                await this.annotationCreator.CreateAsync(
-                    this.Session,
-                    kind.Create(),
-                    selected,
-                    participantAndDomain.Item2,
-                    participantAndDomain.Item1,
-                    dialogViewModel.Title,
-                    dialogViewModel.ShortName,
-                    dialogViewModel.Content,
-                    dialogViewModel.Classification);
-            }
-            catch (Exception ex)
-            {
-                DXMessageBox.Show($"The {kind.Name} could not be created:\n\n" + ex.Message, this.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
 
         /// <summary>
@@ -1108,16 +1022,6 @@ namespace CDP4Requirements.ViewModels
                     .Subscribe(this.RefreshAnalysisChecks));
 
             this.Disposables.Add(
-                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ReviewItemDiscrepancy))
-                    .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequestForDeviation)))
-                    .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequestForWaiver)))
-                    .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ChangeRequest)))
-                    .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModelDataNote)))
-                    .Where(x => x.ChangedThing.TopContainer == this.Thing.TopContainer)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.RefreshAnnotationStates()));
-
-            this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
                     .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
                     .Where(x => VandVCoverageQuery.IsVandVLink((BinaryRelationship)x.ChangedThing))
@@ -1256,20 +1160,6 @@ namespace CDP4Requirements.ViewModels
         {
             return this.SpecificationRows.Any(row => row.Thing == thing)
                    || this.SpecificationRows.Any(row => VandVGroupRowViewModel.QueryGroupRows(row).Any(groupRow => groupRow.Thing == thing));
-        }
-
-        /// <summary>
-        /// Re-reads the review-request state of every V&amp;V item row, so the icons follow the requests raised,
-        /// implemented and closed during the session.
-        /// </summary>
-        private void RefreshAnnotationStates()
-        {
-            foreach (var itemRow in this.requirementRows.SelectMany(row => row.ContainedRows.OfType<VandVItemRowViewModel>()))
-            {
-                itemRow.RefreshAnnotationState();
-            }
-
-            this.PopulateContextMenu();
         }
 
         /// <summary>
@@ -1477,144 +1367,6 @@ namespace CDP4Requirements.ViewModels
         private bool BelongsToThisIteration(Requirement requirement)
         {
             return requirement != null && requirement.GetContainerOfType<Iteration>() == this.Thing;
-        }
-
-        /// <summary>
-        /// Fills the "Check Annotations" group with the review requests raised against the selected row, each with the
-        /// actions it supports: open it to read and reply, mark it implemented, close it, or reopen it.
-        /// </summary>
-        /// <remarks>
-        /// The base implementation lists the annotations but offers no action beyond opening the window, so a raised
-        /// request could never be retired.
-        /// </remarks>
-        protected override void PopulateAnnotationMenuItemGroup()
-        {
-            this.AnnotationMenuGroup.SubMenu.Clear();
-
-            if (this.SelectedThing == null)
-            {
-                return;
-            }
-
-            foreach (var annotation in AnnotationQuery.QueryAllFor(this.Thing, this.SelectedThing.Thing))
-            {
-                var isOpen = AnnotationQuery.IsOpen(annotation);
-                var status = AnnotationQuery.DescribeStatus(annotation);
-                var hasStatus = !string.IsNullOrEmpty(status);
-
-                var canWrite = this.PermissionService.CanWrite(annotation);
-
-                var identifier = AnnotationKind.QueryShortName(annotation);
-
-                var header = hasStatus
-                    ? $"{identifier}, {AnnotationKind.Describe(annotation)} ({status})"
-                    : $"{identifier}, {AnnotationKind.Describe(annotation)}";
-
-                var group = new ContextMenuItemViewModel(header, "", null, MenuItemKind.None, annotation.ClassKind);
-
-                group.SubMenu.Add(
-                    new ContextMenuItemViewModel(
-                        "Open...",
-                        "",
-                        x => this.ExecuteOpenAnnotationWindow((ModellingAnnotationItem)x),
-                        annotation,
-                        true,
-                        MenuItemKind.Navigate));
-
-                group.SubMenu.Add(
-                    new ContextMenuItemViewModel(
-                        "Reply...",
-                        "",
-                        x => this.ReplyToAnnotation((EngineeringModelDataAnnotation)x),
-                        annotation,
-                        canWrite,
-                        MenuItemKind.Create));
-
-                group.SubMenu.Add(
-                    new ContextMenuItemViewModel(
-                        "Mark Implemented",
-                        "",
-                        x => this.SetAnnotationStatus((ModellingAnnotationItem)x, AnnotationStatusKind.DONE),
-                        annotation,
-                        hasStatus && isOpen && canWrite,
-                        MenuItemKind.Edit));
-
-                group.SubMenu.Add(
-                    new ContextMenuItemViewModel(
-                        "Close",
-                        "",
-                        x => this.SetAnnotationStatus((ModellingAnnotationItem)x, AnnotationStatusKind.CLOSED),
-                        annotation,
-                        hasStatus && isOpen && canWrite,
-                        MenuItemKind.Edit));
-
-                group.SubMenu.Add(
-                    new ContextMenuItemViewModel(
-                        "Reopen",
-                        "",
-                        x => this.SetAnnotationStatus((ModellingAnnotationItem)x, AnnotationStatusKind.OPEN),
-                        annotation,
-                        hasStatus && !isOpen && canWrite,
-                        MenuItemKind.Edit));
-
-                this.AnnotationMenuGroup.SubMenu.Add(group);
-            }
-        }
-
-        /// <summary>
-        /// Asks for a reply and posts it onto a review request.
-        /// </summary>
-        /// <param name="annotation">The review request.</param>
-        private async void ReplyToAnnotation(EngineeringModelDataAnnotation annotation)
-        {
-            var dialogViewModel = new AnnotationDialogViewModel(annotation);
-            var result = this.DialogNavigationService.NavigateModal(dialogViewModel);
-
-            if (result == null || result.Result != true)
-            {
-                return;
-            }
-
-            if (!this.Session.OpenIterations.TryGetValue(this.Thing, out var participantAndDomain) || participantAndDomain == null)
-            {
-                return;
-            }
-
-            try
-            {
-                await this.annotationCreator.ReplyAsync(this.Session, annotation, participantAndDomain.Item2, dialogViewModel.Content);
-            }
-            catch (Exception ex)
-            {
-                DXMessageBox.Show("The reply could not be posted:" + Environment.NewLine + Environment.NewLine + ex.Message, this.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
-        /// Writes a new status onto a review request.
-        /// </summary>
-        /// <param name="annotation">The review request.</param>
-        /// <param name="status">The new status.</param>
-        private async void SetAnnotationStatus(ModellingAnnotationItem annotation, AnnotationStatusKind status)
-        {
-            try
-            {
-                await this.annotationCreator.SetStatusAsync(this.Session, annotation, status);
-            }
-            catch (Exception ex)
-            {
-                DXMessageBox.Show("The review request could not be updated:\n\n" + ex.Message, this.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
-        /// Opens the floating annotation window for the supplied <see cref="ModellingAnnotationItem"/>.
-        /// </summary>
-        /// <param name="annotation">The <see cref="ModellingAnnotationItem"/>.</param>
-        protected override void ExecuteOpenAnnotationWindow(ModellingAnnotationItem annotation)
-        {
-            var vm = new AnnotationFloatingDialogViewModel(annotation, this.Session);
-            this.DialogNavigationService.NavigateFloating(vm);
         }
 
         /// <summary>

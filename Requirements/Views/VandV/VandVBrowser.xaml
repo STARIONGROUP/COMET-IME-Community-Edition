@@ -15,6 +15,8 @@
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:rows="clr-namespace:CDP4Requirements.ViewModels.Rows"
              xmlns:selectors="clr-namespace:CDP4Requirements.Selectors"
+             xmlns:compositionConverters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:behaviors="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              d:DesignHeight="300"
              d:DesignWidth="700"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -26,6 +28,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <selectors:VandVTreeListNodeImageSelector x:Key="VandVTreeListNodeSelector" />
+            <compositionConverters:AnnotationStateToBrushConverter x:Key="AnnotationStateToBrushConverter" />
 
             <!--  Specification and group rows mirror the stock Requirements browser grouping.  -->
             <HierarchicalDataTemplate DataType="{x:Type rows:VandVSpecificationRowViewModel}" ItemsSource="{Binding ContainedRows}">
@@ -175,6 +178,31 @@
                 <dxg:TreeListColumn FieldName="Acceptance" Header="Acceptance Criteria" Width="240" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
                 <dxg:TreeListColumn FieldName="Result" Header="Result" Width="160" Visible="{Binding DataContext.SelectedView.ShowsExecution, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
                 <dxg:TreeListColumn FieldName="EvidenceReference" Header="Evidence" Width="140" Visible="{Binding DataContext.SelectedView.ShowsExecution, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+
+                <!--  hidden, filter-only: lets the register be narrowed to the items carrying a kind of annotation  -->
+                <dxg:TreeListColumn FieldName="AnnotationList" Header="Annotation" Visible="False" ShowInColumnChooser="False">
+                    <dxmvvm:Interaction.Behaviors>
+                        <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Annotation" ItemsSource="{Binding SpecificationRows}"/>
+                    </dxmvvm:Interaction.Behaviors>
+                </dxg:TreeListColumn>
+
+                <!--  last column: the row icon carries the dot, this spells out what was raised  -->
+                <dxg:TreeListColumn FieldName="AnnotationIndicator"
+                                    Header="Annotations"
+                                    Width="110"
+                                    Visible="False"
+                                    ShowInColumnChooser="True"
+                                    AllowEditing="False">
+                    <dxg:TreeListColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Margin="2,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{Binding RowData.Row.AnnotationState, Converter={StaticResource AnnotationStateToBrushConverter}}"
+                                       Text="{Binding RowData.Row.AnnotationIndicator}"
+                                       ToolTip="{Binding RowData.Row.AnnotationSummary}" />
+                        </DataTemplate>
+                    </dxg:TreeListColumn.CellTemplate>
+                </dxg:TreeListColumn>
             </dxg:TreeListControl.Columns>
         </dxg:TreeListControl>
     </Grid>
