@@ -35,10 +35,15 @@ namespace CDP4CommonView.ViewModels
 
     using CDP4CommonView.EventAggregator;
 
+    using CDP4Composition.Annotations;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -47,6 +52,12 @@ namespace CDP4CommonView.ViewModels
     /// </summary>
     public class DiscussionItemViewModel : EngineeringModelDataDiscussionItemRowViewModel
     {
+        /// <summary>
+        /// How far <see cref="ModifiedOn"/> must sit past <see cref="CreatedOn"/> before the reply counts as
+        /// edited rather than merely written.
+        /// </summary>
+        private static readonly TimeSpan EditedThreshold = TimeSpan.FromSeconds(2);
+
         /// <summary>
         /// Backing field for <see cref="ParticipantFullName"/>
         /// </summary>
@@ -76,11 +87,22 @@ namespace CDP4CommonView.ViewModels
         public DiscussionItemViewModel(EngineeringModelDataDiscussionItem discussionItem, ISession session, IViewModelBase<Thing> containerviewModel)
             : base(discussionItem, session, containerviewModel)
         {
+            // on a shared board the same thread carries replies to the request and to each proposal, so each one
+            // has to say which it belongs to
+            this.SourceLabel = discussionItem.Container is EngineeringModelDataAnnotation annotation
+                ? CDP4Composition.Annotations.AnnotationKind.QueryShortName(annotation)
+                : string.Empty;
+
             this.CanEditDiscussionItem = this.Session.PermissionService.CanWrite(this.Thing);
             this.EventPublisher = new EventPublisher();
             this.InitializeCommands();
             this.UpdateProperties();
         }
+
+        /// <summary>
+        /// Gets the short-name of the annotation this reply was posted on
+        /// </summary>
+        public string SourceLabel { get; }
 
         /// <summary>
         /// Gets the <see cref="EventPublisher"/>
@@ -100,6 +122,11 @@ namespace CDP4CommonView.ViewModels
         /// Gets the cancel <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to delete this reply
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> DeleteCommand { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the current <see cref="DiscussionItem"/> is editable
@@ -157,6 +184,11 @@ namespace CDP4CommonView.ViewModels
                     this.ObjectChangeEventHandler(new ObjectChangedEvent(this.Thing));
                     this.EventPublisher.Publish(new ConfirmationEvent(true));
                 });
+
+            this.DeleteCommand = ReactiveCommandCreator.CreateAsyncTask(
+                this.ExecuteDeleteCommand,
+                this.WhenAnyValue(x => x.CanEditDiscussionItem),
+                RxApp.MainThreadScheduler);
         }
 
         /// <summary>
@@ -168,7 +200,27 @@ namespace CDP4CommonView.ViewModels
                 ? "Error: Not Set"
                 : this.Thing.Author.Person.Name;
 
-            this.IsModifiedAtVisible = this.ModifiedOn > this.CreatedOn;
+            // the data-source stamps ModifiedOn on the create too, a fraction after CreatedOn, so a plain
+            // greater-than marked every reply as edited the moment it was posted
+            this.IsModifiedAtVisible = (this.ModifiedOn - this.CreatedOn) > EditedThreshold;
+        }
+
+        /// <summary>
+        /// Execute the <see cref="DeleteCommand"/>
+        /// </summary>
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task ExecuteDeleteCommand()
+        {
+            // the stock delete confirmation, so removing a reply looks like every other delete in the IME
+            var dialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+            var dialogResult = dialogNavigationService.NavigateModal(new ConfirmationDialogViewModel(this.Thing));
+
+            if (dialogResult?.Result != true)
+            {
+                return;
+            }
+
+            await new AnnotationService().DeleteDiscussionItemAsync(this.Session, this.Thing);
         }
 
         /// <summary>

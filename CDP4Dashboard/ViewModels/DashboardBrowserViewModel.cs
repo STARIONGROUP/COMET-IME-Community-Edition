@@ -31,7 +31,6 @@ namespace CDP4Dashboard.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
@@ -417,15 +416,6 @@ namespace CDP4Dashboard.ViewModels
         {
             base.PopulateContextMenu();
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Dashboard", "", this.CreateCommand, MenuItemKind.Create));
-        }
-
-        /// <summary>
-        /// Not implemented
-        /// </summary>
-        /// <param name="annotation">Not implemented</param>
-        protected override void ExecuteOpenAnnotationWindow(ModellingAnnotationItem annotation)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>

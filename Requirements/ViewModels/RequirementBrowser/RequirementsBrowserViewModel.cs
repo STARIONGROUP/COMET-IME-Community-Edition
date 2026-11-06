@@ -37,7 +37,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Exceptions;
-    using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.ViewModels;
@@ -55,7 +54,6 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Operations;
 
     using CDP4Requirements.Comparers;
     using CDP4Requirements.Services;
@@ -238,6 +236,12 @@ namespace CDP4Requirements.ViewModels
         /// Gets the <see cref="RequirementsSpecificationRowViewModel"/> rows
         /// </summary>
         public DisposableReactiveList<RequirementsSpecificationRowViewModel> ReqSpecificationRows { get; private set; }
+
+        /// <summary>
+        /// Gets the top-level rows of this browser, so the inherited expand / collapse-all commands and the
+        /// annotation refresh reach the whole tree.
+        /// </summary>
+        protected override IEnumerable<IRowViewModelBase<Thing>> RootRowViewModels => this.ReqSpecificationRows;
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="BinaryRelationship"/>
@@ -869,46 +873,6 @@ namespace CDP4Requirements.ViewModels
                 }
             }
 
-            this.ContextMenu.Add(
-                new ContextMenuItemViewModel(
-                    "Create a Model Note",
-                    "",
-                    this.CreateEngineeringModelDataNoteCommand,
-                    MenuItemKind.Create,
-                    ClassKind.EngineeringModelDataNote));
-
-            this.ContextMenu.Add(
-                new ContextMenuItemViewModel(
-                    "Create a Change Request",
-                    "",
-                    this.CreateChangeRequestCommand,
-                    MenuItemKind.Create,
-                    ClassKind.ChangeRequest));
-
-            this.ContextMenu.Add(
-                new ContextMenuItemViewModel(
-                    "Create a Review Item Discrepancy",
-                    "",
-                    this.CreateReviewItemDiscrepancyCommand,
-                    MenuItemKind.Create,
-                    ClassKind.ReviewItemDiscrepancy));
-
-            this.ContextMenu.Add(
-                new ContextMenuItemViewModel(
-                    "Create a Request for Deviation",
-                    "",
-                    this.CreateRequestForDeviationCommand,
-                    MenuItemKind.Create,
-                    ClassKind.RequestForDeviation));
-
-            this.ContextMenu.Add(
-                new ContextMenuItemViewModel(
-                    "Create a Request for Waiver",
-                    "",
-                    this.CreateRequestForWaiverCommand,
-                    MenuItemKind.Create,
-                    ClassKind.RequestForWaiver));
-
             var verifyRequirementsContextMenu = new ContextMenuItemViewModel(
                 "Verify Requirements",
                 "",
@@ -984,16 +948,6 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Open the annotation floating dialog
-        /// </summary>
-        /// <param name="annotation">The associated <see cref="ModellingAnnotationItem"/></param>
-        protected override void ExecuteOpenAnnotationWindow(ModellingAnnotationItem annotation)
-        {
-            var vm = new AnnotationFloatingDialogViewModel(annotation, this.Session);
-            this.DialogNavigationService.NavigateFloating(vm);
-        }
-
-        /// <summary>
         /// Executes the navigation to the <see cref="RequirementsSpecificationEditorViewModel"/>
         /// </summary>
         private void ExecuteNavigateToRequirementsSpecificationEditor()
@@ -1011,45 +965,6 @@ namespace CDP4Requirements.ViewModels
                 this.openRequirementsSpecificationEditorViewModels.Add(vm);
                 this.PanelNavigationService.OpenInDock(vm);
             }
-        }
-
-        /// <summary>
-        /// Execute the creation of a <see cref="ModellingAnnotationItem"/>
-        /// </summary>
-        protected void ExecuteCreateEngineeringModelDataNoteCommand(
-            EngineeringModelDataNote engineeringModelDataNote,
-            Participant participant,
-            DomainOfExpertise owner)
-        {
-            if (this.SelectedThing == null)
-            {
-                return;
-            }
-
-            engineeringModelDataNote.Author = participant;
-            var annotatedThing = new ModellingThingReference(this.SelectedThing.Thing);
-            engineeringModelDataNote.RelatedThing.Add(annotatedThing);
-            engineeringModelDataNote.PrimaryAnnotatedThing = annotatedThing;
-
-            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
-            var model = this.Thing.TopContainer as EngineeringModel;
-
-            if (model == null)
-            {
-                throw new InvalidOperationException("A modelling annotation item can only be created in the context of a Engineering Model.");
-            }
-
-            var containerClone = model.Clone(false);
-            var transaction = new ThingTransaction(transactionContext, containerClone);
-
-            this.ThingDialogNavigationService.Navigate(
-                engineeringModelDataNote,
-                transaction,
-                this.Session,
-                true,
-                ThingDialogKind.Create,
-                this.ThingDialogNavigationService,
-                containerClone);
         }
     }
 }

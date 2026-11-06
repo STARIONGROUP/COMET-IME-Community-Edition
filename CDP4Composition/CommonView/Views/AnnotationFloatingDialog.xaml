@@ -2,67 +2,87 @@
             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+            xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+            xmlns:reportingData="clr-namespace:CDP4Common.ReportingData;assembly=CDP4Common"
             xmlns:views="clr-namespace:CDP4CommonView.Views"
             Title="{Binding ShortName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
             dx:ThemeManager.Theme="Seven"
             Height="Auto"
             MaxHeight="1080"
-            Width="525"
+            Width="680"
             EnableTransparency="True">
     <dx:DXWindow.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
             <DataTemplate x:Key="DiscussionItemTemplate">
-                <dxlc:LayoutGroup Orientation="Horizontal"
-                                  View="GroupBox"
-                                  GroupBoxDisplayMode="Light">
-                    <dxlc:LayoutGroup.Resources>
-                        
-                    </dxlc:LayoutGroup.Resources>
-                    <dxlc:LayoutGroup Orientation="Vertical" 
-                                      Width="100" 
-                                      Height="100"
-                                      View="Group"
-                                      Margin="5">
-                        <dxlc:LayoutItem>
-                            <Image Width="48"
-                                   Height="48"
-                                   Source="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Top"/>
-                        </dxlc:LayoutItem>
-                        <dxlc:LayoutItem Label="{Binding ParticipantFullName, Mode=OneWay}"
-                                         FontSize="8"
-                                         HorizontalAlignment="Left"/>
-                        <dxlc:LayoutItem Label="Posted on: "
-                                         FontSize="8"
-                                         HorizontalAlignment="Left">
-                            <Label Content="{Binding CreatedOn, Mode=OneWay}"
-                                   FontSize="8"/>
-                        </dxlc:LayoutItem>
-                        <dxlc:LayoutItem Label="Edit: "
-                                         Visibility="{Binding IsModifiedAtVisible, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                         FontSize="8"
-                                         HorizontalAlignment="Left">
-                            <Label Content="{Binding ModifiedOn, Mode=OneWay}"
-                                   FontSize="8"/>
-                        </dxlc:LayoutItem>
-                    </dxlc:LayoutGroup>
+                <!--  compact: author, when and the text. No avatar, and the edit stamp only once edited.  -->
+                <Border Margin="0,1"
+                        Padding="6,4"
+                        BorderBrush="#FFE0E4E9"
+                        BorderThickness="0,0,0,1">
+                    <StackPanel>
+                        <!--  Grid, not StackPanel: the edited stamp made the row wide enough to push the buttons
+                              out of the window, so they are pinned to their own column instead  -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                    <dxlc:LayoutItem VerticalAlignment="Stretch">
-                        <views:InlineEditContentUserControl VerticalAlignment="Stretch"
+                            <StackPanel Grid.Column="0"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <TextBlock FontWeight="Bold"
+                                           FontSize="11"
+                                           Text="{Binding ParticipantFullName, Mode=OneWay}" />
+                                <TextBlock Margin="6,0,0,0"
+                                           FontSize="11"
+                                           Foreground="Gray"
+                                           Text="{Binding CreatedOn, Mode=OneWay}" />
+                                <TextBlock Margin="6,0,0,0"
+                                           FontSize="11"
+                                           FontStyle="Italic"
+                                           Foreground="Gray"
+                                           TextTrimming="CharacterEllipsis"
+                                           Visibility="{Binding IsModifiedAtVisible, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Run Text="edited " /><Run Text="{Binding ModifiedOn, Mode=OneWay}" />
+                                </TextBlock>
+                                <!--  which annotation this reply hangs off, since the board is shared  -->
+                                <TextBlock Margin="6,0,0,0"
+                                           FontSize="11"
+                                           Foreground="#FF4A7EBB"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding SourceLabel, Mode=OneWay}" />
+                            </StackPanel>
+
+                            <Button Grid.Column="1"
+                                    Margin="6,0,0,0"
+                                    Padding="1"
+                                    BorderThickness="0"
+                                    Background="Transparent"
+                                    VerticalAlignment="Center"
+                                    ToolTip="Delete this reply"
+                                    Command="{Binding DeleteCommand}">
+                                <Image Width="14"
+                                       Height="14"
+                                       Source="{dx:DXImage Image=Delete_16x16.png}" />
+                            </Button>
+                        </Grid>
+
+                        <views:InlineEditContentUserControl Margin="0,2,0,0"
                                                             HorizontalAlignment="Stretch"
                                                             InlineMode="True"
                                                             StartInPreviewMode="True"
-                                                            BorderThickness="3"
+                                                            BorderThickness="0"
                                                             EventPublisher="{Binding EventPublisher, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ContentText="{Binding Content, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             SaveCommand="{Binding SaveCommand}"
                                                             CancelCommand="{Binding CancelCommand}">
                         </views:InlineEditContentUserControl>
-                    </dxlc:LayoutItem>
-                </dxlc:LayoutGroup>
+                    </StackPanel>
+                </Border>
             </DataTemplate>
         </ResourceDictionary>
     </dx:DXWindow.Resources>
@@ -75,9 +95,17 @@
             <dxlc:LayoutGroup Orientation="Vertical"
                               View="GroupBox"
                               GroupBoxDisplayMode="Light">
+                <dxlc:LayoutItem Label="Kind: "
+                                 LabelPosition="Left">
+                    <dxlc:LayoutItem Label="{Binding Kind, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Title: "
                                  LabelPosition="Left">
                     <dxlc:LayoutItem Label="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Status: "
+                                 LabelPosition="Left">
+                    <dxlc:LayoutItem Label="{Binding Status, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Description: "
                                  LabelPosition="Left">
@@ -87,6 +115,154 @@
                                  LabelPosition="Left">
                     <dxlc:LayoutItem Label="{Binding PrimaryAnnotatedThingName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+
+            <!--  a change request and its proposals belong together, so the proposals live on the request's board  -->
+            <dxlc:LayoutGroup Orientation="Vertical"
+                              View="GroupBox"
+                              GroupBoxDisplayMode="Light"
+                              Header="Change Proposals"
+                              Width="Auto"
+                              Height="Auto"
+                              Visibility="{Binding IsChangeRequest, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <dxlc:LayoutItem>
+                    <ItemsControl HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding ChangeProposalRows, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,2"
+                                        Padding="4"
+                                        BorderBrush="#FFBFCBD9"
+                                        BorderThickness="1">
+                                    <StackPanel>
+                                        <!--  read-only face  -->
+                                        <StackPanel Visibility="{Binding IsNotEditing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <TextBlock FontWeight="Bold">
+                                                <Run Text="{Binding ShortName, Mode=OneWay}" />
+                                                <Run Text=" - " />
+                                                <Run Text="{Binding Title, Mode=OneWay}" />
+                                            </TextBlock>
+
+                                            <!--  the status is shown, so applying a new one visibly changes the card  -->
+                                            <TextBlock Margin="0,2">
+                                                <Run Text="Status: " />
+                                                <Run FontWeight="Bold" Text="{Binding StatusDisplay, Mode=OneWay}" />
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,2"
+                                                       Text="{Binding Content, Mode=OneWay}"
+                                                       TextWrapping="Wrap" />
+
+                                            <!--  the toolbar idiom used by the rest of the IME, so these read as buttons  -->
+                                            <dxb:ToolBarControl Margin="0,4,0,0"
+                                                                AllowCustomizationMenu="False"
+                                                                AllowQuickCustomization="False"
+                                                                Background="Transparent"
+                                                                ShowDragWidget="False">
+                                                <dxb:BarSubItem Content="Set Status"
+                                                                Glyph="{dx:DXImage Image=Apply_16x16.png}"
+                                                                Hint="Set the status of this proposal">
+                                                    <dxb:BarButtonItem Content="Reopen"
+                                                                       Command="{Binding SetStatusCommand}"
+                                                                       CommandParameter="{x:Static reportingData:AnnotationStatusKind.OPEN}" />
+                                                    <dxb:BarButtonItem Content="Mark Implemented"
+                                                                       Command="{Binding SetStatusCommand}"
+                                                                       CommandParameter="{x:Static reportingData:AnnotationStatusKind.DONE}" />
+                                                    <dxb:BarButtonItem Content="Close (Accepted)"
+                                                                       Command="{Binding SetStatusCommand}"
+                                                                       CommandParameter="{x:Static reportingData:AnnotationStatusKind.CLOSED}" />
+                                                    <dxb:BarButtonItem Content="Mark Invalid (Raised in Error)"
+                                                                       Command="{Binding SetStatusCommand}"
+                                                                       CommandParameter="{x:Static reportingData:AnnotationStatusKind.INVALID}" />
+                                                    <dxb:BarButtonItem Content="Mark Won't Fix"
+                                                                       Command="{Binding SetStatusCommand}"
+                                                                       CommandParameter="{x:Static reportingData:AnnotationStatusKind.WONTFIX}" />
+                                                    <dxb:BarButtonItem Content="Mark Not Applicable"
+                                                                       Command="{Binding SetStatusCommand}"
+                                                                       CommandParameter="{x:Static reportingData:AnnotationStatusKind.NOT_APPLICABLE}" />
+                                                </dxb:BarSubItem>
+
+                                                <dxb:BarButtonItem Command="{Binding EditCommand}"
+                                                                   Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                                                   Hint="Edit this proposal" />
+
+                                                <dxb:BarButtonItem Command="{Binding DeleteCommand}"
+                                                                   Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                                                   Hint="Delete this proposal" />
+                                            </dxb:ToolBarControl>
+                                        </StackPanel>
+
+                                        <!--  edit face  -->
+                                        <StackPanel Visibility="{Binding IsEditing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <dxlc:LayoutItem Label="Short Name: " LabelPosition="Left">
+                                                <TextBox Text="{Binding EditShortName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            </dxlc:LayoutItem>
+                                            <dxlc:LayoutItem Label="Title: " LabelPosition="Left">
+                                                <TextBox Text="{Binding EditTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            </dxlc:LayoutItem>
+                                            <dxlc:LayoutItem Label="Proposal: " LabelPosition="Left">
+                                                <TextBox Height="60"
+                                                         AcceptsReturn="True"
+                                                         TextWrapping="Wrap"
+                                                         VerticalScrollBarVisibility="Auto"
+                                                         Text="{Binding EditContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            </dxlc:LayoutItem>
+                                            <StackPanel Margin="0,4,0,0"
+                                                        HorizontalAlignment="Right"
+                                                        Orientation="Horizontal">
+                                                <Button Width="60" Content="Save" Command="{Binding SaveEditCommand}" />
+                                                <Button Margin="4,0,0,0" Width="60" Content="Cancel" Command="{Binding CancelEditCommand}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </dxlc:LayoutItem>
+
+                <!--  once a proposal exists the composer collapses to this one small + button  -->
+                <dxlc:LayoutItem HorizontalAlignment="Left">
+                    <Button Padding="3"
+                            ToolTip="Add a change proposal"
+                            Command="{Binding ShowProposalComposerCommand}"
+                            Visibility="{Binding IsProposalComposerCollapsed, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Image Width="16"
+                               Height="16"
+                               Source="{dx:DXImage Image=Add_16x16.png}" />
+                    </Button>
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutGroup Orientation="Vertical"
+                                  View="Group"
+                                  Width="Auto"
+                                  Height="Auto"
+                                  Visibility="{Binding IsProposalComposerVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <dxlc:LayoutItem Label="Short Name: " LabelPosition="Left">
+                        <TextBox Text="{Binding NewProposalShortName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </dxlc:LayoutItem>
+                    <dxlc:LayoutItem Label="Title: " LabelPosition="Left">
+                        <TextBox Text="{Binding NewProposalTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </dxlc:LayoutItem>
+                    <dxlc:LayoutItem Label="Proposal: " LabelPosition="Left">
+                        <TextBox Height="60"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Text="{Binding NewProposalContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </dxlc:LayoutItem>
+                    <dxlc:LayoutItem HorizontalAlignment="Right">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Propose Change"
+                                    Width="120"
+                                    Command="{Binding CreateChangeProposalCommand}" />
+                            <Button Margin="4,0,0,0"
+                                    Content="Cancel"
+                                    Width="80"
+                                    Command="{Binding CancelProposalComposerCommand}" />
+                        </StackPanel>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
             </dxlc:LayoutGroup>
 
             <dxlc:LayoutGroup Orientation="Vertical"
@@ -107,8 +283,18 @@
                 </dxlc:LayoutItem>
             </dxlc:LayoutGroup>
 
-            <dxlc:LayoutGroup Orientation="Horizontal" 
-                              Height="Auto" 
+            <!--  the board is shared, so a reply has to say which annotation it belongs to  -->
+            <dxlc:LayoutItem Label="Reply to: "
+                             LabelPosition="Left"
+                             Visibility="{Binding HasMultipleReplyTargets, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <dxe:ComboBoxEdit IsTextEditable="False"
+                                  DisplayMember="Caption"
+                                  ItemsSource="{Binding PossibleReplyTargets}"
+                                  EditValue="{Binding SelectedReplyTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </dxlc:LayoutItem>
+
+            <dxlc:LayoutGroup Orientation="Horizontal"
+                              Height="Auto"
                               Width="Auto"
                               Margin="0,3,0,0"
                               View="Group"

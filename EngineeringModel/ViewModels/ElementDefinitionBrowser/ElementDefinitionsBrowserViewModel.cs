@@ -37,7 +37,6 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.ViewModels;
@@ -1053,16 +1052,6 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 Clipboard.SetText(modelCode.ModelCode);
             }
-        }
-
-        /// <summary>
-        /// Executes the <see cref="OpenAnnotationWindowCommand"/>
-        /// </summary>
-        /// <param name="annotation">The associated <see cref="ModellingAnnotationItem"/></param>
-        protected override void ExecuteOpenAnnotationWindow(ModellingAnnotationItem annotation)
-        {
-            var vm = new AnnotationFloatingDialogViewModel(annotation, this.Session);
-            this.DialogNavigationService.NavigateFloating(vm);
         }
 
         /// <summary>

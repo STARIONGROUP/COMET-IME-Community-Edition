@@ -37,6 +37,8 @@ namespace CDP4Requirements.Tests.Services
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Annotations;
+
     using CDP4Dal;
 
     using ClosedXML.Excel;
@@ -295,18 +297,18 @@ namespace CDP4Requirements.Tests.Services
             var vandVItem = this.AddRequirement("VNV-1", true);
             this.AddVerifies(vandVItem, requirement);
 
-            Assert.That(AnnotationQuery.SummarizeState(AnnotationQuery.QueryFor(this.iteration, vandVItem)), Is.EqualTo(AnnotationState.None));
+            Assert.That(AnnotationQuery.SummarizeState(AnnotationQuery.QueryReviewRequestsFor(vandVItem)), Is.EqualTo(AnnotationState.None));
 
             var rid = this.AddRequest(new ReviewItemDiscrepancy(Guid.NewGuid(), this.assembler.Cache, this.uri), "RID-1", vandVItem, AnnotationStatusKind.OPEN);
             var rfd = this.AddRequest(new RequestForDeviation(Guid.NewGuid(), this.assembler.Cache, this.uri), "RFD-1", vandVItem, AnnotationStatusKind.CLOSED);
 
-            Assert.That(AnnotationQuery.SummarizeState(AnnotationQuery.QueryFor(this.iteration, vandVItem)), Is.EqualTo(AnnotationState.Open), "one request is still open");
+            Assert.That(AnnotationQuery.SummarizeState(AnnotationQuery.QueryReviewRequestsFor(vandVItem)), Is.EqualTo(AnnotationState.Open), "one request is still open");
 
             rid.Status = AnnotationStatusKind.DONE;
 
             Assert.Multiple(() =>
             {
-                Assert.That(AnnotationQuery.SummarizeState(AnnotationQuery.QueryFor(this.iteration, vandVItem)), Is.EqualTo(AnnotationState.Resolved));
+                Assert.That(AnnotationQuery.SummarizeState(AnnotationQuery.QueryReviewRequestsFor(vandVItem)), Is.EqualTo(AnnotationState.Resolved));
                 Assert.That(AnnotationQuery.IsOpen(rfd), Is.False);
             });
         }

@@ -109,7 +109,7 @@
                 Background="#FFD8DCBB"
                 BorderBrush="#FF6EB9DC"
                 Click="Edit_OnClick"
-                Content="{dx:DXImageGrayscale Image=Edit_16x16.png}"
+                Content="{dx:DXImage Image=EditName_16x16.png}"
                 Foreground="#00000000"
                 Opacity="0.1"
                 Style="{StaticResource HidingButtonStyle}"

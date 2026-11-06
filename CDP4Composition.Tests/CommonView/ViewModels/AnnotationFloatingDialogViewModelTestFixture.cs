@@ -180,5 +180,59 @@ namespace CDP4CommonView.Tests.ViewModels
             this.messageBus.SendObjectChangeEvent(this.rid, EventKind.Updated);
             Assert.AreEqual(0, vm.DiscussionRows.Count);
         }
+
+        [Test]
+        public async Task VerifyThatAModelNoteOpensItsDiscussionBoard()
+        {
+            // regression: this view-model was typed on ModellingAnnotationItem, so a model note - which is an
+            // EngineeringModelDataAnnotation but not a ModellingAnnotationItem - could not be opened at all
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
+
+            this.ed.Name = "an element";
+
+            var note = new EngineeringModelDataNote(Guid.NewGuid(), this.assembler.Cache, this.uri) { Content = "a note about the element" };
+            var noteReference = new ModellingThingReference(Guid.NewGuid(), this.assembler.Cache, this.uri) { ReferencedThing = this.ed };
+
+            note.PrimaryAnnotatedThing = noteReference;
+            note.RelatedThing.Add(noteReference);
+            this.model.GenericNote.Add(note);
+            this.assembler.Cache.TryAdd(new CacheKey(note.Iid, null), new Lazy<Thing>(() => note));
+
+            var vm = new AnnotationFloatingDialogViewModel(note, this.session.Object);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.Kind, Is.EqualTo("Model Note"));
+                Assert.That(vm.Content, Is.EqualTo("a note about the element"));
+
+                // a note carries no short-name or title of its own, so both fall back to the kind rather than to
+                // the SDK's "not implemented" sentence or to an empty window caption
+                Assert.That(vm.ShortName, Is.EqualTo("NOTE"));
+                Assert.That(vm.Title, Is.EqualTo("Model Note"));
+                Assert.That(vm.Status, Is.Empty);
+                Assert.That(vm.PrimaryAnnotatedThingName, Is.EqualTo(this.ed.UserFriendlyName));
+            });
+
+            vm.NewDiscussionItemText = "a reply on a note";
+            Assert.That(((ICommand)vm.PostDiscussionItemCommand).CanExecute(null), Is.True);
+
+            await vm.PostDiscussionItemCommand.Execute();
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
+        }
+
+        [Test]
+        public void VerifyThatAnAnnotationWithoutAPrimaryAnnotatedThingDoesNotThrow()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
+
+            var orphan = new ReviewItemDiscrepancy(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "RID-2", Title = "no reference", Status = AnnotationStatusKind.OPEN };
+            this.model.ModellingAnnotation.Add(orphan);
+
+            AnnotationFloatingDialogViewModel vm = null;
+
+            Assert.That(() => vm = new AnnotationFloatingDialogViewModel(orphan, this.session.Object), Throws.Nothing);
+            Assert.That(vm.PrimaryAnnotatedThingName, Is.EqualTo("-"));
+        }
     }
 }

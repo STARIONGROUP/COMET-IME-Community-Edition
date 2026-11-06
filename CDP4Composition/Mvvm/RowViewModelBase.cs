@@ -35,9 +35,11 @@ namespace CDP4Composition.Mvvm
     using CDP4Common.CommonData;
     using CDP4Common;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     
+    using CDP4Composition.Annotations;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.MessageBus;
@@ -116,6 +118,26 @@ namespace CDP4Composition.Mvvm
         private string details;
 
         /// <summary>
+        /// Backing field for <see cref="AnnotationState"/>
+        /// </summary>
+        private AnnotationState annotationState;
+
+        /// <summary>
+        /// Backing field for <see cref="AnnotationIndicator"/>
+        /// </summary>
+        private string annotationIndicator = string.Empty;
+
+        /// <summary>
+        /// Backing field for <see cref="AnnotationSummary"/>
+        /// </summary>
+        private string annotationSummary = string.Empty;
+
+        /// <summary>
+        /// Backing field for <see cref="AnnotationList"/>
+        /// </summary>
+        private IReadOnlyList<EngineeringModelDataAnnotation> annotationList = new List<EngineeringModelDataAnnotation>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RowViewModelBase{T}"/> class.
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> represented by the row</param>
@@ -150,6 +172,87 @@ namespace CDP4Composition.Mvvm
 
             this.InitializeSubscriptions();
             this.UpdateTooltip();
+
+            // deliberately not the virtual RefreshAnnotationState: a derived override would run before the derived
+            // constructor body had set its own fields
+            this.UpdateAnnotationState();
+        }
+
+        /// <summary>
+        /// Gets the annotation state of the represented <see cref="Thing"/>, nothing raised, at least one annotation
+        /// still open, or all of them closed out. A browser renders this as a coloured badge so a reader sees that
+        /// something was raised against a row without opening any menu.
+        /// </summary>
+        public AnnotationState AnnotationState
+        {
+            get => this.annotationState;
+            private set => this.RaiseAndSetIfChanged(ref this.annotationState, value);
+        }
+
+        /// <summary>
+        /// Gets the short badge naming the annotation that most needs attention, plus how many others there are, or
+        /// an empty string when nothing was raised against the represented <see cref="Thing"/>.
+        /// </summary>
+        public string AnnotationIndicator
+        {
+            get => this.annotationIndicator;
+            private set => this.RaiseAndSetIfChanged(ref this.annotationIndicator, value);
+        }
+
+        /// <summary>
+        /// Gets the tooltip listing every annotation raised against the represented <see cref="Thing"/>, one line of
+        /// kind, identifier and status each.
+        /// </summary>
+        public string AnnotationSummary
+        {
+            get => this.annotationSummary;
+            private set => this.RaiseAndSetIfChanged(ref this.annotationSummary, value);
+        }
+
+        /// <summary>
+        /// Gets the annotations raised against the represented <see cref="Thing"/>.
+        /// </summary>
+        /// <remarks>
+        /// Exists so a browser can offer a hidden column filtered with
+        /// <see cref="FilterOperators.AnnotationFilterOperatorHandler"/>, the same way the Category column is
+        /// filtered. The filter needs the annotations themselves, not the rendered badge text.
+        /// </remarks>
+        public IReadOnlyList<EngineeringModelDataAnnotation> AnnotationList
+        {
+            get => this.annotationList;
+            private set => this.RaiseAndSetIfChanged(ref this.annotationList, value);
+        }
+
+        /// <summary>
+        /// Re-reads the annotations raised against the represented <see cref="Thing"/>.
+        /// </summary>
+        /// <remarks>
+        /// Driven by the browser rather than by a per-row subscription: an annotation is contained by the
+        /// <see cref="EngineeringModel"/>, not by the annotated thing, so a row never sees its own annotation change.
+        /// </remarks>
+        public virtual void RefreshAnnotationState()
+        {
+            this.UpdateAnnotationState();
+        }
+
+        /// <summary>
+        /// Re-reads the annotations raised against the represented <see cref="Thing"/>, without virtual dispatch so
+        /// that the constructor can call it safely.
+        /// </summary>
+        private void UpdateAnnotationState()
+        {
+            var annotations = AnnotationQuery.QueryAllFor(this.Thing);
+
+            this.AnnotationList = annotations;
+            this.AnnotationState = AnnotationQuery.SummarizeState(annotations);
+            this.AnnotationIndicator = AnnotationQuery.DescribeIndicator(annotations);
+            this.AnnotationSummary = AnnotationQuery.DescribeSummary(annotations);
+
+            // the row icon reads its dot off the ThingStatus, which is otherwise only rebuilt when the represented
+            // thing itself changes; an annotation is contained by the model, so the dot would stay stale.
+            // Deliberately not routed through the virtual UpdateThingStatus: rows whose UpdateThingStatus re-reads
+            // their projected properties call back into here, which recursed until the stack blew.
+            this.ThingStatus?.RefreshAnnotationState();
         }
 
         /// <summary>

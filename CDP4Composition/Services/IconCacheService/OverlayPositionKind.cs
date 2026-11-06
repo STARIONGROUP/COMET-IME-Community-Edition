@@ -38,6 +38,11 @@ namespace CDP4Composition.Services
         /// <summary>
         /// Asserts that the overlay shall be palced on the bottom right corner
         /// </summary>
-        BottomRight
+        BottomRight,
+
+        /// <summary>
+        /// Asserts that the overlay shall be placed on the bottom left corner
+        /// </summary>
+        BottomLeft
     }
 }
