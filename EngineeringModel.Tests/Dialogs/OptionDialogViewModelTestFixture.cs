@@ -265,6 +265,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             vm.SelectedBaselineOption = baseline;
             await vm.ResetElementUsagesCommand.Execute();
             Assert.That(vm.ElementUsageRows.Select(x => x.IsIncluded), Is.EqualTo(PersistedInclusions));
+            Assert.That(vm.ElementUsageRows.Select(x => x.HasChanged), Is.All.False);
             Assert.That(vm.SelectedBaselineOption, Is.Null);
 
             clone = this.iteration.Clone(false);

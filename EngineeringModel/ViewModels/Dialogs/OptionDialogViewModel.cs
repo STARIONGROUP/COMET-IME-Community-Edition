@@ -224,7 +224,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            foreach (var row in this.ElementUsageRows.Where(x => x.IsIncluded != x.WasIncluded))
+            foreach (var row in this.ElementUsageRows.Where(x => x.HasChanged))
             {
                 var clone = row.Thing.Clone(false);
 
@@ -269,7 +269,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             foreach (var row in this.ElementUsageRows)
             {
-                row.IsIncluded = row.WasIncluded;
+                row.Reset();
             }
         }
 

@@ -85,9 +85,14 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs.Rows
         public bool IsEditable { get; }
 
         /// <summary>
+        /// Gets a value indicating whether <see cref="IsIncluded"/> differs from the persisted inclusion of the <see cref="ElementUsage"/>.
+        /// </summary>
+        public bool HasChanged => this.IsIncluded != this.WasIncluded;
+
+        /// <summary>
         /// Gets a value indicating whether the <see cref="ElementUsage"/> is included in the <see cref="Option"/> as currently persisted.
         /// </summary>
-        public bool WasIncluded { get; }
+        private bool WasIncluded { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="ElementUsage"/> is included in the <see cref="Option"/>.
@@ -104,5 +109,10 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs.Rows
         /// <param name="option">The <see cref="Option"/> to check.</param>
         /// <returns><c>true</c> when the <paramref name="option"/> is not excluded from the <see cref="ElementUsage"/>.</returns>
         public bool IsIncludedIn(Option option) => this.Thing.ExcludeOption.TrueForAll(x => x.Iid != option.Iid);
+
+        /// <summary>
+        /// Restores <see cref="IsIncluded"/> to the persisted inclusion of the <see cref="ElementUsage"/>.
+        /// </summary>
+        public void Reset() => this.IsIncluded = this.WasIncluded;
     }
 }
