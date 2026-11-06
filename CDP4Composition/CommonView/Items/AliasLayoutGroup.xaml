@@ -59,7 +59,7 @@
                                Hint="Show Help" />
         </dxb:ToolBarControl>
     </dxlc:LayoutItem>
-    <dxlc:LayoutItem>
+    <dxlc:LayoutItem VerticalAlignment="Stretch">
         <dxg:GridControl AllowLiveDataShaping="False"
                          ItemsSource="{Binding Alias}"
                          SelectedItem="{Binding SelectedAlias,
