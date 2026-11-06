@@ -28,6 +28,7 @@ namespace ProductTree.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading;
@@ -528,20 +529,27 @@ namespace ProductTree.Tests
 
             vm.SelectedThing = usageRow;
 
-            Assert.IsTrue(vm.CanEditElementDefinition);
-            Assert.IsTrue(((ICommand)vm.EditElementDefinitionCommand).CanExecute(null));
-
             vm.PopulateContextMenu();
 
-            var editMenus = vm.ContextMenu.Where(x => x.Header == "Edit").ToList();
+            var editMenus = vm.ContextMenu.Where(x => x.MenuItemKind == MenuItemKind.Edit && x.Header == "Edit").ToList();
             Assert.That(editMenus, Has.Count.EqualTo(1));
+            Assert.That(vm.ContextMenu.Where(x => x.MenuItemKind == MenuItemKind.Edit && x.MenuCommand == vm.UpdateCommand), Is.Empty);
 
             var editMenu = editMenus.Single();
             Assert.That(editMenu.SubMenu.Select(x => x.Header), Is.EqualTo(new[] { "Element Usage", "Element Definition" }));
-            Assert.That(editMenu.SubMenu.Single(x => x.Header == "Element Definition").MenuCommand, Is.SameAs(vm.EditElementDefinitionCommand));
-            Assert.That(editMenu.SubMenu.Single(x => x.Header == "Element Usage").MenuCommand, Is.SameAs(vm.UpdateCommand));
 
-            await vm.EditElementDefinitionCommand.Execute();
+            var editUsage = editMenu.SubMenu.Single(x => x.Header == "Element Usage");
+            Assert.That(editUsage.MenuCommand, Is.SameAs(vm.UpdateCommand));
+            Assert.That(editUsage.InputGestureText, Is.EqualTo("CTRL+E"));
+
+            var editDefinition = editMenu.SubMenu.Single(x => x.Header == "Element Definition");
+            Assert.That(editDefinition.RelatedThing, Is.SameAs(usedDefinition));
+            Assert.IsTrue(editDefinition.CanExecute);
+            Assert.IsTrue(editDefinition.MenuCommand.CanExecute(null));
+
+            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+
+            await ((ReactiveCommand<Unit, Unit>)editDefinition.MenuCommand).Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -565,7 +573,6 @@ namespace ProductTree.Tests
             vm.SelectedThing = vm.TopElement.Single();
             vm.PopulateContextMenu();
 
-            Assert.IsFalse(vm.CanEditElementDefinition);
             Assert.That(vm.ContextMenu.SelectMany(x => x.SubMenu ?? new List<ContextMenuItemViewModel>()).Select(x => x.Header), Has.No.Member("Element Definition"));
 
             var usedDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
@@ -576,12 +583,16 @@ namespace ProductTree.Tests
                 ElementDefinition = usedDefinition
             };
 
-            this.permissionService.Setup(x => x.CanWrite(usedDefinition)).Returns(false);
-
             vm.SelectedThing = new ElementUsageRowViewModel(elementUsage, this.option, this.session.Object, null);
 
-            Assert.IsFalse(vm.CanEditElementDefinition);
-            Assert.IsFalse(((ICommand)vm.EditElementDefinitionCommand).CanExecute(null));
+            this.permissionService.Setup(x => x.CanWrite(usedDefinition)).Returns(false);
+
+            vm.PopulateContextMenu();
+
+            var editDefinition = vm.ContextMenu.Single(x => x.MenuItemKind == MenuItemKind.Edit && x.Header == "Edit").SubMenu.Single(x => x.Header == "Element Definition");
+
+            Assert.IsFalse(editDefinition.CanExecute);
+            Assert.IsFalse(editDefinition.MenuCommand.CanExecute(null));
         }
 
         [Test]
