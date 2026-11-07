@@ -333,6 +333,22 @@ namespace ProductTree.Tests.ProductTreeRows
         }
 
         [Test]
+        public void VerifyThatDragOverIsNotAllowedWithoutPermissionOnTheTargetElementDefinition()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(ClassKind.ElementUsage, this.elementDef)).Returns(false);
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementDef2);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
+        }
+
+        [Test]
         public void VerifyThatDragOverWorks2()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
