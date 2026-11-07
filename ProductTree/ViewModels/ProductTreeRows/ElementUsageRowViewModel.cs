@@ -713,6 +713,18 @@ namespace CDP4ProductTree.ViewModels
                     this.parameterGroupCache[group.ContainingGroup].ContainedRows.RemoveWithoutDispose(this.parameterGroupCache[group]);
                 }
 
+                // Replace Groups before Dispose of deleted group
+                foreach (var kvp in this.parameterGroupContainment.Where(x => x.Value == group).ToList())
+                {
+                    this.UpdateParameterGroupPosition(kvp.Key);
+                }
+
+                // Replace parameters before Dispose of deleted group
+                foreach (var kvp in this.parameterOrOverrideContainerMap.Where(x => x.Value == group).ToList())
+                {
+                    this.UpdateParameterBasePosition(kvp.Key);
+                }
+
                 this.parameterGroupCache[group].Dispose();
                 this.parameterGroupCache.Remove(group);
                 this.parameterGroupContainment.Remove(group);

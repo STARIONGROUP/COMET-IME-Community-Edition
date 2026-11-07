@@ -28,6 +28,7 @@ namespace ProductTree.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading;
@@ -517,6 +518,45 @@ namespace ProductTree.Tests
 
             vm.PopulateContextMenu();
             Assert.AreEqual(7, vm.ContextMenu.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatParameterGroupIsDeletedWithItsParameters()
+        {
+            var parameterType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "type", ShortName = "type" };
+            var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "group" };
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain, ParameterType = parameterType, Group = group };
+            var ungroupedParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain, ParameterType = parameterType };
+
+            this.elementDef.ParameterGroup.Add(group);
+            this.elementDef.Parameter.Add(parameter);
+            this.elementDef.Parameter.Add(ungroupedParameter);
+
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, this.iteration.Iid), new Lazy<Thing>(() => group));
+            this.assembler.Cache.TryAdd(new CacheKey(parameter.Iid, this.iteration.Iid), new Lazy<Thing>(() => parameter));
+
+            var deleteSteps = new List<List<Guid>>();
+
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>()))
+                .Callback<OperationContainer>(x => deleteSteps.Add(x.Operations.Select(operation => operation.ModifiedThing.Iid).ToList()))
+                .Returns(Task.CompletedTask);
+
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            vm.SelectedThing = vm.TopElement.Single().ContainedRows.Single(x => x.Thing == group);
+            vm.PopulateContextMenu();
+
+            Assert.That(vm.ContextMenu.Single(x => x.Header == "Delete this Parameter Group").MenuCommand, Is.SameAs(vm.DeleteCommand));
+
+            var deleteItem = vm.ContextMenu.Single(x => x.Header == "Delete this Parameter Group and its Parameters");
+            Assert.IsTrue(deleteItem.CanExecute);
+
+            await ((ReactiveCommand<Unit, Unit>)deleteItem.MenuCommand).Execute();
+
+            Assert.That(deleteSteps, Has.Count.EqualTo(2), vm.Feedback);
+            Assert.That(deleteSteps[0], Is.EqualTo(new[] { parameter.Iid }));
+            Assert.That(deleteSteps[1], Is.EqualTo(new[] { group.Iid }));
         }
 
         [Test]

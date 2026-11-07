@@ -269,6 +269,43 @@ namespace ProductTree.Tests.ProductTreeRows
         }
 
         [Test]
+        public void VerifyThatContentOfDeletedGroupIsMovedAndCanBeDeleted()
+        {
+            var revisionProperty = typeof(ElementDefinition).GetProperty("RevisionNumber");
+
+            var group = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "group" };
+            var nestedGroup = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "nested", ContainingGroup = group };
+            var type = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "type" };
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type, Owner = this.domain, Group = group };
+            parameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri) { Published = new ValueArray<string>(new List<string> { "1" }), Manual = new ValueArray<string>(new List<string> { "1" }), ValueSwitch = ParameterSwitchKind.MANUAL });
+
+            this.elementDef.ParameterGroup.Add(group);
+            this.elementDef.ParameterGroup.Add(nestedGroup);
+            this.elementDef.Parameter.Add(parameter);
+
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+
+            var groupRow = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Single();
+            Assert.That(groupRow.ContainedRows.Any(x => x.Thing == parameter), Is.True);
+
+            // the server removes the references to the deleted group
+            parameter.Group = null;
+            nestedGroup.ContainingGroup = null;
+            this.elementDef.ParameterGroup.Remove(group);
+            revisionProperty.SetValue(this.elementDef, 50);
+            this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
+
+            Assert.That(vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Single().Thing, Is.SameAs(nestedGroup));
+            Assert.That(vm.ContainedRows.Any(x => x.Thing == parameter), Is.True);
+
+            this.elementDef.Parameter.Remove(parameter);
+            revisionProperty.SetValue(this.elementDef, 60);
+
+            Assert.DoesNotThrow(() => this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated));
+            Assert.That(vm.ContainedRows.Any(x => x.Thing == parameter), Is.False);
+        }
+
+        [Test]
         public void VerifyThatParametersAreCorrectlyHandled()
         {
             var revisionProperty = typeof(ElementDefinition).GetProperty("RevisionNumber");
