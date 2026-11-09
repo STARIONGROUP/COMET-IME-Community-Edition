@@ -789,7 +789,7 @@ namespace CDP4ProductTree.ViewModels
         /// <param name="elementDefinition">The <see cref="ElementDefinition"/> in the payload</param>
         private void DragOver(IDropInfo dropinfo, ElementDefinition elementDefinition)
         {
-            if (!this.PermissionService.CanWrite(ClassKind.ElementUsage, this.Thing.Container))
+            if (!this.PermissionService.CanWrite(ClassKind.ElementUsage, this.Thing))
             {
                 dropinfo.Effects = DragDropEffects.None;
                 return;
