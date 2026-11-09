@@ -607,6 +607,93 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Adds the <see cref="ContextMenuItemViewModel"/> to delete a <see cref="ParameterGroup"/> together with its <see cref="Parameter"/>s and nested <see cref="ParameterGroup"/>s
+        /// </summary>
+        /// <param name="parameterGroup">The <see cref="ParameterGroup"/></param>
+        protected void AddDeleteParameterGroupWithParametersContextMenuItem(ParameterGroup parameterGroup)
+        {
+            var groups = QueryGroupAndNestedGroups(parameterGroup);
+            var canDelete = groups.All(this.PermissionService.CanWrite) && groups.SelectMany(x => x.ContainedParameter()).All(this.PermissionService.CanWrite);
+
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Delete this Parameter Group and its Parameters", "", this.ExecuteDeleteParameterGroupWithParameters, parameterGroup, canDelete, MenuItemKind.Delete));
+        }
+
+        /// <summary>
+        /// Queries a <see cref="ParameterGroup"/> together with all its nested <see cref="ParameterGroup"/>s
+        /// </summary>
+        /// <param name="parameterGroup">The <see cref="ParameterGroup"/></param>
+        /// <returns>The <see cref="ParameterGroup"/> followed by its nested <see cref="ParameterGroup"/>s</returns>
+        private static List<ParameterGroup> QueryGroupAndNestedGroups(ParameterGroup parameterGroup)
+        {
+            var groups = new List<ParameterGroup> { parameterGroup };
+            groups.AddRange(parameterGroup.ContainedGroup(true));
+
+            return groups;
+        }
+
+        /// <summary>
+        /// Deletes a <see cref="ParameterGroup"/> together with its <see cref="Parameter"/>s and nested <see cref="ParameterGroup"/>s
+        /// </summary>
+        /// <param name="thing">The <see cref="ParameterGroup"/> to delete</param>
+        /// <remarks>
+        /// The rows of the browsers require a <see cref="ParameterGroup"/> to outlive what it contains.
+        /// The <see cref="Parameter"/>s are therefore deleted first, followed by each <see cref="ParameterGroup"/> starting from the most nested one.
+        /// </remarks>
+        private async void ExecuteDeleteParameterGroupWithParameters(Thing thing)
+        {
+            if (!(thing is ParameterGroup parameterGroup) || !this.IsDeleteCommandAllowed())
+            {
+                return;
+            }
+
+            var confirmation = new ConfirmationDialogViewModel(parameterGroup) { DeletedThingText = "Parameter Group and its Parameters" };
+            var dialogResult = this.dialogNavigationService.NavigateModal(confirmation);
+
+            if (dialogResult == null || !dialogResult.Result.HasValue || !dialogResult.Result.Value)
+            {
+                return;
+            }
+
+            var groups = QueryGroupAndNestedGroups(parameterGroup);
+            var parameters = groups.SelectMany(x => x.ContainedParameter()).ToList();
+
+            var deleteSteps = new List<IEnumerable<Thing>>();
+
+            if (parameters.Any())
+            {
+                deleteSteps.Add(parameters);
+            }
+
+            deleteSteps.AddRange(Enumerable.Reverse(groups).Select(x => new Thing[] { x }));
+
+            this.IsBusy = true;
+
+            try
+            {
+                foreach (var deleteStep in deleteSteps)
+                {
+                    var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.Thing));
+
+                    foreach (var thingToDelete in deleteStep)
+                    {
+                        transaction.Delete(thingToDelete.Clone(false));
+                    }
+
+                    await this.Session.Write(transaction.FinalizeTransaction());
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("An error was produced when deleting the {0}: {1}", thing.ClassKind, ex.Message);
+                this.Feedback = ex.Message;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
         /// Check if the Delete Command asociated to this ViewModel is allowed.
         /// </summary>
         /// <returns>True if the Delete Command is allowed, false otherwise</returns>

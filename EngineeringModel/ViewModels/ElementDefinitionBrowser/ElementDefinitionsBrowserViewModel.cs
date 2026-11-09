@@ -780,6 +780,8 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy the Parameter Group", "CTRL+C", this.CopyParameterGroupCommand, MenuItemKind.Copy, ClassKind.ParameterGroup));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Paste a Parameter or Parameter Group", "CTRL+V", this.PasteParameterGroupCommand, MenuItemKind.None, ClassKind.ParameterGroup));
+
+                this.AddDeleteParameterGroupWithParametersContextMenuItem(parameterGroupRow.Thing);
                 return;
             }
 

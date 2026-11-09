@@ -409,6 +409,43 @@ namespace ProductTree.Tests.ProductTreeRows
         }
 
         [Test]
+        public void VerifyThatContentOfDeletedGroupIsMovedAndCanBeDeleted()
+        {
+            var revisionProperty = typeof(ElementDefinition).GetProperty("RevisionNumber");
+
+            var group = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "group" };
+            var nestedGroup = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "nested", ContainingGroup = group };
+            var type = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "type" };
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type, Owner = this.domain, Group = group };
+            parameter.ValueSet.Add(this.valueSet);
+
+            this.elementDef2.ParameterGroup.Add(group);
+            this.elementDef2.ParameterGroup.Add(nestedGroup);
+            this.elementDef2.Parameter.Add(parameter);
+
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+
+            var groupRow = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Single();
+            Assert.That(groupRow.ContainedRows.Any(x => x.Thing == parameter), Is.True);
+
+            // the server removes the references to the deleted group
+            parameter.Group = null;
+            nestedGroup.ContainingGroup = null;
+            this.elementDef2.ParameterGroup.Remove(group);
+            revisionProperty.SetValue(this.elementDef2, 50);
+            this.messageBus.SendObjectChangeEvent(this.elementDef2, EventKind.Updated);
+
+            Assert.That(vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Single().Thing, Is.SameAs(nestedGroup));
+            Assert.That(vm.ContainedRows.Any(x => x.Thing == parameter), Is.True);
+
+            this.elementDef2.Parameter.Remove(parameter);
+            revisionProperty.SetValue(this.elementDef2, 60);
+
+            Assert.DoesNotThrow(() => this.messageBus.SendObjectChangeEvent(this.elementDef2, EventKind.Updated));
+            Assert.That(vm.ContainedRows.Any(x => x.Thing == parameter), Is.False);
+        }
+
+        [Test]
         public void VerifyThatDragOverWorks()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);

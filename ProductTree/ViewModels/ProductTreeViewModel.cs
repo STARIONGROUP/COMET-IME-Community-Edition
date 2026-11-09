@@ -495,6 +495,11 @@ namespace CDP4ProductTree.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
             }
 
+            if (this.SelectedThing is ParameterGroupRowViewModel parameterGroupRow)
+            {
+                this.AddDeleteParameterGroupWithParametersContextMenuItem(parameterGroupRow.Thing);
+            }
+
             if (this.SelectedThing is IHavePath)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));

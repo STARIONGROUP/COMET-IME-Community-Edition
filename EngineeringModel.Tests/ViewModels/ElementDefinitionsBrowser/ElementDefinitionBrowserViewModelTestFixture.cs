@@ -28,6 +28,7 @@ namespace CDP4EngineeringModel.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reflection;
@@ -660,7 +661,7 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = defRow.ContainedRows[1];
             vm.PopulateContextMenu();
-            Assert.AreEqual(11, vm.ContextMenu.Count);
+            Assert.AreEqual(12, vm.ContextMenu.Count);
 
             var usageRow = defRow.ContainedRows[2];
             var usage2Row = defRow.ContainedRows[3];
@@ -825,6 +826,199 @@ namespace CDP4EngineeringModel.Tests
 
             await vm.CreateParameterGroup.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.Is<ParameterGroup>(gr => gr.ContainingGroup == group), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<Thing>(), null));
+        }
+
+        [Test]
+        public async Task VerifyThatParameterGroupIsDeletedWithItsParametersInTheExpectedOrder()
+        {
+            var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "group" };
+            var nestedGroup = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "nested", ContainingGroup = group };
+            var deepGroup = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "deep", ContainingGroup = nestedGroup };
+            var otherGroup = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "other" };
+
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Group = group };
+            var deepParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Group = deepGroup };
+            var otherParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Group = otherGroup };
+            var ungroupedParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain };
+
+            this.elementDef.ParameterGroup.Add(group);
+            this.elementDef.ParameterGroup.Add(nestedGroup);
+            this.elementDef.ParameterGroup.Add(deepGroup);
+            this.elementDef.ParameterGroup.Add(otherGroup);
+            this.elementDef.Parameter.Add(parameter);
+            this.elementDef.Parameter.Add(deepParameter);
+            this.elementDef.Parameter.Add(otherParameter);
+            this.elementDef.Parameter.Add(ungroupedParameter);
+            this.iteration.Element.Add(this.elementDef);
+
+            foreach (var thing in new Thing[] { group, nestedGroup, deepGroup, parameter, deepParameter })
+            {
+                this.assembler.Cache.TryAdd(new CacheKey(thing.Iid, this.iteration.Iid), new Lazy<Thing>(() => thing));
+            }
+
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(true));
+
+            var deleteSteps = new List<List<Guid>>();
+
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>()))
+                .Callback<OperationContainer>(x =>
+                {
+                    Assert.That(x.Operations.All(operation => operation.OperationKind == OperationKind.Delete), Is.True);
+                    deleteSteps.Add(x.Operations.Select(operation => operation.ModifiedThing.Iid).ToList());
+                })
+                .Returns(Task.CompletedTask);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            vm.SelectedThing = vm.ElementDefinitionRowViewModels.Single().ContainedRows.Single(x => x.Thing == group);
+            vm.PopulateContextMenu();
+
+            Assert.That(vm.ContextMenu.Single(x => x.Header == "Delete this Parameter Group").MenuCommand, Is.SameAs(vm.DeleteCommand));
+
+            var deleteItem = vm.ContextMenu.Single(x => x.Header == "Delete this Parameter Group and its Parameters");
+            Assert.IsTrue(deleteItem.CanExecute);
+
+            await ((ReactiveCommand<Unit, Unit>)deleteItem.MenuCommand).Execute();
+
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.Is<IDialogViewModel>(dialog => dialog is CDP4Composition.ViewModels.ConfirmationDialogViewModel)), Times.Once);
+
+            Assert.That(deleteSteps, Has.Count.EqualTo(4), vm.Feedback);
+            Assert.That(deleteSteps[0], Is.EquivalentTo(new[] { parameter.Iid, deepParameter.Iid }));
+            Assert.That(deleteSteps[1], Is.EqualTo(new[] { deepGroup.Iid }));
+            Assert.That(deleteSteps[2], Is.EqualTo(new[] { nestedGroup.Iid }));
+            Assert.That(deleteSteps[3], Is.EqualTo(new[] { group.Iid }));
+        }
+
+        [Test]
+        public async Task VerifyThatEmptyParameterGroupIsDeletedWithoutAParameterStep()
+        {
+            var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "group" };
+            this.elementDef.ParameterGroup.Add(group);
+            this.iteration.Element.Add(this.elementDef);
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, this.iteration.Iid), new Lazy<Thing>(() => group));
+
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(true));
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            vm.SelectedThing = vm.ElementDefinitionRowViewModels.Single().ContainedRows.Single(x => x.Thing == group);
+            vm.PopulateContextMenu();
+
+            var deleteItem = vm.ContextMenu.Single(x => x.Header == "Delete this Parameter Group and its Parameters");
+            await ((ReactiveCommand<Unit, Unit>)deleteItem.MenuCommand).Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            Assert.IsNull(vm.Feedback);
+        }
+
+        [Test]
+        public async Task VerifyThatDeletingStopsWhenAStepFails()
+        {
+            var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "group" };
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Group = group };
+
+            this.elementDef.ParameterGroup.Add(group);
+            this.elementDef.Parameter.Add(parameter);
+            this.iteration.Element.Add(this.elementDef);
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, this.iteration.Iid), new Lazy<Thing>(() => group));
+            this.assembler.Cache.TryAdd(new CacheKey(parameter.Iid, this.iteration.Iid), new Lazy<Thing>(() => parameter));
+
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(true));
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            vm.SelectedThing = vm.ElementDefinitionRowViewModels.Single().ContainedRows.Single(x => x.Thing == group);
+            vm.PopulateContextMenu();
+
+            var deleteItem = vm.ContextMenu.Single(x => x.Header == "Delete this Parameter Group and its Parameters");
+            await ((ReactiveCommand<Unit, Unit>)deleteItem.MenuCommand).Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            Assert.That(vm.Feedback, Is.EqualTo("test"));
+            Assert.IsFalse(vm.IsBusy);
+        }
+
+        [Test]
+        public async Task VerifyThatParameterGroupIsNotDeletedWithItsParametersWhenNotConfirmed()
+        {
+            var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "group" };
+            this.elementDef.ParameterGroup.Add(group);
+            this.iteration.Element.Add(this.elementDef);
+
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(false));
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            vm.SelectedThing = vm.ElementDefinitionRowViewModels.Single().ContainedRows.Single(x => x.Thing == group);
+            vm.PopulateContextMenu();
+
+            var deleteItem = vm.ContextMenu.Single(x => x.Header == "Delete this Parameter Group and its Parameters");
+            await ((ReactiveCommand<Unit, Unit>)deleteItem.MenuCommand).Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+        }
+
+        [Test]
+        public async Task VerifyThatDeleteParameterGroupWithParametersIsDisabledWithoutPermissionOnAParameter()
+        {
+            var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "group" };
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Group = group };
+
+            this.elementDef.ParameterGroup.Add(group);
+            this.elementDef.Parameter.Add(parameter);
+            this.iteration.Element.Add(this.elementDef);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            vm.SelectedThing = vm.ElementDefinitionRowViewModels.Single().ContainedRows.Single(x => x.Thing == group);
+
+            this.permissionService.Setup(x => x.CanWrite(parameter)).Returns(false);
+
+            vm.PopulateContextMenu();
+
+            var deleteItem = vm.ContextMenu.Single(x => x.Header == "Delete this Parameter Group and its Parameters");
+
+            Assert.IsFalse(deleteItem.CanExecute);
+            Assert.IsFalse(deleteItem.MenuCommand.CanExecute(null));
+        }
+
+        [Test]
+        public async Task VerifyThatRowsAreUpdatedWhenParametersAndGroupsAreDeletedInSteps()
+        {
+            var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "group" };
+            var nestedGroup = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "nested", ContainingGroup = group };
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Group = nestedGroup };
+            var ungroupedParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain };
+
+            this.elementDef.ParameterGroup.Add(group);
+            this.elementDef.ParameterGroup.Add(nestedGroup);
+            this.elementDef.Parameter.Add(parameter);
+            this.elementDef.Parameter.Add(ungroupedParameter);
+            this.iteration.Element.Add(this.elementDef);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            var definitionRow = vm.ElementDefinitionRowViewModels.Single();
+
+            var revision = 50;
+
+            foreach (Action deleteStep in new Action[] { () => this.elementDef.Parameter.Remove(parameter), () => this.elementDef.ParameterGroup.Remove(nestedGroup), () => this.elementDef.ParameterGroup.Remove(group) })
+            {
+                deleteStep();
+                this.rev.SetValue(this.elementDef, revision++);
+                this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
+            }
+
+            Assert.That(definitionRow.ContainedRows.Any(x => x.Thing is ParameterGroup), Is.False);
+            Assert.That(definitionRow.ContainedRows.Count(x => x.Thing == ungroupedParameter), Is.EqualTo(1));
+            Assert.That(definitionRow.ContainedRows.Any(x => x.Thing == parameter), Is.False);
         }
 
         [Test]
