@@ -495,6 +495,28 @@ namespace CDP4ProductTree.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
             }
 
+            if (this.SelectedThing is ElementUsageRowViewModel usageRow)
+            {
+                var definition = usageRow.Thing.ElementDefinition;
+
+                var editMenu = new ContextMenuItemViewModel("Edit", "", null, MenuItemKind.Edit);
+                editMenu.SubMenu.Add(new ContextMenuItemViewModel("Element Usage", "CTRL+E", this.UpdateCommand, MenuItemKind.Edit, ClassKind.ElementUsage));
+                editMenu.SubMenu.Add(new ContextMenuItemViewModel("Element Definition", "", this.ExecuteUpdateCommand, definition, this.PermissionService.CanWrite(definition), MenuItemKind.Edit));
+
+                var genericEditMenuItem = this.ContextMenu.FirstOrDefault(x => x.MenuItemKind == MenuItemKind.Edit && x.MenuCommand == this.UpdateCommand);
+
+                if (genericEditMenuItem != null)
+                {
+                    var index = this.ContextMenu.IndexOf(genericEditMenuItem);
+                    this.ContextMenu.RemoveAt(index);
+                    this.ContextMenu.Insert(index, editMenu);
+                }
+                else
+                {
+                    this.ContextMenu.Insert(0, editMenu);
+                }
+            }
+
             if (this.SelectedThing is IHavePath)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
