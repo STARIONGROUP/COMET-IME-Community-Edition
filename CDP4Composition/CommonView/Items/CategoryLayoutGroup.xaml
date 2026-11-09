@@ -11,7 +11,7 @@
                   mc:Ignorable="d"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch">
-    <dxlc:LayoutItem>
+    <dxlc:LayoutItem VerticalAlignment="Stretch">
         <items:CategorySelectionGrid behaviours:CategorySelectionGridProperties.PossibleCategories="{Binding PossibleCategory}"
                                      behaviours:CategorySelectionGridProperties.SelectedCategories="{Binding Category}"
                                      behaviours:CategorySelectionGridProperties.IsReadOnly="{Binding IsReadOnly}" />

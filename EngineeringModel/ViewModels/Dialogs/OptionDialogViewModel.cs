@@ -26,8 +26,11 @@
 
 namespace CDP4EngineeringModel.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -40,6 +43,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using CDP4EngineeringModel.ViewModels.Dialogs.Rows;
+
     using ReactiveUI;
 
     /// <summary>
@@ -49,6 +54,17 @@ namespace CDP4EngineeringModel.ViewModels
     public class OptionDialogViewModel : CDP4CommonView.OptionDialogViewModel, IThingDialogViewModel
     {
         private bool isDefault;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedBaselineOption"/>.
+        /// </summary>
+        private Option selectedBaselineOption;
+
+        /// <summary>
+        /// Backing field for <see cref="ElementUsageRows"/>, built on first access so that the permission check of every
+        /// <see cref="ElementUsage"/> is only paid when the Element Usages tab is shown.
+        /// </summary>
+        private Lazy<List<OptionElementUsageRowViewModel>> elementUsageRows;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionDialogViewModel"/> class.
@@ -101,6 +117,76 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets the rows that set which <see cref="ElementUsage"/>s of the <see cref="Iteration"/> are included in the <see cref="Option"/>.
+        /// </summary>
+        public List<OptionElementUsageRowViewModel> ElementUsageRows => this.elementUsageRows.Value;
+
+        /// <summary>
+        /// Gets the other <see cref="Option"/>s of the <see cref="Iteration"/> that <see cref="ElementUsageRows"/> can be filled from.
+        /// </summary>
+        public List<Option> PossibleBaselineOption { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Option"/> whose inclusions are copied to the editable <see cref="ElementUsageRows"/> when selected.
+        /// </summary>
+        public Option SelectedBaselineOption
+        {
+            get => this.selectedBaselineOption;
+            set => this.RaiseAndSetIfChanged(ref this.selectedBaselineOption, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether <see cref="ElementUsageRows"/> cannot be edited.
+        /// A nested dialog cannot edit them since the parent dialog may still delete the <see cref="Option"/> they would refer to.
+        /// </summary>
+        public bool IsElementUsagesReadOnly => this.IsReadOnly || !this.isRoot;
+
+        /// <summary>
+        /// Gets the command that includes every editable <see cref="ElementUsage"/> in the <see cref="Option"/>.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CheckAllElementUsagesCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that excludes every editable <see cref="ElementUsage"/> from the <see cref="Option"/>.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> UncheckAllElementUsagesCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command that restores <see cref="ElementUsageRows"/> to the state they were in when first shown.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> ResetElementUsagesCommand { get; private set; }
+
+        /// <summary>
+        /// Initializes the dialog.
+        /// </summary>
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            var iteration = (Iteration)this.Container;
+
+            this.elementUsageRows = new Lazy<List<OptionElementUsageRowViewModel>>(this.CreateElementUsageRows);
+            this.PossibleBaselineOption = iteration.Option.Where(x => x.Iid != this.Thing.Iid).ToList();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="ReactiveCommand"/>s of this dialog.
+        /// </summary>
+        protected override void InitializeCommands()
+        {
+            base.InitializeCommands();
+
+            var canExecute = Observable.Return(!this.IsElementUsagesReadOnly);
+            this.CheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(_ => true), canExecute);
+            this.UncheckAllElementUsagesCommand = ReactiveCommandCreator.Create(() => this.SetEditableElementUsagesIncluded(_ => false), canExecute);
+            this.ResetElementUsagesCommand = ReactiveCommandCreator.Create(this.ResetElementUsages, canExecute);
+
+            this.Disposables.Add(this.WhenAnyValue(vm => vm.SelectedBaselineOption)
+                .Where(x => x != null)
+                .Subscribe(baseline => this.SetEditableElementUsagesIncluded(row => row.IsIncludedIn(baseline))));
+        }
+
+        /// <summary>
         /// Populate the <see cref="OptionDialogViewModel.PossibleCategory"/> and <see cref="OptionDialogViewModel.Category"/>
         /// </summary>
         protected override void PopulateCategory()
@@ -131,6 +217,71 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var iteration = (Iteration)this.Container;
                 iteration.DefaultOption = this.IsDefault ? this.Thing : null;
+            }
+
+            if (!this.elementUsageRows.IsValueCreated)
+            {
+                return;
+            }
+
+            foreach (var row in this.ElementUsageRows.Where(x => x.HasChanged))
+            {
+                var clone = row.Thing.Clone(false);
+
+                // the live ExcludeOption may have changed since the dialog opened, so always remove before adding
+                clone.ExcludeOption.RemoveAll(x => x.Iid == this.Thing.Iid);
+
+                if (!row.IsIncluded)
+                {
+                    clone.ExcludeOption.Add(this.Thing);
+                }
+
+                this.transaction.CreateOrUpdate(clone);
+            }
+        }
+
+        /// <summary>
+        /// Creates a row for every <see cref="ElementUsage"/> of the <see cref="Iteration"/>.
+        /// </summary>
+        /// <returns>The rows of <see cref="ElementUsageRows"/>.</returns>
+        private List<OptionElementUsageRowViewModel> CreateElementUsageRows()
+        {
+            var rows = ((Iteration)this.Container).Element
+                .SelectMany(x => x.ContainedElement)
+                .Select(x => new OptionElementUsageRowViewModel(x, this.Thing, !this.IsElementUsagesReadOnly && this.PermissionService.CanWrite(x)))
+                .ToList();
+
+            // once a row no longer matches the selected baseline, clear the selection so that picking it again re-applies it
+            this.Disposables.Add(rows
+                .Select(row => row.WhenAnyValue(x => x.IsIncluded).Skip(1).Where(isIncluded => this.SelectedBaselineOption != null && isIncluded != row.IsIncludedIn(this.SelectedBaselineOption)))
+                .Merge()
+                .Subscribe(_ => this.SelectedBaselineOption = null));
+
+            return rows;
+        }
+
+        /// <summary>
+        /// Restores every row of <see cref="ElementUsageRows"/> to its persisted state and clears <see cref="SelectedBaselineOption"/>.
+        /// </summary>
+        private void ResetElementUsages()
+        {
+            this.SelectedBaselineOption = null;
+
+            foreach (var row in this.ElementUsageRows)
+            {
+                row.Reset();
+            }
+        }
+
+        /// <summary>
+        /// Sets <see cref="OptionElementUsageRowViewModel.IsIncluded"/> on every editable row of <see cref="ElementUsageRows"/>.
+        /// </summary>
+        /// <param name="isIncluded">Computes whether the <see cref="ElementUsage"/> of a row is included in the <see cref="Option"/>.</param>
+        private void SetEditableElementUsagesIncluded(Func<OptionElementUsageRowViewModel, bool> isIncluded)
+        {
+            foreach (var row in this.ElementUsageRows.Where(x => x.IsEditable))
+            {
+                row.IsIncluded = isIncluded(row);
             }
         }
 
