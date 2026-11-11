@@ -30,6 +30,8 @@ namespace CDP4Composition.Mvvm
 
     using CDP4Common.CommonData;
 
+    using CDP4Composition.Annotations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -58,6 +60,11 @@ namespace CDP4Composition.Mvvm
         private bool hasRelationship = false;
 
         /// <summary>
+        /// Backing field for <see cref="AnnotationState"/>
+        /// </summary>
+        private AnnotationState annotationState = AnnotationState.None;
+
+        /// <summary>
         /// Initializes a new instace of the <see cref="ThingStatus"/> class
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/></param>
@@ -66,6 +73,7 @@ namespace CDP4Composition.Mvvm
             this.Thing = thing;
             this.HasError = thing.ValidationErrors.Any();
             this.HasRelationship = thing.HasRelationship;
+            this.AnnotationState = AnnotationQuery.SummarizeState(AnnotationQuery.QueryAllFor(thing));
         }
 
         /// <summary>
@@ -93,6 +101,7 @@ namespace CDP4Composition.Mvvm
                 viewModel.ThingStatus.Thing = thing;
                 viewModel.ThingStatus.HasError = thing.ValidationErrors.Any();
                 viewModel.ThingStatus.HasRelationship = thing.HasRelationship;
+                viewModel.ThingStatus.AnnotationState = AnnotationQuery.SummarizeState(AnnotationQuery.QueryAllFor(thing));
             }
         }
 
@@ -113,6 +122,25 @@ namespace CDP4Composition.Mvvm
         {
             get => this.hasRelationship;
             private set => this.RaiseAndSetIfChanged(ref this.hasRelationship, value);
+        }
+
+        /// <summary>
+        /// Gets the annotation state of the thing, nothing raised, at least one annotation still open, or all of
+        /// them closed out
+        /// </summary>
+        public AnnotationState AnnotationState
+        {
+            get => this.annotationState;
+            private set => this.RaiseAndSetIfChanged(ref this.annotationState, value);
+        }
+
+        /// <summary>
+        /// Re-reads just the <see cref="AnnotationState"/>, so a row can follow the annotations raised against it
+        /// without rebuilding the whole status.
+        /// </summary>
+        public void RefreshAnnotationState()
+        {
+            this.AnnotationState = AnnotationQuery.SummarizeState(AnnotationQuery.QueryAllFor(this.Thing));
         }
 
         /// <summary>

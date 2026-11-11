@@ -36,6 +36,7 @@ namespace CDP4Requirements.Selectors
     using CDP4Common.Helpers;
 
     using CDP4Composition;
+    using CDP4Composition.Annotations;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
@@ -111,7 +112,7 @@ namespace CDP4Requirements.Selectors
 
             if (rowData.Row is VandVItemRowViewModel vandVItemRow)
             {
-                return this.QueryVandVItemIcon(vandVItemRow.AnnotationState);
+                return this.QueryVandVItemIcon(vandVItemRow.ReviewRequestState);
             }
 
             if (!(rowData.Row is IRowViewModelBase<Thing> row))

@@ -60,6 +60,11 @@ namespace CDP4Composition.FilterOperators
                 return new CategoryFilterOperatorHandler(rowViewModels, fieldName);
             }
 
+            if (customFilterOperator == CustomFilterOperatorType.Annotation)
+            {
+                return new AnnotationFilterOperatorHandler(rowViewModels, fieldName);
+            }
+
             throw new NotSupportedException($"{nameof(CustomFilterOperatorHandler)} {customFilterOperator} is not supported by {nameof(CustomFilterOperatorHandlerFactory)}.");
         }
     }

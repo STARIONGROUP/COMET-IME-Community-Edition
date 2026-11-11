@@ -25,9 +25,13 @@
 
 namespace CDP4Composition.Mvvm
 {
+    using System.Collections.Generic;
     using System.ComponentModel;
     using CDP4Common.CommonData;
+    using CDP4Common.ReportingData;
     using CDP4Common.Types;
+
+    using CDP4Composition.Annotations;
 
     using CDP4Composition.DragDrop;
 
@@ -69,6 +73,37 @@ namespace CDP4Composition.Mvvm
         /// The thing.
         /// </param>
         void EndInlineEdit(Thing thing);
+
+        /// <summary>
+        /// Re-reads the annotations raised against the represented <see cref="Thing"/>, so the row's annotation
+        /// badge follows what is raised and closed during the session.
+        /// </summary>
+        void RefreshAnnotationState();
+
+        /// <summary>
+        /// Gets the annotations raised against the represented <see cref="Thing"/>.
+        /// </summary>
+        /// <remarks>
+        /// On the interface rather than only on <see cref="RowViewModelBase{T}"/> because a DevExpress column
+        /// resolves its FieldName against the declared element type of the bound list, and browsers that expose
+        /// their rows as <see cref="IRowViewModelBase{T}"/> would otherwise render an empty cell and offer no filter.
+        /// </remarks>
+        IReadOnlyList<EngineeringModelDataAnnotation> AnnotationList { get; }
+
+        /// <summary>
+        /// Gets the annotation state of the represented <see cref="Thing"/>.
+        /// </summary>
+        AnnotationState AnnotationState { get; }
+
+        /// <summary>
+        /// Gets the short badge naming the annotation that most needs attention.
+        /// </summary>
+        string AnnotationIndicator { get; }
+
+        /// <summary>
+        /// Gets the tooltip listing every annotation raised against the represented <see cref="Thing"/>.
+        /// </summary>
+        string AnnotationSummary { get; }
 
         /// <summary>
         /// Gets the error message for the property with the given name.

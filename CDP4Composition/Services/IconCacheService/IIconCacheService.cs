@@ -7,6 +7,7 @@
 namespace CDP4Composition.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Windows.Media.Imaging;
 
     /// <summary>
@@ -54,5 +55,19 @@ namespace CDP4Composition.Services
         /// An instance of <see cref="BitmapSource"/>
         /// </returns>
         BitmapSource QueryOverlayBitmapSource(Uri uri, Uri overlayUri, OverlayPositionKind overlayPosition);
+
+        /// <summary>
+        /// Queries the <see cref="BitmapSource"/> of an icon carrying every supplied overlay at once.
+        /// </summary>
+        /// <param name="uri">
+        /// The uri of the icon <see cref="BitmapSource"/>
+        /// </param>
+        /// <param name="overlays">
+        /// The overlays to draw, each with the corner it goes in.
+        /// </param>
+        /// <returns>
+        /// An instance of <see cref="BitmapSource"/>
+        /// </returns>
+        BitmapSource QueryOverlayBitmapSource(Uri uri, IReadOnlyList<(Uri OverlayUri, OverlayPositionKind Position, bool Desaturated)> overlays);
     }
 }

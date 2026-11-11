@@ -35,7 +35,6 @@ namespace CDP4Budget.ViewModels
     using ConfigFile;
 
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
@@ -214,11 +213,6 @@ namespace CDP4Budget.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
-
-        protected override void ExecuteOpenAnnotationWindow(ModellingAnnotationItem annotation)
-        {
-            throw new System.NotImplementedException();
-        }
 
         /// <summary>
         /// Handle the <see cref="ObjectChangedEvent"/>

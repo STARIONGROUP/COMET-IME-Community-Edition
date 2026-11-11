@@ -34,6 +34,8 @@ namespace CDP4Requirements.Services
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
 
+    using CDP4Composition.Annotations;
+
     using ClosedXML.Excel;
 
     /// <summary>
@@ -672,7 +674,7 @@ namespace CDP4Requirements.Services
 
             var row = 2;
 
-            foreach (var request in AnnotationQuery.Query(iteration))
+            foreach (var request in VandVAnnotationQuery.Query(iteration))
             {
                 var annotation = request.Annotation;
 

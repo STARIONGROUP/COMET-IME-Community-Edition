@@ -36,6 +36,7 @@
             <converters:DataTypeConverter x:Key="DataTypeConverter" />
             <converters:ElementUsageTypeToVisibilityConverter x:Key="ElementUsageTypeToVisibilityConverter" />
             <selectors:ElementDefinitionTreeListNodeImageSelector x:Key="ElementDefinitionTreeListNodeSelector" />
+            <compositionConverters:AnnotationStateToBrushConverter x:Key="AnnotationStateToBrushConverter" />
             
             <HierarchicalDataTemplate DataType="{x:Type viewModels:ElementDefinitionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
             </HierarchicalDataTemplate>
@@ -269,6 +270,31 @@
                         </dxmvvm:Interaction.Behaviors>
                     </dxg:TreeListColumn>
                     <dxg:TreeListColumn FieldName="ParameterTypeName" Header="ParameterTypeName" Visible ="False" ShowInColumnChooser="False" />
+
+                    <!--  hidden: the row icon carries the dot, this spells out what was raised when switched on  -->
+                    <dxg:TreeListColumn FieldName="AnnotationIndicator"
+                                        Header="Annotations"
+                                        Width="110"
+                                        Visible="False"
+                                        ShowInColumnChooser="True"
+                                        AllowEditing="False">
+                        <dxg:TreeListColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Margin="2,0"
+                                           VerticalAlignment="Center"
+                                           Foreground="{Binding RowData.Row.AnnotationState, Converter={StaticResource AnnotationStateToBrushConverter}}"
+                                           Text="{Binding RowData.Row.AnnotationIndicator}"
+                                           ToolTip="{Binding RowData.Row.AnnotationSummary}" />
+                            </DataTemplate>
+                        </dxg:TreeListColumn.CellTemplate>
+                    </dxg:TreeListColumn>
+
+                    <!--  hidden, filter-only: narrows the tree to the items carrying a kind of annotation  -->
+                    <dxg:TreeListColumn FieldName="AnnotationList" Header="Annotation" Visible="False" ShowInColumnChooser="False">
+                        <dxmvvm:Interaction.Behaviors>
+                            <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Annotation" ItemsSource="{Binding ElementDefinitionRowViewModels}"/>
+                        </dxmvvm:Interaction.Behaviors>
+                    </dxg:TreeListColumn>
                 </dxg:TreeListControl.Columns>
                 <dxg:TreeListControl.InputBindings>
                     <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>

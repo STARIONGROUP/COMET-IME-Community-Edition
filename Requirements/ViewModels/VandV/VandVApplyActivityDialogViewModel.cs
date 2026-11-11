@@ -38,6 +38,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.Annotations;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
@@ -308,7 +309,7 @@ namespace CDP4Requirements.ViewModels
                 guards.Add("analysis check VIOLATED");
             }
 
-            if (AnnotationQuery.QueryFor(iteration, item).Any(AnnotationQuery.IsOpen))
+            if (AnnotationQuery.QueryReviewRequestsFor(item).Any(AnnotationQuery.IsOpen))
             {
                 guards.Add("open review request");
             }

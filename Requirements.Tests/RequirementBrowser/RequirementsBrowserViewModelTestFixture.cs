@@ -35,11 +35,15 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System.Threading.Tasks;
     using System.Windows;
 
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Annotations;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
@@ -322,6 +326,98 @@ namespace CDP4Requirements.Tests.RequirementBrowser
                     MessageBoxImage.Warning
                 )
             );
+        }
+
+        [Test]
+        public async Task VerifyThatAnnotationsCanBeRaisedAndWorkedFromTheRequirementsBrowser()
+        {
+            // regression: the browser offered one hard-coded create command per annotation kind, each navigating to
+            // a ThingDialog the IME does not register, and no way at all to read, reply to or close what was raised.
+            // Only the V&V browser could do any of it.
+            var requirement = new Requirement(Guid.NewGuid(), this.cache, this.uri) { ShortName = "REQ-1", Name = "a requirement", Owner = this.domain };
+            this.reqSpec.Requirement.Add(requirement);
+
+            var rid = new ReviewItemDiscrepancy(Guid.NewGuid(), this.cache, this.uri) { ShortName = "RID-1", Title = "a discrepancy", Status = AnnotationStatusKind.OPEN, Owner = this.domain };
+            var note = new EngineeringModelDataNote(Guid.NewGuid(), this.cache, this.uri) { Content = "a note" };
+
+            foreach (var annotation in new EngineeringModelDataAnnotation[] { rid, note })
+            {
+                var reference = new ModellingThingReference(Guid.NewGuid(), this.cache, this.uri) { ReferencedThing = requirement };
+                annotation.PrimaryAnnotatedThing = reference;
+                annotation.RelatedThing.Add(reference);
+            }
+
+            this.model.ModellingAnnotation.Add(rid);
+            this.model.GenericNote.Add(note);
+
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            var requirementRow = vm.ReqSpecificationRows
+                .SelectMany(row => row.ContainedRows)
+                .OfType<RequirementRowViewModel>()
+                .Single(row => row.Thing == requirement);
+
+            vm.SelectedThing = requirementRow;
+            vm.PopulateContextMenu();
+
+            Assert.Multiple(() =>
+            {
+                // every kind is creatable, and the command behind it actually runs
+                Assert.That(vm.CreateAnnotationCommands.Count, Is.EqualTo(5));
+                Assert.That(vm.CreateAnnotationMenuGroup.SubMenu.Select(x => x.Header), Does.Contain("Model Note"));
+                Assert.That(vm.CreateAnnotationMenuGroup.SubMenu.Select(x => x.Header), Does.Contain("Review Item Discrepancy"));
+                Assert.That(vm.CreateAnnotationCommands.Values.All(command => ((ICommand)command).CanExecute(null)), Is.True);
+
+                // both kinds raised against the requirement are listed, a model note included
+                Assert.That(vm.AnnotationMenuGroup.SubMenu.Count, Is.EqualTo(2));
+                Assert.That(vm.AnnotationMenuGroup.SubMenu.Select(x => x.Header), Does.Contain("RID-1, Review Item Discrepancy (OPEN)"));
+                Assert.That(vm.AnnotationMenuGroup.SubMenu.Select(x => x.Header), Does.Contain("NOTE, Model Note"));
+
+                // and each one can be opened, replied to and retired
+                var ridMenu = vm.AnnotationMenuGroup.SubMenu.Single(x => x.Header.StartsWith("RID-1"));
+                Assert.That(ridMenu.SubMenu.Select(x => x.Header), Is.EquivalentTo(new[] { "Open Discussion Board...", "Reply...", "Set Status", "Delete" }));
+
+                // every status the SDK defines is offered, not just a hand-picked three
+                var statusMenu = ridMenu.SubMenu.Single(x => x.Header == "Set Status");
+                Assert.That(statusMenu.SubMenu.Count, Is.EqualTo(6));
+                Assert.That(statusMenu.SubMenu.Select(x => x.Header), Does.Contain("Mark Invalid (Raised in Error)"));
+                Assert.That(statusMenu.SubMenu.Select(x => x.Header), Does.Contain("Mark Won't Fix"));
+                Assert.That(statusMenu.SubMenu.Select(x => x.Header), Does.Contain("Mark Not Applicable"));
+
+                // the status it already has is the one you cannot pick
+                Assert.That(statusMenu.SubMenu.Single(x => x.Header == "Reopen").CanExecute, Is.False);
+                Assert.That(statusMenu.SubMenu.Single(x => x.Header == "Close (Accepted)").CanExecute, Is.True);
+
+                // a mistyped note has to be removable, not just closable, and a note has no status to set
+                Assert.That(ridMenu.SubMenu.Single(x => x.Header == "Delete").CanExecute, Is.True);
+                var noteMenu = vm.AnnotationMenuGroup.SubMenu.Single(x => x.Header.StartsWith("NOTE"));
+                Assert.That(noteMenu.SubMenu.Single(x => x.Header == "Delete").CanExecute, Is.True);
+                Assert.That(noteMenu.SubMenu.Select(x => x.Header), Does.Not.Contain("Set Status"));
+
+                // the row carries the badge that is the only indication outside the menu
+                Assert.That(requirementRow.AnnotationState, Is.EqualTo(AnnotationState.Open));
+                Assert.That(requirementRow.AnnotationIndicator, Is.EqualTo("RID-1 +1"));
+                Assert.That(requirementRow.AnnotationSummary, Does.Contain("Model Note: NOTE"));
+
+                // and the icon dot follows the same state
+                Assert.That(requirementRow.ThingStatus.AnnotationState, Is.EqualTo(AnnotationState.Open));
+
+                // the filter column reads the annotations themselves, so the browser can be narrowed by kind
+                Assert.That(requirementRow.AnnotationList, Is.EquivalentTo(new EngineeringModelDataAnnotation[] { rid, note }));
+            });
+
+            // closing the only concession leaves the note, which has no status, so the row reads as resolved
+            rid.Status = AnnotationStatusKind.CLOSED;
+            requirementRow.RefreshAnnotationState();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(requirementRow.AnnotationState, Is.EqualTo(AnnotationState.Resolved));
+                Assert.That(requirementRow.ThingStatus.AnnotationState, Is.EqualTo(AnnotationState.Resolved), "the icon dot must go grey with the row, not stay stale");
+            });
+
+            vm.Dispose();
         }
 
         /// <summary>
