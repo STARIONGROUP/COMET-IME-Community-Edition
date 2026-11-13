@@ -358,10 +358,14 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.Value = this.GetStringDisplayFromValueSet(valueSet.ActualValue, true);
                 this.Formula = this.GetStringDisplayFromValueSet(valueSet.Formula, false);
-                this.Computed = this.GetStringDisplayFromValueSet(valueSet.Computed, true);
+                this.Computed = this.GetObjectDisplayFromValueSet(valueSet.Computed) is EnumerationValueDefinition enumerationValueDefinition
+                    ? enumerationValueDefinition.Name
+                    : this.GetStringDisplayFromValueSet(valueSet.Computed, true);
                 this.Manual = this.GetObjectDisplayFromValueSet(valueSet.Manual);
                 this.Reference = this.GetObjectDisplayFromValueSet(valueSet.Reference);
-                this.Published = this.GetStringDisplayFromValueSet(valueSet.Published, true);
+                this.Published = this.GetObjectDisplayFromValueSet(valueSet.Published) is EnumerationValueDefinition publishedEnumerationValueDefinition
+                    ? publishedEnumerationValueDefinition.Name
+                    : this.GetStringDisplayFromValueSet(valueSet.Published, true);
 
                 this.Switch = valueSet.ValueSwitch;
                 this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
