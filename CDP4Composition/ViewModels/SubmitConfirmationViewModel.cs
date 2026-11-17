@@ -63,6 +63,11 @@ namespace CDP4Composition.ViewModels
         private ReactiveList<SubmitParameterRowViewModel> selectedSubscriptions;
 
         /// <summary>
+        /// Backing field for the <see cref="IsSetSwitchToComputed"/>
+        /// </summary>
+        private bool isSetSwitchToComputed;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SubmitConfirmationViewModel"/> class.
         /// </summary>
         /// <param name="processedValueSets">
@@ -71,10 +76,14 @@ namespace CDP4Composition.ViewModels
         /// <param name="valueSetKind">
         /// assertion that is used to determine the visibilty of the <see cref="ParameterOrOverrideBase"/> and <see cref="ParameterSubscription"/>
         /// </param>
-        public SubmitConfirmationViewModel(IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, ValueSetKind valueSetKind)
+        /// <param name="isSetSwitchToComputedVisible">
+        /// A value indicating whether the option to set the switch to <see cref="ParameterSwitchKind.COMPUTED"/> is visible
+        /// </param>
+        public SubmitConfirmationViewModel(IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, ValueSetKind valueSetKind, bool isSetSwitchToComputedVisible = false)
             : base(processedValueSets, valueSetKind)
         {
             this.DialogTitle = "Submit Changes...";
+            this.IsSetSwitchToComputedVisible = isSetSwitchToComputedVisible;
             this.SelectedParameters = new ReactiveList<SubmitParameterRowViewModel>();
             this.SelectedSubscriptions = new ReactiveList<SubmitParameterRowViewModel>();
 
@@ -110,6 +119,20 @@ namespace CDP4Composition.ViewModels
         /// Gets a value indicating whether the information message is visible
         /// </summary>
         public bool IsInformationMessageVisible { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the option to set the switch to <see cref="ParameterSwitchKind.COMPUTED"/> is visible
+        /// </summary>
+        public bool IsSetSwitchToComputedVisible { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the switch of the submitted Parameters and ParameterOverrides is set to <see cref="ParameterSwitchKind.COMPUTED"/>
+        /// </summary>
+        public bool IsSetSwitchToComputed
+        {
+            get => this.isSetSwitchToComputed;
+            set => this.RaiseAndSetIfChanged(ref this.isSetSwitchToComputed, value);
+        }
 
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
@@ -171,6 +194,14 @@ namespace CDP4Composition.ViewModels
         {
             var parameterOrOverrides = this.ParameterOrOverrideSubmitParameterRowViewModels.Where(x => x.IsSelected && !x.HasValidationError).Select(x => x.Thing).ToList();
             var parameterSubscriptions = this.ParameterSubscriptionSubmitParameterRowViewModels.Where(x => x.IsSelected && !x.HasValidationError).Select(x => x.Thing).ToList();
+
+            if (this.IsSetSwitchToComputed)
+            {
+                foreach (var parameterValueSet in parameterOrOverrides.OfType<ParameterValueSetBase>())
+                {
+                    parameterValueSet.ValueSwitch = ParameterSwitchKind.COMPUTED;
+                }
+            }
 
             var clones = parameterOrOverrides.Concat(parameterSubscriptions);
 
