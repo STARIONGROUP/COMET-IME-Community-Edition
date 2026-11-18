@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="WorkbookOperator.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
@@ -62,6 +62,16 @@ namespace CDP4CrossViewEditor
         public IEnumerable<Guid> ParameterTypes;
 
         /// <summary>
+        /// Options user selection; empty for every option, on a single calculation sheet
+        /// </summary>
+        public IEnumerable<Guid> Options;
+
+        /// <summary>
+        /// Flag that indicates the selection covered the whole product tree, which later rebuilds then follow as it changes
+        /// </summary>
+        public bool FollowProductTree;
+
+        /// <summary>
         /// Parameter sheet values changed by the user
         /// </summary>
         public Dictionary<string, string> ParameterValues;
@@ -70,6 +80,17 @@ namespace CDP4CrossViewEditor
         /// Flag that indicates value persistence
         /// </summary>
         public bool PersistValues;
+
+        /// <summary>
+        /// A value indicating whether the calculation sheet, on which the user does their own calculations against the
+        /// values of the Crossview sheet, is written as well.
+        /// </summary>
+        public bool GenerateCalculationSheet;
+
+        /// <summary>
+        /// The parameter types whose columns, on the calculation sheet, sum the rows below a row that has no value of its own.
+        /// </summary>
+        public IEnumerable<Guid> SummedParameterTypes;
     }
 
     /// <summary>
@@ -83,6 +104,18 @@ namespace CDP4CrossViewEditor
         /// The NLog Logger
         /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// The operator that listens to the changes of the Crossview sheet of each workbook, with that sheet, by the full name of
+        /// the workbook.
+        /// </summary>
+        /// <remarks>
+        /// The Crossview sheet survives a rebuild, so the listener of the previous rebuild is removed. One that is missed, because
+        /// the workbook was saved under another name in between, does no harm: every listener reads the selection afresh from the
+        /// workbook. Everything here runs on the thread of Excel, so the dictionary needs no lock.
+        /// </remarks>
+        private static readonly Dictionary<string, (Worksheet Sheet, WorkbookOperator Operator)> Listeners =
+            new Dictionary<string, (Worksheet Sheet, WorkbookOperator Operator)>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// The <see cref="Workbook"/> that is being managed by the current <see cref="WorkbookOperator"/>
@@ -155,7 +188,19 @@ namespace CDP4CrossViewEditor
 
                 await this.RefreshSessionData(session);
 
+                // read before the Crossview sheet is rebuilt, since the snapshots record its rows and columns as the calculation
+                // sheets were last written against them
+                var calculationSnapshots = this.workbookMetadata.GenerateCalculationSheet
+                    ? CalculationSheetGenerator.ReadSnapshots(this.workbook, iteration, this.workbookMetadata.Options)
+                    : null;
+
                 this.WriteCrossviewSheet(session, iteration, participant);
+
+                if (this.workbookMetadata.GenerateCalculationSheet)
+                {
+                    // written after the Crossview sheet, because its formulas point at the cells that sheet creates
+                    this.WriteCalculationSheets(iteration, calculationSnapshots);
+                }
 
                 this.WriteSessionInfoToWorkbook(session, iteration, participant);
 
@@ -168,7 +213,8 @@ namespace CDP4CrossViewEditor
             catch (Exception ex)
             {
                 this.application.StatusBar = "Rebuild Crossview sheet failed";
-                throw ex;
+                Logger.Error(ex, "Rebuild Crossview sheet failed");
+                throw;
             }
             finally
             {
@@ -212,6 +258,22 @@ namespace CDP4CrossViewEditor
         {
             var crossviewSheetGenerator = new CrossviewSheetGenerator(session, iteration, participant);
             crossviewSheetGenerator.Rebuild(this.application, this.workbook, this.workbookMetadata);
+        }
+
+        /// <summary>
+        /// Write the calculation sheets, on which the user does their own calculations against the values of the Crossview
+        /// sheet, to the workbook.
+        /// </summary>
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/> whose product tree is written to the sheets
+        /// </param>
+        /// <param name="previous">
+        /// The calculation sheets as they were before this rebuild, by sheet name
+        /// </param>
+        private void WriteCalculationSheets(Iteration iteration, IReadOnlyDictionary<string, CalculationSheetSnapshot> previous)
+        {
+            var calculationSheetGenerator = new CalculationSheetGenerator(iteration);
+            calculationSheetGenerator.Rebuild(this.application, this.workbook, this.workbookMetadata, previous);
         }
 
         /// <summary>
@@ -260,11 +322,38 @@ namespace CDP4CrossViewEditor
             {
                 var worksheet = (Worksheet)this.workbook.Worksheets[CrossviewSheetConstants.CrossviewSheetName];
                 worksheet.Activate();
+
+                this.StopPreviousListener();
+
                 worksheet.ChangeEvent += this.Worksheet_ChangeEvent;
+
+                // the entry of a workbook that is closed stays until a workbook of the same name is rebuilt
+                Listeners[this.workbook.FullName] = (worksheet, this);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+            }
+        }
+
+        /// <summary>
+        /// Removes the listener the previous rebuild of this workbook attached to its Crossview sheet.
+        /// </summary>
+        private void StopPreviousListener()
+        {
+            if (!Listeners.TryGetValue(this.workbook.FullName, out var previous))
+            {
+                return;
+            }
+
+            try
+            {
+                previous.Sheet.ChangeEvent -= previous.Operator.Worksheet_ChangeEvent;
+            }
+            catch (Exception ex)
+            {
+                // the sheet of a workbook that was closed and opened again is gone, and so is its listener
+                Logger.Debug(ex, "The previous listener of the Crossview sheet could not be removed");
             }
         }
 
@@ -287,21 +376,35 @@ namespace CDP4CrossViewEditor
                 return;
             }
 
-            if (string.IsNullOrEmpty(cellName))
+            if (string.IsNullOrEmpty(cellName) || !this.workbookMetadata.PersistValues)
             {
                 return;
             }
 
-            if (this.workbookMetadata.ParameterValues.ContainsKey(cellName))
+            // the selection is read from the workbook rather than taken from this rebuild, so that a listener a later rebuild did
+            // not remove cannot write an older selection back
+            var workbookDataDal = new CrossviewWorkbookDataDal(this.workbook);
+            var saved = workbookDataDal.Read();
+
+            if (saved == null)
             {
-                this.workbookMetadata.ParameterValues[cellName] = target.Value.ToString();
+                return;
+            }
+
+            var values = saved.ManuallySavedValues;
+            var value = target.Value?.ToString();
+
+            // a value the user cleared is no longer kept, rather than failing on the empty cell
+            if (value == null)
+            {
+                values.Remove(cellName);
             }
             else
             {
-                this.workbookMetadata.ParameterValues.Add(cellName, target.Value.ToString());
+                values[cellName] = value;
             }
 
-            this.WriteWorkbookDataToWorkbook();
+            workbookDataDal.Write(new CrossviewWorkbookData(saved.SavedElementDefinitions, saved.SavedParameterTypes, values));
         }
     }
 }

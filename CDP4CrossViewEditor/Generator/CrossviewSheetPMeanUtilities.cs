@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossviewSheetPMeanUtilities.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
 //
@@ -236,7 +236,7 @@ namespace CDP4CrossViewEditor.Generator
                 return;
             }
 
-            foreach (var option in redundancy.ValueSets.Select(x => x.ActualOption))
+            foreach (var option in redundancy.ValueSets.Select(x => x.ActualOption).Where(crossviewArrayAssembler.IsOptionSelected))
             {
                 var redundancyValueSet = redundancy.ValueSets.First(x => x.ActualOption == option) as ParameterValueSetBase;
                 var pOnValueSet = pOn.ValueSets.First(x => x.ActualOption == option) as ParameterValueSetBase;

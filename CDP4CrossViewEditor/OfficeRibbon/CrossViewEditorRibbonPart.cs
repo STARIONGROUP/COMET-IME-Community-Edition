@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossViewEditorRibbonPart.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -33,20 +33,28 @@ namespace CDP4CrossViewEditor
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Windows;
 
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
+    using CDP4CrossViewEditor.Assemblers;
+    using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Events;
 
     using CDP4OfficeInfrastructure;
+    using CDP4OfficeInfrastructure.OfficeDal;
+
+    using CommonServiceLocator;
 
     using NLog;
 
@@ -67,6 +75,11 @@ namespace CDP4CrossViewEditor
         /// The <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application
         /// </summary>
         private readonly IOfficeApplicationWrapper officeApplicationWrapper;
+
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> that tells the user what happened, resolved when it is first needed
+        /// </summary>
+        private IMessageBoxService messageBoxService;
 
         /// <summary>
         /// Gets or sets the <see cref="IExcelQuery"/> that is used to query the excel application
@@ -216,13 +229,214 @@ namespace CDP4CrossViewEditor
                 return;
             }
 
-            if (ribbonControlId.StartsWith("Editor_"))
+            try
             {
-                await this.LaunchCrossViewEditorAsync(ribbonControlTag);
+                if (ribbonControlId.StartsWith("Editor_", StringComparison.Ordinal))
+                {
+                    await this.LaunchCrossViewEditorAsync(ribbonControlTag);
+                }
+                else if (ribbonControlId.StartsWith("CrossViewRebuild_", StringComparison.Ordinal))
+                {
+                    await this.RebuildCrossViewAsync(ribbonControlTag);
+                }
+                else
+                {
+                    Logger.Debug($"The ribbon control with Id {ribbonControlId} and Tag {ribbonControlTag} is not handled by the current RibbonPart");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Debug($"The ribbon control with Id {ribbonControlId} and Tag {ribbonControlTag} is not handled by the current RibbonPart");
+                // an exception that leaves a ribbon action reaches Excel, which closes itself over it, so it is reported here
+                Logger.Error(ex, "The Cross View action {0} failed", ribbonControlId);
+                this.Report($"The Cross View sheets could not be built:\n\n{ex.Message}", MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Rebuild the Cross View sheets of the specified <see cref="Iteration"/> with the selection and the settings of the last
+        /// time, without opening the editor.
+        /// </summary>
+        /// <param name="iterationId">
+        /// The unique id of the <see cref="Iteration"/>
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>
+        /// </returns>
+        [ExcludeFromCodeCoverage]
+        private async Task RebuildCrossViewAsync(string iterationId)
+        {
+            var context = this.QueryIterationContext(iterationId);
+
+            if (context == null)
+            {
+                return;
+            }
+
+            var workbook = this.ExcelQuery.QueryActiveWorkbook(this.officeApplicationWrapper.Excel);
+
+            if (workbook == null)
+            {
+                this.Report("There is no open workbook to rebuild.", MessageBoxImage.Exclamation);
+                return;
+            }
+
+            var preservedData = new CrossviewWorkbookDataDal(workbook).Read();
+
+            if (preservedData == null)
+            {
+                this.Report(
+                    "This workbook holds no Cross View selection yet. Use the Cross View Editor once to choose the elements and the parameter types, after which this button rebuilds them.",
+                    MessageBoxImage.Exclamation);
+
+                return;
+            }
+
+            if (!this.IsIterationOfWorkbook(workbook, context.Value.Iteration))
+            {
+                return;
+            }
+
+            var settings = CrossviewSheetUtilities.ReadSettings(workbook);
+            var followProductTree = settings?.FollowProductTree ?? false;
+
+            // an option that was deleted from the model since would leave no option dependent column and no sheet of its own
+            var options = context.Value.Iteration.Option.Select(option => option.Iid).Where(iid => settings?.Options.Contains(iid) == true).ToList();
+
+            var workbookMetadata = new WorkbookMetadata
+            {
+                ElementDefinitions = CrossviewSheetRowAssembler.QuerySelection(context.Value.Iteration, preservedData.SavedElementDefinitions, followProductTree),
+                FollowProductTree = followProductTree,
+                ParameterTypes = preservedData.SavedParameterTypes.ToList(),
+                Options = options,
+                ParameterValues = preservedData.ManuallySavedValues,
+                PersistValues = settings?.PersistValues ?? true,
+                GenerateCalculationSheet = settings?.GenerateCalculationSheet ?? false,
+                SummedParameterTypes = settings?.SummedParameterTypes ?? new List<Guid>()
+            };
+
+            var workbookOperator = new WorkbookOperator(this.officeApplicationWrapper.Excel, workbook, workbookMetadata);
+
+            await workbookOperator.Rebuild(this.Session, context.Value.Iteration, context.Value.Participant);
+        }
+
+        /// <summary>
+        /// Queries whether a workbook is to be rebuilt from an <see cref="Iteration"/>, asking the user when the workbook was last
+        /// built from another one.
+        /// </summary>
+        /// <param name="workbook">
+        /// The workbook
+        /// </param>
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/> that was chosen in the menu
+        /// </param>
+        /// <returns>
+        /// True when the workbook was built from this iteration, or the user confirms the change
+        /// </returns>
+        /// <remarks>
+        /// Rebuilding from the wrong model would put another product tree on the calculation sheets, and with it drop the work of
+        /// the user on them. Moving a workbook on to the next iteration of the same model is a deliberate change, hence the question.
+        /// </remarks>
+        [ExcludeFromCodeCoverage]
+        private bool IsIterationOfWorkbook(NetOffice.ExcelApi.Workbook workbook, Iteration iteration)
+        {
+            var builtFrom = new WorkbookSessionDal(workbook).Read()?.IterationSetup?.Iid;
+
+            if (builtFrom == null || builtFrom == iteration.IterationSetup?.Iid)
+            {
+                return true;
+            }
+
+            if (this.messageBoxService == null)
+            {
+                this.messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+            }
+
+            var answer = this.messageBoxService.Show(
+                "This workbook was built from another iteration than the one chosen. Rebuilding it from this one puts this product tree on its sheets, and what you added on rows that are not in it is set aside.\n\nRebuild from this iteration?",
+                "Cross View",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            return answer == MessageBoxResult.Yes;
+        }
+
+        /// <summary>
+        /// Queries the <see cref="Iteration"/> a ribbon control stands for, together with the active <see cref="Participant"/>.
+        /// </summary>
+        /// <param name="iterationId">
+        /// The unique id of the <see cref="Iteration"/>
+        /// </param>
+        /// <returns>
+        /// The iteration with its participant, or null when the action cannot be carried out
+        /// </returns>
+        [ExcludeFromCodeCoverage]
+        private (Iteration Iteration, Participant Participant)? QueryIterationContext(string iterationId)
+        {
+            if (iterationId == string.Empty)
+            {
+                Logger.Debug("The cross editor workbook cannot be build: the iteration id is empty");
+                return null;
+            }
+
+            var uniqueId = Guid.Parse(iterationId);
+            var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+
+            if (iteration == null)
+            {
+                Logger.Debug($"The cross editor workbook cannot be build: iteration {uniqueId} cannot be found");
+                return null;
+            }
+
+            if (!(iteration.Container is EngineeringModel engineeringModel))
+            {
+                Logger.Error("The cross editor workbook cannot be build: Iteration container object is null");
+                return null;
+            }
+
+            if (this.officeApplicationWrapper.Excel == null)
+            {
+                Logger.Error("The cross editor workbook cannot be build: The Excel Application object is null");
+                return null;
+            }
+
+            return (iteration, engineeringModel.EngineeringModelSetup.Participant.FirstOrDefault(x => x.Person == this.Session.ActivePerson));
+        }
+
+        /// <summary>
+        /// Tells the user what happened, on screen and on the status bar.
+        /// </summary>
+        /// <param name="message">
+        /// The message
+        /// </param>
+        /// <param name="icon">
+        /// The <see cref="MessageBoxImage"/> of the message
+        /// </param>
+        /// <remarks>
+        /// The Excel integration does not reliably write a log file, so the message on screen is the only diagnostic the user has.
+        /// </remarks>
+        [ExcludeFromCodeCoverage]
+        private void Report(string message, MessageBoxImage icon)
+        {
+            Logger.Info(message);
+
+            try
+            {
+                if (this.officeApplicationWrapper.Excel != null)
+                {
+                    this.officeApplicationWrapper.Excel.StatusBar = $"CDP4: {message.Split('\n')[0]}";
+                }
+
+                if (this.messageBoxService == null)
+                {
+                    this.messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+                }
+
+                this.messageBoxService.Show(message, "Cross View", MessageBoxButton.OK, icon);
+            }
+            catch (Exception ex)
+            {
+                // this is the last resort of the add-in, so a failure to report may not become a failure of its own
+                Logger.Error(ex, "The message could not be shown to the user");
             }
         }
 
@@ -235,34 +449,15 @@ namespace CDP4CrossViewEditor
         [ExcludeFromCodeCoverage]
         private async Task LaunchCrossViewEditorAsync(string iterationId)
         {
-            if (iterationId == string.Empty)
+            var context = this.QueryIterationContext(iterationId);
+
+            if (context == null)
             {
-                Logger.Debug("The cross editor workbook cannot be build: the iteration id is empty");
                 return;
             }
 
-            var uniqueId = Guid.Parse(iterationId);
-            var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
-
-            if (iteration == null)
-            {
-                Logger.Debug($"The cross editor workbook cannot be build: iteration {uniqueId} cannot be found");
-                return;
-            }
-
-            if (!(iteration.Container is EngineeringModel engineeringModel))
-            {
-                Logger.Error("The cross editor workbook cannot be build: Iteration container object is null");
-                return;
-            }
-
-            var activeParticipant = engineeringModel.EngineeringModelSetup.Participant.FirstOrDefault(x => x.Person == this.Session.ActivePerson);
-
-            if (this.officeApplicationWrapper.Excel == null)
-            {
-                Logger.Error("The cross editor workbook cannot be build: The Excel Application object is null");
-                return;
-            }
+            var iteration = context.Value.Iteration;
+            var activeParticipant = context.Value.Participant;
 
             var activeWorkbook = this.ExcelQuery.QueryActiveWorkbook(this.officeApplicationWrapper.Excel);
 
@@ -279,8 +474,12 @@ namespace CDP4CrossViewEditor
                 {
                     ElementDefinitions = dialogResult.WorkbookElements.Select(x => x.Iid),
                     ParameterTypes = dialogResult.WorkbookParameterType.Select(x => x.Iid),
+                    Options = dialogResult.Options.Select(x => x.Iid).ToList(),
+                    FollowProductTree = dialogResult.FollowProductTree,
                     ParameterValues = dialogResult.WorkbookChangedValues,
-                    PersistValues = dialogResult.PersistValues
+                    PersistValues = dialogResult.PersistValues,
+                    GenerateCalculationSheet = dialogResult.GenerateCalculationSheet,
+                    SummedParameterTypes = dialogResult.SummedParameterTypes.Select(x => x.Iid).ToList()
                 };
 
                 var workbookOperator = new WorkbookOperator(this.officeApplicationWrapper.Excel, workbook, workbookMetadata);
@@ -305,7 +504,7 @@ namespace CDP4CrossViewEditor
         {
             var menuxml = string.Empty;
 
-            if (ribbonControlId != "Editor")
+            if (ribbonControlId != "Editor" && ribbonControlId != "CrossViewRebuild")
             {
                 return menuxml;
             }
@@ -321,7 +520,7 @@ namespace CDP4CrossViewEditor
                 var domainShortName = selectedDomainOfExpertise == null ? string.Empty : selectedDomainOfExpertise.ShortName;
                 var label = $"{engineeringModel.EngineeringModelSetup.ShortName} - {iteration.IterationSetup.IterationNumber} : [{domainShortName}]";
 
-                var menuContent = $"<button id=\"Editor_{iteration.Iid}\" label=\"{label}\" onAction=\"OnAction\" tag=\"{iteration.Iid}\" />";
+                var menuContent = $"<button id=\"{ribbonControlId}_{iteration.Iid}\" label=\"{label}\" onAction=\"OnAction\" tag=\"{iteration.Iid}\" />";
                 sb.Append(menuContent);
             }
 
@@ -347,7 +546,7 @@ namespace CDP4CrossViewEditor
         /// </returns>
         public override bool GetEnabled(string ribbonControlId, string ribbonControlTag = "")
         {
-            return ribbonControlId == "Editor" && this.IsEditorEnabled();
+            return (ribbonControlId == "Editor" || ribbonControlId == "CrossViewRebuild") && this.IsEditorEnabled();
         }
 
         /// <summary>
@@ -364,7 +563,17 @@ namespace CDP4CrossViewEditor
         /// </returns>
         public override string GetLabel(string ribbonControlId, string ribbonControlTag = "")
         {
-            return ribbonControlId == "Editor" ? "Editor" : string.Empty;
+            switch (ribbonControlId)
+            {
+                case "Editor":
+                    return "Editor";
+
+                case "CrossViewRebuild":
+                    return "Rebuild";
+
+                default:
+                    return string.Empty;
+            }
         }
 
         /// <summary>

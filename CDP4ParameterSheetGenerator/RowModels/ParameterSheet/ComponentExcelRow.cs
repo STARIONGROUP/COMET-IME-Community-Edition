@@ -154,6 +154,8 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
 
             this.Format = NumberFormat.Format(parameterTypeComponent.ParameterType, parameterTypeComponent.Scale);
 
+            this.ModelCode = parameterOverrideValueSet.ModelCode(parameterTypeComponent.Index);
+
             if (parameterTypeComponent.Scale == null)
             {
                 this.ParameterTypeShortName = parameterTypeComponent.ParameterType.ShortName;

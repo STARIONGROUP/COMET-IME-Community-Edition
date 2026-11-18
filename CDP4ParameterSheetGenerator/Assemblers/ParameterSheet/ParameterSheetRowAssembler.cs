@@ -61,6 +61,12 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         private readonly DomainOfExpertise owner;
 
         /// <summary>
+        /// A value indicating whether <see cref="Parameter"/>s owned by another <see cref="DomainOfExpertise"/> than the
+        /// <see cref="owner"/>, and that the <see cref="owner"/> does not subscribe to, are assembled as read-only rows.
+        /// </summary>
+        private readonly bool includeAllParameters;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterSheetRowAssembler"/> class.
         /// </summary>
         /// <param name="iteration">
@@ -70,7 +76,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="owner">
         /// The owning <see cref="DomainOfExpertise"/>. Only the owned <see cref="Parameter"/>s and <see cref="ParameterSubscription"/>s are taken into account.
         /// </param>
-        public ParameterSheetRowAssembler(Iteration iteration, DomainOfExpertise owner)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether <see cref="Parameter"/>s owned by another <see cref="DomainOfExpertise"/> than
+        /// <paramref name="owner"/>, and that <paramref name="owner"/> does not subscribe to, are to be assembled as read-only rows.
+        /// </param>
+        public ParameterSheetRowAssembler(Iteration iteration, DomainOfExpertise owner, bool includeAllParameters = false)
         {
             if (iteration == null)
             {
@@ -84,6 +94,7 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
 
             this.iteration = iteration;
             this.owner = owner;
+            this.includeAllParameters = includeAllParameters;
         }
 
         /// <summary>
@@ -111,7 +122,7 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
 
             foreach (var elementDefinition in sortedElementDefinitions)
             {
-                var elementDefinitionExcelRow = new ElementDefinitionExcelRow(elementDefinition, this.owner, processedValueSets);
+                var elementDefinitionExcelRow = new ElementDefinitionExcelRow(elementDefinition, this.owner, processedValueSets, this.includeAllParameters);
                 definitionRows.Add(elementDefinitionExcelRow);
             }
 

@@ -64,19 +64,23 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="processedValueSets">
         /// The <see cref="Thing"/>s for which the values need to be restored to what the user provided.
         /// </param>
-        public ElementDefinitionExcelRow(ElementDefinition elementDefinition, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether <see cref="Parameter"/>s that are owned by another <see cref="DomainOfExpertise"/> than
+        /// <paramref name="owner"/>, and that <paramref name="owner"/> does not subscribe to, are to be represented as read-only rows.
+        /// </param>
+        public ElementDefinitionExcelRow(ElementDefinition elementDefinition, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters = false)
             : base(elementDefinition)
         {
             this.UpdateProperties();
 
             var sortedParameters = elementDefinition.Parameter.OrderBy(parameter => parameter.ParameterType.Name);
-            this.ProcessParameters(sortedParameters, owner, processedValueSets);
+            this.ProcessParameters(sortedParameters, owner, processedValueSets, includeAllParameters);
 
             var sortedParameterGroups = elementDefinition.ParameterGroup.Where(pg => pg.ContainingGroup == null);
-            this.ProcessParameterGroups(sortedParameterGroups, owner, processedValueSets);
+            this.ProcessParameterGroups(sortedParameterGroups, owner, processedValueSets, includeAllParameters);
 
             var sortedElementUSages = elementDefinition.ContainedElement.OrderBy(elementUsage => elementUsage.Name);
-            this.ProcessElementUsages(sortedElementUSages, owner, processedValueSets);
+            this.ProcessElementUsages(sortedElementUSages, owner, processedValueSets, includeAllParameters);
         }
 
         /// <summary>
@@ -108,7 +112,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="processedValueSets">
         /// The <see cref="Thing"/>s for which the values need to be restored to what the user provided.
         /// </param>
-        private void ProcessParameters(IEnumerable<Parameter> parameters, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether <see cref="Parameter"/>s that are owned by another <see cref="DomainOfExpertise"/> than
+        /// <paramref name="owner"/>, and that <paramref name="owner"/> does not subscribe to, are to be represented as read-only rows.
+        /// </param>
+        private void ProcessParameters(IEnumerable<Parameter> parameters, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters)
         {
             foreach (var parameter in parameters)
             {
@@ -135,23 +143,33 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                 if (parameter.Owner != owner && parameter.Group == null)
                 {
                     var parameterSubscription = parameter.ParameterSubscription.SingleOrDefault(x => x.Owner == owner);
-                    if (parameterSubscription != null)
-                    {
-                        var parameterSubscriptionExcelRow = new ParameterSubscriptionExcelRow(parameterSubscription, processedValueSets);
 
-                        if (!parameterSubscription.IsOptionDependent && parameterSubscription.StateDependence == null)
+                    if (parameterSubscription == null)
+                    {
+                        if (includeAllParameters)
                         {
-                            this.ContainedRows.Add(parameterSubscriptionExcelRow);
-                            parameterSubscriptionExcelRow.Container = this;                            
+                            var readOnlyParameterExcelRow = new ReadOnlyParameterExcelRow(parameter);
+                            this.ContainedRows.Add(readOnlyParameterExcelRow);
+                            readOnlyParameterExcelRow.Container = this;
                         }
-                        else                        
+
+                        continue;
+                    }
+
+                    var parameterSubscriptionExcelRow = new ParameterSubscriptionExcelRow(parameterSubscription, processedValueSets);
+
+                    if (!parameterSubscription.IsOptionDependent && parameterSubscription.StateDependence == null)
+                    {
+                        this.ContainedRows.Add(parameterSubscriptionExcelRow);
+                        parameterSubscriptionExcelRow.Container = this;
+                    }
+                    else
+                    {
+                        var containedItems = parameterSubscriptionExcelRow.GetContainedRows();
+                        foreach (var containedItem in containedItems)
                         {
-                            var containedItems = parameterSubscriptionExcelRow.GetContainedRows();
-                            foreach (var containedItem in containedItems)
-                            {
-                                this.ContainedRows.Add(containedItem);
-                                containedItem.Container = this;
-                            }
+                            this.ContainedRows.Add(containedItem);
+                            containedItem.Container = this;
                         }
                     }
                 }
@@ -170,11 +188,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="processedValueSets">
         /// The <see cref="Thing"/>s for which the values need to be restored to what the user provided.
         /// </param>
-        private void ProcessParameterGroups(IEnumerable<ParameterGroup> parameterGroups, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        private void ProcessParameterGroups(IEnumerable<ParameterGroup> parameterGroups, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters)
         {
             foreach (var parameterGroup in parameterGroups)
             {
-                var row = new ParameterGroupExcelRow(parameterGroup, owner, processedValueSets);
+                var row = new ParameterGroupExcelRow(parameterGroup, owner, processedValueSets, includeAllParameters);
                 this.ContainedRows.Add(row);
                 row.Container = this;
             }
@@ -191,11 +209,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="processedValueSets">
         /// The <see cref="Thing"/>s for which the values need to be restored to what the user provided.
         /// </param>
-        private void ProcessElementUsages(IEnumerable<ElementUsage> elementUsages, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        private void ProcessElementUsages(IEnumerable<ElementUsage> elementUsages, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters)
         {
             foreach (var elementUsage in elementUsages)
             {
-                var row = new ElementUsageExcelRow(elementUsage, owner, processedValueSets);
+                var row = new ElementUsageExcelRow(elementUsage, owner, processedValueSets, includeAllParameters);
                 this.ContainedRows.Add(row);
                 row.Container = this;
             }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossViewDialogViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2023 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -37,6 +37,9 @@ namespace CDP4CrossViewEditor.ViewModels
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
+
+    using CDP4CrossViewEditor.Assemblers;
+    using CDP4CrossViewEditor.Generator;
 
     using CDP4Dal;
 
@@ -125,6 +128,40 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
+        /// Backing field for <see cref="GenerateCalculationSheet"/>
+        /// </summary>
+        private bool generateCalculationSheet;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a calculation sheet is written next to the Crossview sheet.
+        /// </summary>
+        public bool GenerateCalculationSheet
+        {
+            get => this.generateCalculationSheet;
+            set => this.RaiseAndSetIfChanged(ref this.generateCalculationSheet, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedOptions"/>
+        /// </summary>
+        private List<object> selectedOptions = new List<object>();
+
+        /// <summary>
+        /// Gets the <see cref="Option"/>s of the iteration.
+        /// </summary>
+        public List<Option> PossibleOptions { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="Option"/>s, as the checked combo box edits them; none selected means every option
+        /// on a single calculation sheet.
+        /// </summary>
+        public List<object> SelectedOptions
+        {
+            get => this.selectedOptions;
+            set => this.RaiseAndSetIfChanged(ref this.selectedOptions, value);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CrossViewDialogViewModel"/> class.
         /// </summary>
         /// <param name="application">
@@ -197,24 +234,45 @@ namespace CDP4CrossViewEditor.ViewModels
         private void InitModels()
         {
             CrossviewWorkbookData preservedData = null;
+            (List<Guid> Options, bool GenerateCalculationSheet, List<Guid> SummedParameterTypes, bool PersistValues, bool FollowProductTree)? settings = null;
 
             if (this.SelectedWorkbook?.Workbook != null)
             {
                 var workbookDataDal = new CrossviewWorkbookDataDal(this.SelectedWorkbook?.Workbook);
                 preservedData = workbookDataDal.Read();
+                settings = CrossviewSheetUtilities.ReadSettings(this.SelectedWorkbook.Workbook);
             }
 
+            this.PossibleOptions = this.Iteration.Option.ToList();
+
+            if (settings != null)
+            {
+                var recorded = settings.Value;
+                this.SelectedOptions = this.PossibleOptions.Where(option => recorded.Options.Contains(option.Iid)).Cast<object>().ToList();
+                this.GenerateCalculationSheet = recorded.GenerateCalculationSheet;
+                this.PersistValues = recorded.PersistValues;
+            }
+
+            // a workbook that has not been built with this dialog before keeps showing every option, as it did until now
+
             this.ManuallyFilledValues = preservedData?.ManuallySavedValues ?? new Dictionary<string, string>();
+
+            var savedElementDefinitions = preservedData?.SavedElementDefinitions.ToList();
 
             this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(
                 this.Iteration,
                 this.Session,
-                preservedData?.SavedElementDefinitions.ToList());
+                savedElementDefinitions == null
+                    ? null
+                    : CrossviewSheetRowAssembler.QuerySelection(this.Iteration, savedElementDefinitions, settings?.FollowProductTree ?? false));
 
             this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(
                 this.Iteration,
                 this.Session,
-                preservedData?.SavedParameterTypes.ToList());
+                preservedData?.SavedParameterTypes.ToList())
+            {
+                PreservedSummedIids = settings?.SummedParameterTypes
+            };
         }
 
         /// <summary>
@@ -230,13 +288,19 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteOk()
         {
+            var selectedElementDefinitions = this.ElementSelectorViewModel?.ElementDefinitionTargetList.Select(e => e.Thing.Iid).ToList() ?? new List<Guid>();
+
             this.DialogResult = new WorkbookSelectionDialogResult(
                 true,
                 this.SelectedWorkbook?.Workbook,
                 this.ElementSelectorViewModel?.ElementDefinitionTargetList.Select(e => e.Thing),
                 this.ParameterSelectorViewModel?.ParameterTypeTargetList.Select(p => p.Thing),
                 this.ManuallyFilledValues,
-                this.PersistValues);
+                this.PersistValues,
+                this.GenerateCalculationSheet,
+                this.ParameterSelectorViewModel?.ParameterTypeTargetList.Where(p => p.IsSummed).Select(p => p.Thing),
+                this.SelectedOptions?.OfType<Option>(),
+                CrossviewSheetRowAssembler.CoversProductTree(this.Iteration, selectedElementDefinitions));
         }
     }
 }

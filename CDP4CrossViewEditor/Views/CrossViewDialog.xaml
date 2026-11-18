@@ -3,52 +3,83 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:uc="clr-namespace:CDP4CrossViewEditor.Views.UserControls"
              Title="{Binding DialogTitle}"
-             Width="700"
-             Height="620"
+             Width="760"
+             Height="700"
+             MinWidth="640"
+             MinHeight="480"
+             SizeToContent="Manual"
+             ResizeMode="CanResize"
+             WindowStartupLocation="CenterScreen"
              dx:ThemeManager.ThemeName="Seven"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              DataContextChanged="DXWindow_DataContextChanged"
              mc:Ignorable="d">
-    <dxlc:LayoutControl Height="Auto"
-                        Background="White"
-                        Orientation="Vertical">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <uc:ElementThingSelector Grid.Row="0" Mode="ElementBase" VerticalAlignment="Stretch" x:Name="ElementThingSelector" />
-            <uc:ParameterThingSelector Grid.Row="1" Mode="ParameterBase" VerticalAlignment="Stretch" x:Name="ParameterThingSelector" />
-            <dxlc:LayoutControl Grid.Row="2" View="Group" HorizontalAlignment="Right" Orientation="Horizontal">
-                <CheckBox Content="Persist manually entered values in the sheet"
-                          HorizontalAlignment="Right"
-                          IsChecked="{Binding PersistValues, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            </dxlc:LayoutControl>
-        </Grid>
-        <dxlc:LayoutGroup Orientation="Horizontal">
-            <Button MinWidth="75"
-                    MinHeight="25"
-                    MaxWidth="75"
-                    MaxHeight="25"
-                    HorizontalAlignment="Right"
-                    Command="{Binding Path=OkCommand}"
-                    Content="OK" IsDefault="True" />
-            <Button MinWidth="75"
-                    MinHeight="25"
-                    MaxWidth="75"
-                    MaxHeight="25"
-                    HorizontalAlignment="Right"
-                    Command="{Binding Path=CancelCommand}"
-                    Content="Cancel" IsCancel="True" />
-        </dxlc:LayoutGroup>
-    </dxlc:LayoutControl>
+    <!-- the selectors and the options have a fixed height, so the scroll viewer keeps the options and the buttons
+         reachable on a short screen, and the window can be resized -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <dxlc:LayoutControl Height="Auto"
+                            Background="White"
+                            Orientation="Vertical">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <uc:ElementThingSelector Grid.Row="0" Mode="ElementBase" VerticalAlignment="Stretch" x:Name="ElementThingSelector" />
+                <uc:ParameterThingSelector Grid.Row="1" Mode="ParameterBase" VerticalAlignment="Stretch" x:Name="ParameterThingSelector" />
+                <dxlc:LayoutControl Grid.Row="2" View="Group" HorizontalAlignment="Right" Orientation="Horizontal">
+                    <dxlc:LayoutItem Label="Options:"
+                                     ToolTip="Only the rows and option dependent values of the selected options are shown, and each selected option gets its own calculation sheet. Select none to show every option on a single calculation sheet.">
+                        <dxe:ComboBoxEdit Width="160"
+                                          ItemsSource="{Binding PossibleOptions}"
+                                          EditValue="{Binding SelectedOptions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Name"
+                                          NullText="All options, one sheet"
+                                          IsTextEditable="False">
+                            <dxe:ComboBoxEdit.StyleSettings>
+                                <dxe:CheckedComboBoxStyleSettings />
+                            </dxe:ComboBoxEdit.StyleSettings>
+                        </dxe:ComboBoxEdit>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutControl>
+                <dxlc:LayoutControl Grid.Row="3" View="Group" HorizontalAlignment="Right" Orientation="Horizontal">
+                    <CheckBox Content="Persist manually entered values in the sheet"
+                              HorizontalAlignment="Right"
+                              IsChecked="{Binding PersistValues, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <CheckBox Content="Add a calculation sheet"
+                              HorizontalAlignment="Right"
+                              Margin="15 0 0 0"
+                              ToolTip="Writes a separate sheet per selected option that repeats its product tree with the values of the Crossview sheet, for your own calculations. What you add to it is kept when you rebuild, and anything that may need checking is marked orange."
+                              IsChecked="{Binding GenerateCalculationSheet, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutControl>
+            </Grid>
+            <dxlc:LayoutGroup Orientation="Horizontal">
+                <Button MinWidth="75"
+                        MinHeight="25"
+                        MaxWidth="75"
+                        MaxHeight="25"
+                        HorizontalAlignment="Right"
+                        Command="{Binding Path=OkCommand}"
+                        Content="OK" IsDefault="True" />
+                <Button MinWidth="75"
+                        MinHeight="25"
+                        MaxWidth="75"
+                        MaxHeight="25"
+                        HorizontalAlignment="Right"
+                        Command="{Binding Path=CancelCommand}"
+                        Content="Cancel" IsCancel="True" />
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+    </ScrollViewer>
 </dx:DXWindow>

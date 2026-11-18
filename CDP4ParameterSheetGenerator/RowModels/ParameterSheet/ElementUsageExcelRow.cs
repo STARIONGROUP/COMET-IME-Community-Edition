@@ -64,13 +64,22 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="processedValueSets">
         /// The <see cref="Thing"/>s for which the values need to be restored to what the user provided.
         /// </param>
-        public ElementUsageExcelRow(ElementUsage elementUsage, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether <see cref="ParameterOverride"/>s that are owned by another <see cref="DomainOfExpertise"/> than
+        /// <paramref name="owner"/>, and that <paramref name="owner"/> does not subscribe to, are to be represented as read-only rows.
+        /// </param>
+        public ElementUsageExcelRow(ElementUsage elementUsage, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters = false)
             : base(elementUsage)
         {
             this.UpdateProperties();
-            
-            var sortedOverrides = elementUsage.ParameterOverride.Where(po => po.Owner == owner).OrderBy(po => po.ParameterType.Name);
-            this.ProcessParameterOverrides(sortedOverrides, owner, processedValueSets);
+
+            // when all parameters are included the overrides of the other domains may not be filtered out here
+            var relevantOverrides = includeAllParameters
+                ? elementUsage.ParameterOverride
+                : elementUsage.ParameterOverride.Where(po => po.Owner == owner);
+
+            var sortedOverrides = relevantOverrides.OrderBy(po => po.ParameterType.Name);
+            this.ProcessParameterOverrides(sortedOverrides, owner, processedValueSets, includeAllParameters);
         }
 
         /// <summary>
@@ -101,7 +110,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <param name="processedValueSets">
         /// The <see cref="Thing"/>s for which the values need to be restored to what the user provided.
         /// </param>
-        private void ProcessParameterOverrides(IEnumerable<ParameterOverride> parameterOverrides, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        /// <param name="includeAllParameters">
+        /// A value indicating whether <see cref="ParameterOverride"/>s that are owned by another <see cref="DomainOfExpertise"/> than
+        /// <paramref name="owner"/>, and that <paramref name="owner"/> does not subscribe to, are to be represented as read-only rows.
+        /// </param>
+        private void ProcessParameterOverrides(IEnumerable<ParameterOverride> parameterOverrides, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, bool includeAllParameters)
         {
             foreach (var parameterOverride in parameterOverrides)
             {
@@ -128,7 +141,19 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                 if (parameterOverride.Owner != owner)
                 {
                     var parameterSubscription = parameterOverride.ParameterSubscription.SingleOrDefault(x => x.Owner == owner);
-                    if (parameterSubscription != null)
+
+                    if (parameterSubscription == null)
+                    {
+                        if (includeAllParameters)
+                        {
+                            var readOnlyParameterExcelRow = new ReadOnlyParameterExcelRow(parameterOverride);
+                            this.ContainedRows.Add(readOnlyParameterExcelRow);
+                            readOnlyParameterExcelRow.Container = this;
+                        }
+
+                        continue;
+                    }
+
                     {
                         var parameterSubscriptionExcelRow = new ParameterSubscriptionExcelRow(parameterSubscription, processedValueSets);
 

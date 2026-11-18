@@ -47,7 +47,8 @@
                                            AutoWidth="True"
                                            IsDetailButtonVisibleBinding="{x:Null}"
                                            ShowGroupPanel="False"
-                                           ShowSearchPanelMode="Default">
+                                           SearchPanelNullText="Search an element definition by name or owner"
+                                           ShowSearchPanelMode="Always">
                                 <dxg:TableView.FilterEditorTemplate>
                                     <DataTemplate>
                                         <dxfui:FilterEditorControl QueryGroupOperations="OnQueryGroupOperations"
@@ -103,6 +104,15 @@
                             <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
+                    <Button Margin="0 5 0 0"
+                            MinWidth="140"
+                            MinHeight="25"
+                            MaxHeight="25"
+                            HorizontalAlignment="Center"
+                            Command="{Binding Path=SelectProductTree}"
+                            ToolTip="Select the top element of the iteration and every element definition that it uses, at any depth">
+                        <TextBlock Text="Add product tree" />
+                    </Button>
                     <Button Margin="0 5 0 0"
                             MinWidth="75"
                             MinHeight="25"

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossviewSheetGenerator.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
@@ -147,13 +147,19 @@ namespace CDP4CrossViewEditor.Generator
             {
                 application.Cursor = XlMousePointer.xlWait;
 
-                this.crossviewSheet = CrossviewSheetUtilities.RetrieveSheet(workbook, true);
+                // cleared in place rather than deleted, so that the references of the calculation sheets and of the user into this
+                // sheet do not become #REF!
+                this.crossviewSheet = CrossviewSheetUtilities.RetrieveSheet(workbook);
+                CrossviewSheetUtilities.ClearSheet(workbook, this.crossviewSheet);
 
-                CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, false);
+                // Excel only selects cells, freezes panes and hides gridlines on the active sheet, and a sheet that is reused rather
+                // than added is not activated by itself; the rebuild is often started from a calculation sheet
+                this.crossviewSheet.Activate();
 
-                this.PopulateSheetArrays(workbookMetadata.ElementDefinitions, workbookMetadata.ParameterTypes);
+                this.PopulateSheetArrays(workbookMetadata.ElementDefinitions, workbookMetadata.ParameterTypes, workbookMetadata.Options);
                 this.WriteSheet(workbookMetadata.ParameterValues);
                 this.ApplySheetSettings();
+                CrossviewSheetUtilities.WriteSettings(this.crossviewSheet, workbookMetadata);
 
                 CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, true);
 
@@ -197,15 +203,18 @@ namespace CDP4CrossViewEditor.Generator
         /// <param name="parameterTypes">
         /// Selected <see cref="ParameterType"/>s list.
         /// </param>
-        private void PopulateSheetArrays(IEnumerable<Guid> elementDefinitions, IEnumerable<Guid> parameterTypes)
+        /// <param name="options">
+        /// Selected <see cref="Option"/>s list, empty for every option.
+        /// </param>
+        private void PopulateSheetArrays(IEnumerable<Guid> elementDefinitions, IEnumerable<Guid> parameterTypes, IEnumerable<Guid> options)
         {
             // Instantiate the different rows
             var sheetRowAssembler = new CrossviewSheetRowAssembler();
-            sheetRowAssembler.Assemble(this.iteration, elementDefinitions);
+            sheetRowAssembler.Assemble(this.iteration, elementDefinitions, options);
             var excelRows = sheetRowAssembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
-            this.crossviewArrayAssember = new CrossviewArrayAssembler(excelRows, parameterTypes);
+            this.crossviewArrayAssember = new CrossviewArrayAssembler(excelRows, parameterTypes, options);
 
             // Instantiate header
             this.headerArrayAssembler = new CrossviewHeaderArrayAssembler(
@@ -298,7 +307,17 @@ namespace CDP4CrossViewEditor.Generator
                         continue;
                     }
 
-                    cell.Name = name.ToString();
+                    try
+                    {
+                        cell.Name = name.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Excel rejects a defined name that holds a character it does not allow - a backslash, for instance,
+                        // which a model code of an option or state dependent parameter contains. The cell keeps its value, it
+                        // just cannot be referenced by name, so the sheet is still written rather than the rebuild failing.
+                        logger.Warn(ex, "The name {0} could not be applied to a cell of the Crossview sheet", name);
+                    }
 
                     // apply special highlighting
                     if (this.crossviewArrayAssember.SpecialHighlighting.ContainsKey(name.ToString()))

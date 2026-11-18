@@ -1,5 +1,6 @@
 ﻿<ribbonxml>
   <group id="CrossViewEditorSheet" label="Cross View">
     <dynamicMenu id="Editor" size="large" getLabel="GetLabel" supertip="Cross View Editor" imageMso="DatasheetView" getEnabled="GetEnabled" getContent="GetContent"/>
+    <dynamicMenu id="CrossViewRebuild" size="large" getLabel="GetLabel" supertip="Rebuild the Cross View and calculation sheets with the selection of the last time, without opening the editor" imageMso="Refresh" getEnabled="GetEnabled" getContent="GetContent"/>
   </group>
 </ribbonxml>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ThingSelectorViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -216,6 +216,87 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             viewModel.SelectedSourceList = viewModel.ElementDefinitionSourceList;
             Assert.DoesNotThrowAsync(async () => await viewModel.MoveItemsToTarget.Execute());
             Assert.DoesNotThrowAsync(async () => await viewModel.ClearItems.Execute());
+        }
+
+        [Test]
+        public void VerifyThatTheCalculationSheetIsOptionalAndOffByDefault()
+        {
+            var defaultResult = new WorkbookSelectionDialogResult(
+                true, null, new List<ElementDefinition>(), new List<ParameterType>(), new Dictionary<string, string>(), true);
+
+            Assert.That(defaultResult.GenerateCalculationSheet, Is.False, "the calculation sheet is expected to be opt in");
+            Assert.That(defaultResult.SummedParameterTypes, Is.Empty, "subtotals are expected to be opt in, so that parent rows stay free for the user's own formulas");
+            Assert.That(defaultResult.Options, Is.Empty, "no option selected is expected to mean every option on one sheet");
+
+            var parameterType = this.iteration.Element.First().Parameter.First().ParameterType;
+
+            var requestedResult = new WorkbookSelectionDialogResult(
+                true, null, new List<ElementDefinition>(), new List<ParameterType>(), new Dictionary<string, string>(), true, true, new[] { parameterType });
+
+            Assert.That(requestedResult.GenerateCalculationSheet, Is.True);
+            Assert.That(requestedResult.SummedParameterTypes, Is.EqualTo(new[] { parameterType }));
+        }
+
+        [Test]
+        public void VerifyThatTheSummedParameterTypesAreRestored()
+        {
+            var parameterType = this.iteration.Element.First().Parameter.First().ParameterType;
+
+            var viewModel = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object, new List<Guid> { parameterType.Iid })
+            {
+                PreservedSummedIids = new List<Guid> { parameterType.Iid }
+            };
+
+            viewModel.BindData();
+
+            Assert.That(viewModel.ParameterTypeTargetList.Single().IsSummed, Is.True);
+
+            var notSummed = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object, new List<Guid> { parameterType.Iid });
+            notSummed.BindData();
+
+            Assert.That(notSummed.ParameterTypeTargetList.Single().IsSummed, Is.False, "a column is only summed when the user asks for it");
+        }
+
+        [Test]
+        public void VerifyThatSelectProductTreeSelectsNothingWhenNoTopElementIsSet()
+        {
+            this.iteration.TopElement = null;
+
+            var viewModel = new ElementDefinitionSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                null);
+
+            viewModel.BindData();
+
+            var numberOfSourceRows = viewModel.ElementDefinitionSourceList.Count;
+
+            viewModel.ExecuteSelectProductTree();
+
+            Assert.That(viewModel.ElementDefinitionTargetList, Is.Empty, "without a top element there is no product tree to select");
+            Assert.That(viewModel.ElementDefinitionSourceList.Count, Is.EqualTo(numberOfSourceRows), "the source list may not be touched");
+        }
+
+        [Test]
+        public void VerifyThatSelectProductTreeTerminatesWhenAnElementDefinitionUsesItself()
+        {
+            // the ElementDefinition of the fixture contains an ElementUsage of itself, so an unguarded walk of the product
+            // tree would recurse until the stack overflows.
+            var topElement = this.iteration.Element.First();
+            this.iteration.TopElement = topElement;
+
+            var viewModel = new ElementDefinitionSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                null);
+
+            viewModel.BindData();
+
+            Assert.DoesNotThrow(() => viewModel.ExecuteSelectProductTree());
+
+            Assert.That(viewModel.ElementDefinitionTargetList.Count, Is.EqualTo(1), "the element definition of the product tree is expected to be selected exactly once");
+            Assert.That(viewModel.ElementDefinitionTargetList.First().Thing, Is.EqualTo(topElement));
+            Assert.That(viewModel.ElementDefinitionSourceList, Is.Empty, "the selected element definition is expected to be removed from the source list");
         }
 
         [Test]

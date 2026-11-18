@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeRowViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
 //
@@ -32,15 +32,32 @@ namespace CDP4CrossViewEditor.RowModels
 
     using CDP4Dal;
 
+    using ReactiveUI;
+
     /// <summary>
     /// Row class representing a <see cref="ParameterType"/> as a plain object
     /// </summary>
     public class ParameterTypeRowViewModel : CDP4CommonView.ParameterTypeRowViewModel<ParameterType>
     {
         /// <summary>
+        /// Backing field for <see cref="IsSummed"/>
+        /// </summary>
+        private bool isSummed;
+
+        /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="ParameterType"/>
         /// </summary>
         public string Type => this.Thing.ClassKind.ToString();
+
+        /// <summary>
+        /// Gets or sets a value indicating whether, on the calculation sheet, a row with rows below it gets the sum of those rows
+        /// in the column of this parameter type where it has no value of its own.
+        /// </summary>
+        public bool IsSummed
+        {
+            get => this.isSummed;
+            set => this.RaiseAndSetIfChanged(ref this.isSummed, value);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeRowViewModel"/> class.

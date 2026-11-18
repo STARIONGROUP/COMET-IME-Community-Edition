@@ -3,8 +3,8 @@
     <dynamicMenu id="Rebuild" size="large" getLabel="GetLabel" supertip="Rebuild the Parameter Sheet" imageMso="Refresh" getEnabled="GetEnabled" getContent="GetContent"/>    
   </group>
   <group id="SynchronizeParameterSheet" label="Synchronize">
-    <button id="SynchronizeAll" size="normal" label="All" supertip="Synchronize the Parameters and Subscriptions" imageMso="RecurrenceEdit" onAction="OnAction" getEnabled="GetEnabled"></button>  
-    <button id="SynchronizeParameters" size="normal" label="Parameters" supertip="Synchronize the Parameters" imageMso="RecurrenceEditSeries" onAction="OnAction" getEnabled="GetEnabled" ></button>  
+    <button id="SynchronizeAll" size="normal" label="All" supertip="Synchronize the Parameters and Subscriptions" imageMso="RecurrenceEdit" onAction="OnAction" getEnabled="GetEnabled"></button>
+    <button id="SynchronizeParameters" size="normal" label="Parameters" supertip="Synchronize the Parameters" imageMso="RecurrenceEditSeries" onAction="OnAction" getEnabled="GetEnabled" ></button>
     <button id="SynchronizeSubscriptions" size="normal" label="Subscriptions" supertip="Synchronize the Subscriptions" imageMso="RecurrenceEditSeries" onAction="OnAction" getEnabled="GetEnabled" ></button>
   </group>
   <group id="SubmitParameterSheet" label="Submit">
