@@ -12,6 +12,7 @@ namespace CDP4Requirements.ViewModels.Dialogs
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.ViewModels;
     using CDP4Dal;
@@ -113,7 +114,7 @@ namespace CDP4Requirements.ViewModels.Dialogs
                     return false;
                 }
 
-                enumPt = cpt.Component[this.valueIndex].ParameterType as EnumerationParameterType;
+                enumPt = cpt.QueryComponent(this.valueIndex)?.ParameterType as EnumerationParameterType;
                 if (enumPt == null)
                 {
                     return false;
@@ -154,7 +155,7 @@ namespace CDP4Requirements.ViewModels.Dialogs
                 var cpt = this.Thing.ParameterType as CompoundParameterType;
                 if (cpt != null)
                 {
-                    enumPt = cpt.Component[this.valueIndex].ParameterType as EnumerationParameterType;
+                    enumPt = cpt.QueryComponent(this.valueIndex)?.ParameterType as EnumerationParameterType;
                     if (enumPt != null)
                     {
                         enumValues.AddRange(enumPt.ValueDefinition);
@@ -177,14 +178,15 @@ namespace CDP4Requirements.ViewModels.Dialogs
             }
 
             var cptPt = this.Thing.ParameterType as CompoundParameterType;
-            if (cptPt == null)
+            var cpt = cptPt?.QueryComponent(this.valueIndex);
+
+            if (cpt == null)
             {
                 this.ParameterType = this.Thing.ParameterType;
                 this.Scale = this.Thing.Scale;
             }
             else
             {
-                var cpt = cptPt.Component[this.valueIndex];
                 this.ParameterType = cpt.ParameterType;
                 this.Scale = cpt.Scale;
             }
