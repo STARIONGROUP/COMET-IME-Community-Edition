@@ -31,7 +31,7 @@
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
                 <items:OwnerLayoutItem />
                 <items:SelectedParameterTypeLayoutItem />
-                <items:SelectedScaleLayoutItem Visibility="{Binding IsScaleVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                <items:SelectedScaleLayoutItem Visibility="{Binding IsParameterScaleVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 <items:StateDependenceLayoutItem />
                 <lc:LayoutItem Label="Group:">
                     <Grid>

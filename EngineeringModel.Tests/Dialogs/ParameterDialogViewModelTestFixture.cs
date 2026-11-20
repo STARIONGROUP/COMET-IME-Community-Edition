@@ -271,6 +271,41 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
         }
 
+        [TestCase(typeof(SimpleQuantityKind), true)]
+        [TestCase(typeof(DerivedQuantityKind), true)]
+        [TestCase(typeof(SpecializedQuantityKind), true)]
+        [TestCase(typeof(CompoundParameterType), false)]
+        [TestCase(typeof(ArrayParameterType), false)]
+        [TestCase(typeof(SampledFunctionParameterType), false)]
+        [TestCase(typeof(BooleanParameterType), false)]
+        [TestCase(typeof(TextParameterType), false)]
+        [TestCase(typeof(EnumerationParameterType), false)]
+        [TestCase(typeof(DateParameterType), false)]
+        [TestCase(typeof(DateTimeParameterType), false)]
+        [TestCase(typeof(TimeOfDayParameterType), false)]
+        public void Verify_that_parameter_scale_is_only_visible_for_QuantityKind(Type parameterTypeKind, bool expectedVisibility)
+        {
+            var parameterType = (ParameterType)Activator.CreateInstance(parameterTypeKind, Guid.NewGuid(), this.cache, this.uri);
+
+            if (parameterType is SpecializedQuantityKind specializedQuantityKind)
+            {
+                specializedQuantityKind.General = this.simpleQt;
+            }
+
+            if (parameterType is SampledFunctionParameterType sampledFunctionParameterType)
+            {
+                sampledFunctionParameterType.IndependentParameterType.Add(new IndependentParameterTypeAssignment(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.simpleQt, MeasurementScale = this.integerScale });
+                sampledFunctionParameterType.DependentParameterType.Add(new DependentParameterTypeAssignment(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.simpleQt, MeasurementScale = this.integerScale });
+            }
+
+            this.parameter.ParameterType = parameterType;
+
+            var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
+                ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
+
+            Assert.That(vm.IsParameterScaleVisible, Is.EqualTo(expectedVisibility));
+        }
+
         [Test]
         public void VerifyUpdateOkCanExecute()
         {

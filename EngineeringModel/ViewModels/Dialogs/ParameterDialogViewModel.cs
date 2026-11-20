@@ -163,6 +163,12 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the parameter-level scale selector shall be made visible,
+        /// which is only the case when the <see cref="ParameterType" /> is a <see cref="QuantityKind" />
+        /// </summary>
+        public bool IsParameterScaleVisible => this.Thing.ParameterType is QuantityKind;
+
+        /// <summary>
         /// Gets a value indicating whether is owner visible.
         /// </summary>
         public bool IsOwnerVisible
