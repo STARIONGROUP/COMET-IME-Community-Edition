@@ -153,6 +153,53 @@ namespace CDP4Composition.Tests.ViewModels
         }
 
         [Test]
+        public async Task VerifyThatSwitchIsSetToComputedWhenOptionIsChecked()
+        {
+            var processedValueSet = new ProcessedValueSet(this.parameterValueSet, ValidationResultKind.Valid);
+            var valueSetValue = new ValueSetValues(0, this.parameterType, ParameterSwitchKind.MANUAL, "1", "a gazilion", "3", "-");
+            processedValueSet.UpdateClone(valueSetValue);
+
+            var processedValueSets = new Dictionary<Guid, ProcessedValueSet>();
+            processedValueSets.Add(processedValueSet.OriginalThing.Iid, processedValueSet);
+
+            var viewmodel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All, true);
+
+            Assert.IsTrue(viewmodel.IsSetSwitchToComputedVisible);
+            Assert.IsFalse(viewmodel.IsSetSwitchToComputed);
+
+            viewmodel.IsSetSwitchToComputed = true;
+
+            await viewmodel.OkCommand.Execute();
+
+            var result = (SubmitConfirmationDialogResult)viewmodel.DialogResult;
+            var clone = (ParameterValueSet)result.Clones.Single();
+
+            Assert.AreEqual(ParameterSwitchKind.COMPUTED, clone.ValueSwitch);
+        }
+
+        [Test]
+        public async Task VerifyThatSwitchIsNotChangedWhenOptionIsNotChecked()
+        {
+            var processedValueSet = new ProcessedValueSet(this.parameterValueSet, ValidationResultKind.Valid);
+            var valueSetValue = new ValueSetValues(0, this.parameterType, ParameterSwitchKind.MANUAL, "1", "a gazilion", "3", "-");
+            processedValueSet.UpdateClone(valueSetValue);
+
+            var processedValueSets = new Dictionary<Guid, ProcessedValueSet>();
+            processedValueSets.Add(processedValueSet.OriginalThing.Iid, processedValueSet);
+
+            var viewmodel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
+
+            Assert.IsFalse(viewmodel.IsSetSwitchToComputedVisible);
+
+            await viewmodel.OkCommand.Execute();
+
+            var result = (SubmitConfirmationDialogResult)viewmodel.DialogResult;
+            var clone = (ParameterValueSet)result.Clones.Single();
+
+            Assert.AreEqual(ParameterSwitchKind.MANUAL, clone.ValueSwitch);
+        }
+
+        [Test]
         public void VerifyThatCheckAllWorks()
         {
             var processedValueSet1 = new ProcessedValueSet(this.parameterValueSet, ValidationResultKind.Valid);

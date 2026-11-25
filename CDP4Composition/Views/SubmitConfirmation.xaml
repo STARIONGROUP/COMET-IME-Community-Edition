@@ -80,6 +80,12 @@
             <dxe:TextEdit Name="SubmitMessageText" Text="{Binding SubmitMessage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
         </GroupBox>
 
+        <CheckBox Margin="5"
+                  Content="Set the switch of the submitted Parameters and ParameterOverrides to COMPUTED"
+                  IsChecked="{Binding IsSetSwitchToComputed, Mode=TwoWay}"
+                  Visibility="{Binding IsSetSwitchToComputedVisible,
+                                       Converter={StaticResource BooleanToVisibilityConverter}}" />
+
         <dxlc:LayoutItem Background="#FFE0C5C5"
                          Padding="5"
                          Visibility="{Binding IsInformationMessageVisible,
