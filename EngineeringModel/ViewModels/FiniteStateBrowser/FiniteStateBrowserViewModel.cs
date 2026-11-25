@@ -308,7 +308,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreatePossibleStateCommand =
                 ReactiveCommandCreator.Create(
-                    () => this.ExecuteCreateCommand<PossibleFiniteState>(this.SelectedThing.Thing.GetContainerOfType<PossibleFiniteStateList>()),
+                    () => this.ExecuteCreateCommand<PossibleFiniteState>(this.SelectedThing.Thing as PossibleFiniteStateList ?? this.SelectedThing.Thing.GetContainerOfType<PossibleFiniteStateList>()),
                     this.WhenAnyValue(x => x.CanCreatePossibleState));
 
             this.BatchUpdateParameterCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteBatchUpdateParameterCommand, this.WhenAnyValue(x => x.CanUpdateBatchParameters));

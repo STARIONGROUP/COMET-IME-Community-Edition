@@ -286,6 +286,40 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         }
 
         [Test]
+        public async Task VerifyThatPossibleStateIsCreatedInTheSelectedPossibleFiniteStateList()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
+
+            var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
+            var ps = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            possibleList.PossibleState.Add(ps);
+
+            this.iteration.PossibleFiniteStateList.Add(possibleList);
+
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
+
+            // possible finite state list row selected
+            viewmodel.SelectedThing = viewmodel.FiniteStateList.First().ContainedRows.First();
+            viewmodel.ComputePermission();
+
+            Assert.IsTrue(viewmodel.CanCreatePossibleState);
+            await viewmodel.CreatePossibleStateCommand.Execute();
+
+            this.thingDialogNavigationService.Verify(
+                x => x.Navigate(
+                    It.IsAny<PossibleFiniteState>(),
+                    It.IsAny<IThingTransaction>(),
+                    this.session.Object,
+                    true,
+                    ThingDialogKind.Create,
+                    this.thingDialogNavigationService.Object,
+                    It.Is<Thing>(container => container is PossibleFiniteStateList && container.Iid == possibleList.Iid),
+                    null),
+                Times.Once);
+        }
+
+        [Test]
         public async Task VerifyThatCanSetDefaultCommandWorks()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
